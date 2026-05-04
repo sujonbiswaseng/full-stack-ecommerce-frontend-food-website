@@ -1,58 +1,103 @@
-'use client'
-import { useCallback, useState } from "react"
-import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import PaginationPage from "./Pagination"
-import { toast } from "sonner"
-import MealCard from "./MealCard"
-import { Ipagination } from "@/types/pagination.type"
-import { cuisines, dietaryPreferences, TResponseMeals } from "@/types/meals.type"
-import { useFilter } from "@/components/shared/filter/ReuseableFilter"
-import { TFilterField } from "@/types/filter.types"
-import { FilterPanel } from "@/components/shared/filter/FilterInput"
-import MealCardSkeleton from "./MealCardSkeleton"
-import { TResponseproviderData } from "@/types/provider.type"
-import { TResponseCategoryData } from "@/types/category"
-import { TUser } from "@/types/user.type"
-const MIN_PRICE_LIMIT = 0;
-const MAX_PRICE_LIMIT = 1000;
-export default function RetrieveAllmeals({categories, initialMeals, pagination }: { categories:TResponseCategoryData<{user:TUser}>[],initialMeals: TResponseMeals<{provider:TResponseproviderData}>[], pagination: Ipagination }) {
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { Ipagination } from "@/types/pagination.type";
+import {
+  cuisines,
+  dietaryPreferences,
+  TResponseMeals,
+} from "@/types/meals.type";
+import { useFilter } from "@/components/shared/filter/ReuseableFilter";
+import { TFilterField } from "@/types/filter.types";
+import { FilterPanel } from "@/components/shared/filter/FilterInput";
+import PaginationPage from "./Pagination";
+import MealCard from "./MealCard";
+import MealCardSkeleton from "../../Skeleton/MealCardSkeleton";
+import { TResponseproviderData } from "@/types/provider.type";
+import { TResponseCategoryData } from "@/types/category";
+import { TUser } from "@/types/user.type";
+import { motion, AnimatePresence } from "framer-motion";
+import Notfounddata from "@/components/Notfounddata";
+
+export default function RetrieveAllmeals({
+  categories,
+  initialMeals,
+  pagination,
+}: {
+  categories: TResponseCategoryData<{ user: TUser }>[];
+  initialMeals: TResponseMeals<{ provider: TResponseproviderData }>[];
+  pagination: Ipagination;
+}) {
   const { updateFilters, reset, isPending } = useFilter();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [mealsData, setMealsData] =useState<TResponseMeals<{ provider: TResponseproviderData }>[]>();
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      setMealsData(initialMeals  || []);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
+  }, [categories]);
+
   const [form, setForm] = useState({
-    search:"",
+    search: "",
     cuisine: "",
     category_name: "",
     isAvailable: true,
-    price:null,
+    price: null,
     dietaryPreference: "",
   });
 
-  const handleChange = useCallback((key: keyof typeof form, value: string | number | boolean) => {
-    setForm(prev => ({ ...prev, [key]: value }));
-  }, []);
+  const handleChange = useCallback(
+    (key: keyof typeof form, value: string | number | boolean) => {
+      setForm((prev) => ({ ...prev, [key]: value }));
+    },
+    [],
+  );
 
-  const handleApply = () => {
-    updateFilters(form);
-  };
+  const handleApply = () => updateFilters(form);
 
   const handleReset = () => {
-    const defaultForm = {
-      search:"",
+    setForm({
+      search: "",
       cuisine: "",
       category_name: "",
       isAvailable: true,
       price: null,
       dietaryPreference: "",
-    };
-    setForm(defaultForm);
+    });
     reset();
   };
 
   const fields: TFilterField[] = [
-    { type: "text", name: "search", value: form.search, placeholder: "Search meal name...", label: "search", onChange: (val) => handleChange("search", val) },
-    { type: "select", name: "cuisine", value: form.cuisine, placeholder: "cuisine...", label: "cuisine", onChange: (val) => handleChange("cuisine", val), options: cuisines.map(v => ({ label: v, value: v })) },
-    { type: "select", name: "category_name", label: "category_name", value: form.category_name,onChange: (val) => handleChange("category_name", val), options: categories.map(v => ({ label: v.name, value: v.name }))
+    {
+      type: "text",
+      name: "search",
+      value: form.search,
+      placeholder: "Search meal name...",
+      label: "search",
+      onChange: (val) => handleChange("search", val),
     },
-
+    {
+      type: "select",
+      name: "cuisine",
+      value: form.cuisine,
+      placeholder: "Cuisine...",
+      label: "cuisine",
+      onChange: (val) => handleChange("cuisine", val),
+      options: cuisines.map((v) => ({ label: v, value: v })),
+    },
+    {
+      type: "select",
+      name: "category_name",
+      label: "category_name",
+      value: form.category_name,
+      onChange: (val) => handleChange("category_name", val),
+      options: categories.map((v) => ({ label: v.name, value: v.name })),
+    },
     {
       type: "select",
       name: "isAvailable",
@@ -61,59 +106,136 @@ export default function RetrieveAllmeals({categories, initialMeals, pagination }
       onChange: (val: string) => handleChange("isAvailable", val),
       options: [
         { label: "Yes", value: "true" },
-        { label: "No", value: "false" }
+        { label: "No", value: "false" },
       ],
     },
-    { type: "number", name: "price", label: "Price", value: form.price as any, onChange: (val) => handleChange("price", val) },
-    { type: "select", name: "dietaryPreference", value: form.dietaryPreference, placeholder: "e.g. Gluten Free", label: "dietaryPreference", onChange: (val) => handleChange("dietaryPreference", val), options: dietaryPreferences.map(v => ({ label: v, value: v })) },
+    {
+      type: "number",
+      name: "price",
+      label: "Price",
+      value: form.price as any,
+      onChange: (val) => handleChange("price", val),
+    },
+    {
+      type: "select",
+      name: "dietaryPreference",
+      value: form.dietaryPreference,
+      placeholder: "e.g. Gluten Free",
+      label: "dietaryPreference",
+      onChange: (val) => handleChange("dietaryPreference", val),
+      options: dietaryPreferences.map((v) => ({ label: v, value: v })),
+    },
   ];
 
   return (
-    <section className="w-full flex justify-center py-10 max-w-[1480px] mx-auto">
-    <div className="w-full">
-      <div className="text-center mb-10 space-y-3 mt-10">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-        FoodHub — Smart Food Ordering Platform
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-        FoodHub connects you with nearby restaurants and home chefs, offering a fast, smart, and seamless food ordering experience powered by modern technology.
-        </p>
-      </div>
+    <section className="w-full bg-background min-h-screen">
+      <div className="container max-w-[1440px] mx-auto w-full p-6">
+        <header className="text-center mb-8 mt-8">
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground tracking-tight"
+          >
+            Bitebase — Smart Food Ordering Platform
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="text-muted-foreground mt-3 max-w-2xl mx-auto text-base md:text-lg"
+          >
+            Bitebase connects you with nearby restaurants and home chefs,
+            offering a fast, smart, and seamless food ordering experience
+            powered by modern technology.
+          </motion.p>
+        </header>
+   
 
-      <section className="mb-8 w-full px-4">
-      <FilterPanel
-        fields={fields}
-        onApply={handleApply}
-        onReset={handleReset}
-        isPending={isPending}
-      />
-    </section>
+        <motion.section
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+          className="mb-8 w-full flex justify-center"
+        >
+          <div className="w-full max-w-5xl bg-card border border-border rounded-xl shadow-sm p-6">
+            <FilterPanel
+              fields={fields}
+              onApply={handleApply}
+              onReset={handleReset}
+              isPending={isPending}
+            />
+          </div>
+        </motion.section>
 
-      {/* EVENTS GRID */}
-
-      <div className="relative dark:bg-gray-950">
-      {isPending && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/50 dark:bg-black/50 backdrop-blur-sm">
-           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-2"></div>
-           <p className="text-sm font-medium">Filtering data...</p>
+        <div className="relative">
+          <AnimatePresence>
+            {isPending && (
+              <motion.div
+                key="filter-loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm rounded-xl"
+                aria-busy="true"
+                aria-live="polite"
+              >
+                <span className="relative flex h-14 w-14 mb-2">
+                  <span className="absolute inset-0 animate-spin rounded-full border-4 border-t-primary border-b-accent border-l-transparent border-r-transparent bg-background" />
+                </span>
+                <span className="font-medium text-muted-foreground">
+                  Filtering data...
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <motion.div
+            key="meals-grid"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
+            className="
+              grid
+              grid-cols-1
+              sm:grid-cols-2
+              md:grid-cols-3
+              xl:grid-cols-4
+              gap-4
+              mt-6
+              min-h-[200px]
+              "
+          >
+            {mealsData == undefined || mealsData === null ? (
+              <Notfounddata
+                content="No meals found. Try adjusting your filters or check back later!"
+                emoji="🍽️"
+              />
+            ) : null}
+      
+       
+            {isPending || isLoading
+              ? Array.from({ length: initialMeals.length || 8 }).map((_, i) => (
+                  <MealCardSkeleton key={i} />
+                ))
+              : mealsData?.map((meal) => {
+                  return (
+                    <MealCard
+                      key={meal.id}
+                      meal={
+                        meal as TResponseMeals<{
+                          provider: TResponseproviderData;
+                        }>
+                      }
+                    />
+                  );
+                })}
+          </motion.div>
         </div>
-      )}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
-        {isPending
-          ? Array.from({ length: initialMeals.length || 8 }).map((_, i) => (
-              <MealCardSkeleton key={i} />
-            ))
-          : 
-          initialMeals.map((meal,index)=>{
-           return <MealCard key={meal.id} meal={meal as TResponseMeals<{provider:TResponseproviderData}>}/>
-          })
-             
-           }
+        <div className="mt-8 flex justify-center">
+          <PaginationPage pagination={pagination} />
+        </div>
       </div>
-      </div>
-      {/* PAGINATION */}
-      <PaginationPage pagination={pagination} />
-    </div>
-  </section>
+    </section>
   );
 }

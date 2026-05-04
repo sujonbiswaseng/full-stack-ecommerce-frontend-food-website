@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import * as React from "react";
 import ImageSkeleton from "@/components/ImageSkeleton";
 import ImageWithSkeleton from "@/components/ImageSkeleton";
-import BlogCardSkeleton from "@/components/Skeleton/BlogCardSkeleton";
-import CardSkeleton from "@/components/Skeleton/BlogCardSkeleton";
+import BlogCardSkeleton from "@/components/Skeleton/CardSkeleton";
+import CardSkeleton from "@/components/Skeleton/CardSkeleton";
 
 // Skeleton loader for card grid
 function CategoriesSkeleton() {

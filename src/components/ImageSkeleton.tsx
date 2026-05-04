@@ -72,7 +72,7 @@ export default function ImageWithSkeleton({
       {src && hasImage ? (
         <Image
           src={src}
-          alt={alt}
+          alt={alt || "bitebase"}
           fill
           sizes="(max-width: 768px) 100vw, 400px"
           placeholder={blurDataURL ? "blur" : undefined}

@@ -66,7 +66,7 @@ export interface IGetMealData {
   id: string;
   meals_name: string;
   description: string | null;
-  image: string | null;
+  images: string[] | null;
   price: number;
   isAvailable: boolean;
   dietaryPreference: TDietaryPreference;
