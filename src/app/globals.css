@@ -1,28 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
-/* =====================================================
-   🎯 DESIGN SYSTEM — LUMEN (PRODUCTION READY)
-   Palette:
-   - Primary: Coral (CTA / Actions)
-   - Secondary: Teal (Support / Balance)
-   - Neutral: Warm Sand (Background)
-===================================================== */
+
+   /* - Primary: Blue (Trust / UI base)
+   - Accent: Red (Food / CTA)
+   - Secondary: Yellow (Warm highlight) */
+
 
 @theme inline {
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-display: 'Space Grotesk', system-ui, sans-serif;
 
   --radius: 0.75rem;
-  --radius-lg: 0.875rem;
-  --radius-xl: 1rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1rem;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
 
@@ -43,63 +43,66 @@
   --color-ring: var(--ring);
 }
 
-/* ================= LIGHT THEME ================= */
+/* ================= LIGHT MODE ================= */
 
 :root {
   /* Background */
-  --background: oklch(0.98 0.01 80);   /* Warm Sand */
-  --foreground: oklch(0.18 0.02 240);
+  --background: oklch(0.97 0.01 85);
+  --foreground: oklch(0.2 0.02 250);
 
   /* Card */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 240);
+  --card-foreground: oklch(0.2 0.02 250);
 
-  /* Primary (Coral) */
-  --primary: oklch(0.68 0.18 28);
-  --primary-foreground: oklch(0.99 0 0);
+  /* 🔵 PRIMARY (Blue) */
+  --primary: oklch(0.55 0.16 250);
+  --primary-foreground: oklch(0.98 0 0);
 
-  /* Secondary (Teal) */
-  --secondary: oklch(0.42 0.08 195);
-  --secondary-foreground: oklch(0.99 0 0);
+  /* 🟡 SECONDARY (Warm Yellow) */
+  --secondary: oklch(0.85 0.12 85);
+  --secondary-foreground: oklch(0.25 0.02 250);
 
-  /* Accent */
-  --accent: oklch(0.94 0.04 30);
-  --accent-foreground: oklch(0.35 0.12 28);
+  /* 🔴 ACCENT (Food Red / Coral) */
+  --accent: oklch(0.65 0.2 25);
+  --accent-foreground: oklch(0.98 0 0);
 
   /* Muted */
-  --muted: oklch(0.95 0.01 80);
-  --muted-foreground: oklch(0.5 0.02 240);
+  --muted: oklch(0.93 0.01 85);
+  --muted-foreground: oklch(0.5 0.02 250);
 
   /* Borders */
-  --border: oklch(0.9 0.01 80);
-  --input: oklch(0.92 0.01 80);
-  --ring: oklch(0.68 0.18 28);
+  --border: oklch(0.88 0.01 85);
+  --input: oklch(0.9 0.01 85);
+  --ring: oklch(0.55 0.16 250);
 }
 
-/* ================= DARK THEME ================= */
+/* ================= DARK MODE ================= */
 
 .dark {
-  --background: oklch(0.16 0.02 240);
-  --foreground: oklch(0.97 0.01 80);
+  --background: oklch(0.15 0.02 250);
+  --foreground: oklch(0.95 0.01 85);
 
-  --card: oklch(0.22 0.02 240);
-  --card-foreground: oklch(0.97 0.01 80);
+  --card: oklch(0.22 0.02 250);
+  --card-foreground: oklch(0.95 0.01 85);
 
-  --primary: oklch(0.74 0.18 32);
-  --primary-foreground: oklch(0.16 0.02 240);
+  /* 🔵 Blue brighter for dark */
+  --primary: oklch(0.7 0.15 250);
+  --primary-foreground: oklch(0.15 0.02 250);
 
-  --secondary: oklch(0.55 0.1 195);
-  --secondary-foreground: oklch(0.99 0 0);
+  /* 🟡 Warm Yellow */
+  --secondary: oklch(0.75 0.12 85);
+  --secondary-foreground: oklch(0.15 0.02 250);
 
-  --accent: oklch(0.3 0.06 28);
-  --accent-foreground: oklch(0.92 0.05 30);
+  /* 🔴 Coral / Red */
+  --accent: oklch(0.7 0.2 25);
+  --accent-foreground: oklch(0.15 0.02 250);
 
-  --muted: oklch(0.25 0.02 240);
-  --muted-foreground: oklch(0.7 0.02 240);
+  --muted: oklch(0.25 0.02 250);
+  --muted-foreground: oklch(0.7 0.02 250);
 
-  --border: oklch(1 0 0 / 0.1);
-  --input: oklch(1 0 0 / 0.12);
-  --ring: oklch(0.74 0.18 32);
+  --border: oklch(1 0 0 / 0.08);
+  --input: oklch(1 0 0 / 0.1);
+  --ring: oklch(0.7 0.15 250);
 }
 
 /* ================= BASE ================= */
@@ -127,6 +130,7 @@
 /* ================= UTILITIES ================= */
 
 @layer utilities {
+
   .font-display {
     font-family: var(--font-display);
   }
@@ -135,20 +139,38 @@
     transition: all 0.3s ease;
   }
 
-  /* Skeleton Loader */
+  /* Reusable Card */
+  .ui-card {
+    @apply bg-card border border-border rounded-lg shadow-sm p-6;
+  }
+
+  /* Buttons (standard system) */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground rounded-md px-4 py-2;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground rounded-md px-4 py-2;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-accent-foreground rounded-md px-4 py-2;
+  }
+
+  /* Skeleton */
   .skeleton {
     background: linear-gradient(
       90deg,
-      oklch(0.9 0.01 80) 25%,
-      oklch(0.95 0.01 80) 50%,
-      oklch(0.9 0.01 80) 75%
+      var(--muted) 25%,
+      var(--accent) 50%,
+      var(--muted) 75%
     );
     background-size: 200% 100%;
-    animation: shimmer 1.5s infinite linear;
+    animation: shimmer 1.4s infinite linear;
   }
 }
 
-/* ================= ANIMATIONS ================= */
+/* ================= ANIMATION ================= */
 
 @keyframes shimmer {
   0% { background-position: -200% 0; }
@@ -158,7 +180,7 @@
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -167,5 +189,5 @@
 }
 
 .animate-fade-up {
-  animation: fade-up 0.4s ease-out both;
+  animation: fade-up 0.45s ease-out both;
 }

@@ -1,5 +1,5 @@
 import Footer from "@/components/shared/footer";
-import { Navbar } from "@/components/shared/Navbar";
+import Navbar from "@/components/shared/Navbar";
 import { getSession } from "@/services/auth.service";
 import { TUser } from "@/types/user.type";
 
@@ -9,7 +9,7 @@ const CommonLayout = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="max-w-[1480px] mx-auto">
-      <Navbar user={result as TUser} className="flex mx-auto" />
+      <Navbar user={result as TUser} />
       {children}
       <Footer />
     </div>
