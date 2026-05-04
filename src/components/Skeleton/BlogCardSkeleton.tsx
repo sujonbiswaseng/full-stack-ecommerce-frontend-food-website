@@ -1,71 +1,88 @@
 "use client";
 
+import * as React from "react";
 import { motion } from "framer-motion";
 
-interface BlogCardSkeletonProps {
+export interface CardSkeletonProps {
   className?: string;
   imageRatio?: string;
   showAvatar?: boolean;
-  contentLines?: number;
+  contentLines: number;
   showActions?: boolean;
   minHeight?: string;
+  width?: string;
+  rounded?: string;
 }
 
-const BlogCardSkeleton: React.FC<BlogCardSkeletonProps> = ({
-  className = "",
-  imageRatio = "aspect-[3/2]",
-  showAvatar = true,
-  contentLines = 2,
-  showActions = true,
-  minHeight = "min-h-[120px]",
+const CardSkeleton: React.FC<CardSkeletonProps> = ({
+  className,
+  imageRatio,
+  showAvatar,
+  contentLines,
+  showActions,
+  minHeight,
+  width,
+  rounded,
 }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 32, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.99 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      transition={{ duration: 0.3, ease: [0.4, 0.1, 0.2, 1] }}
       aria-hidden="true"
-      className={`
-        max-w-[500px]
-        w-full
-        bg-card
-        text-card-foreground
-        mx-auto
-        rounded-2xl
-        border
-        border-border
-        shadow-sm
-        overflow-hidden
-        flex
-        flex-col
-        group
-        animate-pulse
-        ${minHeight}
-        ${className}
-      `}
-      style={{
-        boxShadow:
-          "0 4px 24px 0 var(--shadow-color,rgba(0,0,0,0.10))",
-      }}
+      className={[
+        "bg-card",
+        "text-card-foreground",
+        "border",
+        "border-border",
+        "shadow-sm",
+        "flex",
+        "flex-col",
+        "overflow-hidden",
+        width,
+        minHeight,
+        rounded,
+        "group",
+        "animate-pulse",
+        className,
+      ].join(" ")}
     >
-      {/* Image */}
+      {/* Skeleton Image */}
       <div
-        className={`relative w-full ${imageRatio} bg-muted overflow-hidden`}
+        className={[
+          "relative",
+          "w-full",
+          imageRatio,
+          "bg-muted",
+          "overflow-hidden",
+          rounded,
+        ].join(" ")}
       >
-        <div className="w-full h-full bg-muted" />
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[var(--muted)] to-transparent" />
+        <div className="absolute inset-0 w-full h-full bg-muted" />
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-muted to-transparent" />
       </div>
 
-      <div className="flex flex-col gap-4 p-6 flex-1">
-        {/* Author */}
+      <div className="flex flex-col gap-6 p-6 flex-1">
+        
+        {/* Avatar/Meta skeleton */}
         {showAvatar && (
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-muted border border-border" />
-
-            <div className="flex-1">
-              <div className="h-5 w-2/3 bg-muted rounded mb-2" />
-
+            <div
+              className={[
+                "w-10",
+                "h-10",
+                "bg-muted",
+                "border",
+                "border-border",
+                "flex-shrink-0",
+                "animate-pulse",
+                "mr-2",
+                "rounded-full",
+              ].join(" ")}
+            />
+            <div className="flex flex-col flex-1 gap-2">
+              <div className="h-5 w-2/3 bg-muted rounded" />
               <div className="flex gap-2">
                 <div className="h-3 w-16 bg-muted rounded" />
                 <div className="h-3 w-10 bg-muted rounded" />
@@ -74,32 +91,26 @@ const BlogCardSkeleton: React.FC<BlogCardSkeletonProps> = ({
           </div>
         )}
 
-        {/* Tags */}
-        <div className="flex gap-2">
-          <div className="h-4 w-20 bg-muted rounded" />
-          <div className="h-4 w-16 bg-muted rounded" />
-        </div>
-
-        {/* Dynamic Content Lines */}
-        <div className="space-y-2">
-          {Array.from({ length: contentLines }).map((_, index) => (
+        {/* Content lines for description, adjustable */}
+        <div className="flex flex-col gap-2 mt-3">
+          {Array.from({ length: Math.max(contentLines, 1) }).map((_, idx) => (
             <div
-              key={index}
-              className={`h-4 bg-muted rounded ${
-                index === contentLines - 1
-                  ? "w-4/5"
-                  : "w-full"
-              }`}
+              key={idx}
+              className={[
+                "h-4",
+                idx === contentLines - 1 ? "w-4/5" : "w-full",
+                "bg-muted",
+                "rounded",
+              ].join(" ")}
             />
           ))}
         </div>
 
-        {/* Actions */}
+        {/* CTA/Footer Actions */}
         {showActions && (
-          <div className="flex items-center justify-between mt-auto">
-            <div className="h-3 w-14 bg-muted rounded" />
-
-            <div className="h-8 w-20 rounded-lg bg-muted" />
+          <div className="flex items-center justify-between gap-4 mt-auto pt-4">
+            <div className="h-3 w-14 bg-muted rounded animate-pulse" />
+            <div className="h-10 w-28 rounded-lg bg-muted animate-pulse" />
           </div>
         )}
       </div>
@@ -107,4 +118,4 @@ const BlogCardSkeleton: React.FC<BlogCardSkeletonProps> = ({
   );
 };
 
-export default BlogCardSkeleton;
+export default CardSkeleton;
