@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface Slide {
   id: number;
@@ -41,230 +39,205 @@ const slides: Slide[] = [
   },
 ];
 
-const SLIDE_INTERVAL = 6000;
-
-// Skeleton for loading state, using production color tokens and premium card styling
-function HeroSlideSkeleton() {
-  return (
-    <motion.div
-      aria-label="Loading hero slide"
-      className="flex flex-col h-full w-full justify-end md:justify-center relative z-20"
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+// Arrow SVG (accessible)
+const Arrow = ({
+  direction,
+  ...props
+}: { direction: "left" | "right"; className?: string; onClick?: () => void }) => (
+  <button
+    type="button"
+    aria-label={direction === "left" ? "Previous Slide" : "Next Slide"}
+    className={`
+      group
+      bg-card text-card-foreground 
+      border border-border
+      rounded-full
+      shadow-md
+      w-10 h-10
+      flex items-center justify-center
+      absolute top-1/2 z-40
+      -translate-y-1/2
+      transition-smooth
+      hover:bg-accent hover:text-accent-foreground
+      focus-visible:ring-2
+      focus-visible:ring-ring
+      ${direction === "left" ? "left-4 md:left-8" : "right-4 md:right-8"}
+    `}
+    tabIndex={0}
+    {...props}
+  >
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 20 20"
+      fill="none"
+      className="w-6 h-6"
+      aria-hidden="true"
     >
-      <div className="w-full max-w-2xl lg:max-w-3xl mx-auto rounded-2xl p-6 bg-card border border-border shadow-xl animate-pulse flex flex-col gap-6 lg:gap-8 min-h-[340px]">
-        <div className="h-40 w-full bg-input rounded-xl mb-2" />
-        <div className="h-7 w-1/2 bg-input rounded mb-2" />
-        <div className="h-5 w-4/5 bg-input rounded mb-1" />
-        <div className="h-4 w-2/3 bg-input rounded mb-4" />
-        <div className="flex gap-4 pt-2">
-          <div className="h-10 w-32 rounded-full bg-input" />
-          <div className="h-10 w-32 rounded-full bg-input" />
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+      {direction === "left" ? (
+        <path
+          d="M13 16l-5-5 5-5"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : (
+        <path
+          d="M7 4l5 5-5 5"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      )}
+    </svg>
+  </button>
+);
 
 export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const changeRef = useRef<NodeJS.Timeout | null>(null);
+  const slideCount = slides.length;
 
-  const nextSlide = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % slides.length);
-  }, []);
-
-  const prevSlide = useCallback(() => {
-    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
-  }, []);
-
-  // Slide auto-advance
   useEffect(() => {
-    const timer = setInterval(nextSlide, SLIDE_INTERVAL);
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slideCount);
+    }, 6000);
+
     return () => clearInterval(timer);
-  }, [nextSlide]);
+  }, [slideCount]);
 
-  // Premium skeleton UX
-  useEffect(() => {
-    setIsLoading(true);
-    if (changeRef.current) clearTimeout(changeRef.current);
-    changeRef.current = setTimeout(() => setIsLoading(false), 320);
-    return () => {
-      if (changeRef.current) clearTimeout(changeRef.current);
-    };
-  }, [current]);
+  // Handlers for arrows
+  const goPrev = () => {
+    setCurrent((prev) => (prev === 0 ? slideCount - 1 : prev - 1));
+  };
+  const goNext = () => {
+    setCurrent((prev) => (prev + 1) % slideCount);
+  };
 
-  // Touch swipe gesture
-  useEffect(() => {
-    if (touchStart === null || touchEnd === null) return;
-    const threshold = 44;
-    if (touchStart - touchEnd > threshold) nextSlide();
-    else if (touchEnd - touchStart > threshold) prevSlide();
-    // eslint-disable-next-line
-  }, [touchEnd]);
-
-  // Keyboard navigation (left/right arrows)
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") prevSlide();
-      if (e.key === "ArrowRight") nextSlide();
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [prevSlide, nextSlide]);
-
-  // --- RENDER ---
   return (
     <section
-      className={cn(
-        "relative w-full min-h-[60vh] md:min-h-[65vh] max-h-[700px] h-[65vh] bg-background select-none overflow-hidden"
-      )}
-      tabIndex={-1}
-      aria-roledescription="carousel"
+      className="
+        relative w-full h-[70vh] min-h-[420px] max-h-[540px] bg-background
+        flex items-center
+        overflow-hidden
+      "
       aria-label="Hero slider"
-      onTouchStart={(e) => setTouchStart(e.touches[0].clientX)}
-      onTouchMove={(e) => setTouchEnd(e.touches[0].clientX)}
-      onTouchEnd={() => {
-        setTouchStart(null);
-        setTouchEnd(null);
-      }}
     >
-      {/* Container for centering and limiting width */}
-      <div className="relative w-full h-full max-w-[1440px] mx-auto z-10 flex items-stretch justify-center">
-        {/* -- SLIDE LAYER -- */}
+      {/* Slide arrows */}
+      <Arrow direction="left" onClick={goPrev} />
+      <Arrow direction="right" onClick={goNext} />
+
+      {/* Slides */}
+      <div className="w-full h-full relative">
         <AnimatePresence initial={false} mode="wait">
-          {!isLoading ? (
-            <motion.article
-              key={slides[current].id}
-              initial={{ opacity: 0, y: 32 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{
-                duration: 0.32,
-                ease: [0.2, 0.8, 0.2, 1],
-              }}
-              aria-roledescription="slide"
-              aria-label={slides[current].title}
-              className="absolute inset-0 w-full h-full flex items-end md:items-center"
-            >
-              {/* HERO BACKGROUND IMAGE */}
-              <div className="absolute inset-0 -z-10 pointer-events-none">
-                <Image
-                  src={slides[current].image}
-                  alt={slides[current].title}
-                  fill
-                  priority
-                  sizes="100vw"
-                  className="object-cover w-full h-full select-none"
-                  quality={72}
-                  draggable={false}
-                  aria-hidden
-                />
-                {/* darken using background color variable */}
-                <div
-                  className="absolute inset-0"
-                  style={{ background: "rgba(var(--background-rgb), 0.64)" }}
-                  aria-hidden="true"
-                />
-              </div>
-              {/* CONTENT CARD */}
-              <div className="w-full flex justify-center items-end md:items-center h-full px-4 md:px-8">
-                <motion.div
-                  className="w-full max-w-2xl lg:max-w-3xl mx-auto bg-card/90 border border-border rounded-2xl shadow-xl p-6 flex flex-col gap-6 lg:gap-8 min-h-[340px] transition-colors"
-                  initial={{ scale: 0.97, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.97, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  tabIndex={0}
-                >
-                  <div>
-                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-card-foreground leading-snug mb-2 tracking-tight">
-                      {slides[current].title}
-                    </h1>
-                    <p className="text-muted-foreground text-base md:text-lg lg:text-xl font-medium">
-                      {slides[current].subtitle}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-4 pt-2 mt-auto">
-                    <Button
-                      size="lg"
-                      className={cn(
-                        "h-12 px-8 rounded-full font-semibold text-base lg:text-lg min-w-[128px] md:min-w-[156px] bg-primary text-primary-foreground shadow-md border border-primary/60 focus-visible:ring-2 ring-primary transition-transform active:scale-95"
-                      )}
-                      onClick={() => router.push("/cart")}
-                      variant="default"
+          {slides.map((slide, index) =>
+            index === current ? (
+              <motion.div
+                key={slide.id}
+                initial={{ opacity: 0, scale: 0.98, x: 24 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.97, x: -16 }}
+                transition={{ duration: 0.32, ease: [0.4, 0.1, 0.2, 1] }}
+                className="
+                  absolute inset-0 z-20
+                  w-full h-full
+                "
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${slide.title} - ${slide.subtitle}`}
+              >
+                {/* Background Image */}
+                <div className="absolute inset-0">
+                  <Image
+                    src={slide.image}
+                    alt={slide.title}
+                    fill
+                    priority
+                    className="object-cover object-center transition-smooth"
+                    sizes="(max-width: 768px) 100vw, 1480px"
+                  />
+                  <div className="absolute inset-0 bg-background/80 dark:bg-background/70" />
+                </div>
+                {/* Card Content */}
+                <div className="relative z-30 h-full flex items-center justify-center px-4">
+                  <div className="max-w-[1440px] mx-auto w-full">
+                    <div
+                      className="
+                        bg-card bg-opacity-80 backdrop-blur-md
+                        rounded-lg
+                        shadow-lg
+                        p-6 sm:p-8
+                        max-w-xl mx-auto
+                        flex flex-col items-start
+                        gap-4 sm:gap-6
+                        transition-smooth
+                      "
                     >
-                      Order Now
-                    </Button>
-                    <Button
-                      size="lg"
-                      className={cn(
-                        "h-12 px-8 rounded-full font-semibold text-base lg:text-lg min-w-[128px] md:min-w-[156px] border border-border bg-background text-foreground hover:bg-accent/60 hover:text-accent-foreground transition-colors focus-visible:ring-2 ring-accent"
-                      )}
-                      onClick={() => router.push("/meals")}
-                      variant="ghost"
-                    >
-                      View Menu
-                    </Button>
+                      <h1 className="font-display text-3xl md:text-5xl font-extrabold text-foreground drop-shadow-sm">
+                        {slide.title}
+                      </h1>
+                      <p className="text-lg md:text-xl text-muted-foreground font-medium">
+                        {slide.subtitle}
+                      </p>
+                      <div className="flex flex-wrap gap-4 pt-2">
+                        <button
+                          onClick={() => router.push("/cart")}
+                          className="
+                            btn-primary
+                            min-w-[130px] sm:min-w-[160px]
+                            h-12 px-6 font-semibold
+                            transition-smooth
+                            shadow
+                            hover:bg-primary/90
+                            active:scale-98
+                            focus-visible:ring-2
+                            focus-visible:ring-ring
+                          "
+                        >
+                          Order Now
+                        </button>
+                        <button
+                          onClick={() => router.push("/meals")}
+                          className="
+                            btn-secondary
+                            min-w-[130px] sm:min-w-[160px]
+                            h-12 px-6 font-semibold
+                            border border-border
+                            transition-smooth
+                            hover:bg-secondary hover:text-secondary-foreground
+                            focus-visible:ring-2 focus-visible:ring-ring
+                          "
+                        >
+                          View Menu
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </motion.div>
-              </div>
-            </motion.article>
-          ) : (
-            <HeroSlideSkeleton key={`skeleton-${slides[current].id}`} />
+                </div>
+              </motion.div>
+            ) : null
           )}
         </AnimatePresence>
+      </div>
 
-        {/* CONTROLS (LEFT/RIGHT) */}
-        <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-between z-30 px-4 pointer-events-none">
-          <Button
-            variant="ghost"
-            aria-label="Previous Slide"
-            onClick={prevSlide}
-            tabIndex={0}
-            className="pointer-events-auto rounded-full p-2 h-12 w-12 md:h-14 md:w-14 bg-card border border-border hover:bg-accent/80 focus-visible:ring-2 ring-primary text-card-foreground transition-colors shadow"
-          >
-            <span className="sr-only md:not-sr-only" aria-hidden>
-              &larr;
-            </span>
-          </Button>
-          <Button
-            variant="ghost"
-            aria-label="Next Slide"
-            onClick={nextSlide}
-            tabIndex={0}
-            className="pointer-events-auto rounded-full p-2 h-12 w-12 md:h-14 md:w-14 bg-card border border-border hover:bg-accent/80 focus-visible:ring-2 ring-primary text-card-foreground transition-colors shadow"
-          >
-            <span className="sr-only md:not-sr-only" aria-hidden>
-              &rarr;
-            </span>
-          </Button>
-        </div>
-
-        {/* PAGINATION DOTS */}
-        <div className="absolute bottom-8 left-0 right-0 z-40 flex justify-center items-center gap-4">
-          {slides.map((_, idx) => (
-            <button
-              key={idx}
-              aria-label={`Go to slide ${idx + 1}`}
-              aria-current={current === idx}
-              tabIndex={0}
-              onClick={() => setCurrent(idx)}
-              className={cn(
-                "transition-all outline-none border border-input focus-visible:ring-2 ring-primary rounded-full",
-                current === idx
-                  ? "bg-primary w-7 h-3.5"
-                  : "bg-input w-3.5 h-3.5 hover:bg-accent transition-colors"
-              )}
-            />
-          ))}
-        </div>
+      {/* Dots */}
+      <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-4 z-40">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrent(index)}
+            aria-label={`Go to slide ${index + 1}`}
+            className={`
+              w-3 h-3 rounded-full
+              transition-smooth
+              border border-border
+              focus-visible:ring-2 focus-visible:ring-ring
+              ${current === index ? "bg-primary" : "bg-muted border border-border"}
+            `}
+          />
+        ))}
       </div>
     </section>
   );

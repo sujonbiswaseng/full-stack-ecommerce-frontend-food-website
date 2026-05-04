@@ -15,6 +15,7 @@ import ImageSkeleton from '../ImageSkeleton';
 import { navItems } from '@/routes/navitems';
 import { getIconComponent } from '@/lib/IconMapper';
 import ProfileCard from './ProfileCard';
+import { CartModal } from '../Cardmodel';
 
 interface NavbarProps { user: TResponseUserData | null }
 
@@ -136,6 +137,10 @@ export default function Navbar({ user }: NavbarProps) {
             <span className="sr-only">Toggle theme</span>
             {darkMode ? "🌙" : "☀️"}
           </button>
+          <div>
+          <CartModal />
+          </div>
+
           {user ? (
             <div className="flex items-center gap-4">
               
