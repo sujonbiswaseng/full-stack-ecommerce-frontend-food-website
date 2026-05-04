@@ -14,8 +14,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Foodhub",
-  description: "foodhub website",
+  title: "FoodHub - Premium Food Delivery",
+  description: "Discover and order delicious meals from top restaurants. Premium food delivery experience.",
 };
 
 export default function RootLayout({
@@ -34,9 +34,10 @@ export default function RootLayout({
         suppressHydrationWarning
         data-new-gr-c-s-check-loaded="..."
         data-gr-ext-installed=""
-        className={`w-full overflow-x-hidden min-h-screen font-sans antialiased bg-background`}
+        className={`w-full overflow-x-hidden min-h-screen font-sans antialiased bg-background text-foreground`}
       >
-        {children}
+          {children}
+
         <Toaster />
         <ToastContainer autoClose={1000} theme="dark" />
       </body>

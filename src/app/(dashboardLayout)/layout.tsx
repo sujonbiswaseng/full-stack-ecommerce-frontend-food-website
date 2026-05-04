@@ -19,7 +19,7 @@ const DashboardLayout = async ({ admin, provider, children }: { admin: React.Rea
   }
   return (
     <div className=''>
-       <div className="min-h-svh w-full bg-zinc-200/80 dark:bg-zinc-950">
+       <div className="min-h-svh w-full bg-muted/40">
       <SidebarProvider
         className="mx-auto min-h-svh w-full max-w-screen-2xl border-x border-border/60 bg-background shadow-[0_0_0_1px_rgba(0,0,0,0.03)] dark:border-border/40 dark:shadow-none"
         style={

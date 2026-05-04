@@ -1,73 +1,103 @@
 'use client'
 import { manageCartStore } from "@/store/CartStore";
-import { MessageSquareX, Trash } from "lucide-react";
+import { MessageSquareX, Trash, Plus, Minus, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function CartComponent() {
     const {removeFromCart, cart, clearCart, getSubtotal, getDeliveryCharge, increase, decrease} = manageCartStore()
-    const router=useRouter()
+    const router = useRouter()
     const subtotal = getSubtotal()
     const deliveryCharge = getDeliveryCharge()
     const total = subtotal + deliveryCharge
+    
     return (
-        <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10 px-4 md:px-10">
+        <main className="min-h-screen bg-background py-10 px-4 md:px-10">
             {/* Main Grid */}
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
+            <div className="max-w-[1440px] mx-auto grid lg:grid-cols-3 gap-8">
 
                 {/* Left Section */}
                 <section className="lg:col-span-2 space-y-6">
-                    <h2 className="text-2xl font-semibold text-gray-800">
-                        meals Cart
+                    <h2 className="text-2xl font-bold text-foreground flex items-center justify-between">
+                        Your Cart
+                        {cart.length > 0 && (
+                             <span className="text-sm font-medium bg-primary/10 text-primary px-3 py-1 rounded-full">
+                                 {cart.length} items
+                             </span>
+                        )}
                     </h2>
 
-                    {cart.map((item: any, index: number) => (
-                        <div key={index}>
-                            <CartItem
-                                title={item.name}
-                                image={item.image}
-                                value={item.quantity}
-                                increase={increase}
-                                decrease={decrease}
-                                removechat={removeFromCart}
-                                deliverycharge={item.deliverycharge ?? 0}
-                                quantity={item.id}
-                                clearchat={clearCart}
-                                price={item.price}
-                            />
+                    {cart.length === 0 ? (
+                        <div className="bg-card border border-border rounded-2xl p-12 text-center shadow-sm">
+                            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                                <MessageSquareX className="w-10 h-10 text-muted-foreground" />
+                            </div>
+                            <h3 className="text-xl font-semibold text-card-foreground mb-2">Your cart is empty</h3>
+                            <p className="text-muted-foreground mb-6">Looks like you haven't added any meals yet.</p>
+                            <Button onClick={() => router.push("/meals")}>
+                                Browse Meals
+                            </Button>
                         </div>
-                    ))}
-                    <div className="flex items-center text-sm text-gray-500 mt-4">
-                        <span className="mr-2">🔒</span>
+                    ) : (
+                        <div className="space-y-4">
+                            {cart.map((item: any, index: number) => (
+                                <CartItem
+                                    key={index}
+                                    title={item.name}
+                                    image={item.image}
+                                    value={item.quantity}
+                                    increase={increase}
+                                    decrease={decrease}
+                                    removechat={removeFromCart}
+                                    deliverycharge={item.deliverycharge ?? 0}
+                                    quantity={item.id}
+                                    clearchat={clearCart}
+                                    price={item.price}
+                                />
+                            ))}
+                        </div>
+                    )}
+                    
+                    <div className="flex items-center text-sm text-muted-foreground mt-6 bg-muted/30 p-3 rounded-lg w-fit">
+                        <ShieldCheck className="w-4 h-4 mr-2 text-primary" />
                         100% Secure • Money Back Guarantee
                     </div>
                 </section>
 
                 {/* Right Section */}
-                <aside className="bg-white rounded-2xl shadow-xl p-6 h-fit sticky top-6 border border-gray-100">
-                    <h3 className="text-xl font-semibold mb-6 text-gray-800">
+                <aside className="bg-card rounded-2xl shadow-md p-6 h-fit sticky top-24 border border-border flex flex-col gap-6">
+                    <h3 className="text-xl font-bold text-card-foreground border-b border-border pb-4">
                         Order Summary
                     </h3>
-                       <div className="flex justify-between font-semibold text-lg text-gray-800">
-                        <span>subtotal</span>
-                        <span>৳{subtotal}</span>
-                    </div>
-                      <div className="flex justify-between font-semibold text-lg text-gray-800">
-                        <span>delivery charge</span>
-                        <span>৳{deliveryCharge}</span>
-                   
-                    </div>
-
-                    <div className="border-t my-4" />
-
-                    <div className="flex justify-between font-semibold text-lg text-gray-800">
-                        <span>Total</span>
-                        <span>৳{total}</span>
+                    
+                    <div className="space-y-3">
+                        <div className="flex justify-between font-medium text-muted-foreground">
+                            <span>Subtotal</span>
+                            <span className="text-foreground font-semibold">৳{subtotal.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between font-medium text-muted-foreground">
+                            <span>Delivery charge</span>
+                            <span className="text-foreground font-semibold">৳{deliveryCharge.toFixed(2)}</span>
+                        </div>
                     </div>
 
-                    <button onClick={()=>router.push("/checkout")} className="mt-6 w-full bg-black text-white py-3 rounded-xl font-medium hover:bg-gray-900 transition-all duration-300 active:scale-95">
-                        next
-                    </button>
+                    <div className="border-t border-border pt-4">
+                        <div className="flex justify-between font-bold text-xl text-foreground">
+                            <span>Total</span>
+                            <span className="text-primary">৳{total.toFixed(2)}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1 text-right">Including VAT & Taxes</p>
+                    </div>
+
+                    <Button 
+                        size="lg" 
+                        className="w-full text-lg shadow-md"
+                        disabled={cart.length === 0}
+                        onClick={() => router.push("/checkout")}
+                    >
+                        Proceed to Checkout
+                    </Button>
                 </aside>
             </div>
         </main>
@@ -87,62 +117,80 @@ function CartItem({
     price,
 }: {
     title: string;
-    image:string;
-    clearchat:any;
-    deliverycharge:number;
-    increase:any;
-    decrease:any;
-    removechat:any;
-    quantity:number,
-    value:number;
+    image: string;
+    clearchat: any;
+    deliverycharge: number;
+    increase: any;
+    decrease: any;
+    removechat: any;
+    quantity: number;
+    value: number;
     price: number;
 }) {
     return (
-        <div className="bg-white p-5 rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300">
-            <div className="flex flex-col md:flex-row md:items-center gap-6">
+        <div className="bg-card p-4 rounded-xl shadow-sm border border-border hover:shadow-md transition-all duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-6">
 
                 {/* Image */}
-                <div className="w-24 h-24 relative flex-shrink-0">
+                <div className="w-full sm:w-24 h-40 sm:h-24 relative flex-shrink-0 bg-muted rounded-lg overflow-hidden">
                     <Image
                         src={image}
-                        alt={"product"}
+                        alt={title}
                         fill
-                        className="object-cover rounded-xl"
+                        className="object-cover"
                     />
                 </div>
 
                 {/* Details */}
-                <div className="flex-1 space-y-2">
-                    <h3 className="font-semibold text-gray-800">
-                        {title}
-                    </h3>
-
-                    {/* Delivery Charge */}
-                    <div className="text-sm text-gray-600">
-                        Delivery Charge: 
-                        <span className="font-semibold ml-1 text-amber-700">
-                        ৳{deliverycharge?.toFixed ? deliverycharge.toFixed(2) : deliverycharge}
-                        </span>
+                <div className="flex-1 flex flex-col justify-between h-full">
+                    <div>
+                        <h3 className="font-bold text-lg text-card-foreground line-clamp-1 mb-1">
+                            {title}
+                        </h3>
+                        <div className="text-sm text-muted-foreground">
+                            Delivery: <span className="font-medium text-foreground">৳{deliverycharge?.toFixed ? deliverycharge.toFixed(2) : deliverycharge}</span>
+                        </div>
                     </div>
-               
-                   
-                    {/* Quantity */}
-                    <div className="flex items-center space-x-3">
-                          <button className="bg-gray-100 shadow-sm px-2 py-0.1 rounded-sm" onClick={() => decrease(quantity)}>-</button>
-                          
-                       <p>{value}</p>
-                        <button onClick={()=>increase(quantity)} className="bg-gray-100 shadow-sm px-2 py-0.1 rounded-sm" >
-                            +
-                        </button>
-                        <button className="bg-gray-100 shadow-sm px-2 py-0.1 rounded-sm"  onClick={()=>removechat(quantity)}>  <Trash className="w-[15px] text-red-600" /></button>
-                        <button className="bg-gray-100 shadow-sm px-2 flex gap-x-1.5 py-0.1 rounded-sm"  onClick={()=>clearchat()}>  <MessageSquareX className="w-[15px] text-red-600" />All</button>
+                    
+                    {/* Controls on mobile vs desktop */}
+                    <div className="flex items-center justify-between sm:justify-start gap-4 mt-4 sm:mt-2">
+                        {/* Quantity Controls */}
+                        <div className="flex items-center border border-border rounded-lg bg-background overflow-hidden h-9">
+                            <button 
+                                className="w-9 h-full flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50" 
+                                onClick={() => decrease(quantity)}
+                                disabled={value <= 1}
+                            >
+                                <Minus className="w-4 h-4" />
+                            </button>
+                            <div className="w-10 text-center font-semibold text-sm text-foreground">
+                                {value}
+                            </div>
+                            <button 
+                                className="w-9 h-full flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" 
+                                onClick={() => increase(quantity)}
+                            >
+                                <Plus className="w-4 h-4" />
+                            </button>
+                        </div>
+                        
+                        {/* Remove Action */}
+                        <div className="flex gap-2">
+                            <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={() => removechat(quantity)} title="Remove Item">
+                                <Trash className="w-4 h-4" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Price */}
-                <div className="text-lg font-semibold text-gray-800">
-                ৳{price}.00
+                <div className="text-xl sm:text-lg font-bold text-primary sm:text-right w-full sm:w-auto pt-4 sm:pt-0 border-t border-border sm:border-0 mt-4 sm:mt-0">
+                    ৳{(price * value).toFixed(2)}
+                    <div className="text-xs font-normal text-muted-foreground mt-1">
+                        ৳{price.toFixed(2)} / each
+                    </div>
                 </div>
+                
             </div>
         </div>
     );

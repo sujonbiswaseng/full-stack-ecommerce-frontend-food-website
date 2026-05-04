@@ -32,7 +32,7 @@ const ProviderStats = async () => {
 
         </div>
       ) : (
-        <div className="text-red-600">Failed to load dashboard data. Please try again later.</div>
+        <div className="text-destructive">Failed to load dashboard data. Please try again later.</div>
       )}
     </ErrorBoundary>
    </div>

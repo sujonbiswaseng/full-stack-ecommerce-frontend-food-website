@@ -1,8 +1,8 @@
 
-### Project name : 
+### Project name :
 ##### FoodHub 🍱 | Advanced Full-Stack Multi-Vendor Food Ordering Platform
 
-### Project description : 
+### Project description :
 ##### FoodHub is a modern full-stack multi-vendor food ordering platform where customers can discover meals, place orders, and track deliveries, providers can manage menus and orders, and admins can control users, categories, and platform operations through a secure, responsive, and scalable system.
 
 ### Quick Links
@@ -11,9 +11,14 @@
 - Frontend Live    : https://frontend-next-level-assingment-4.vercel.app
 - Backend Live     : https://backend-next-level-assignment-4.vercel.app
 
+### 🎨 Design System & UI/UX
+- **Multi-Theme System**: Default (Modern SaaS), Midnight (Dark Premium), Emerald (Fresh Startup)
+- **Design Tokens**: CSS Variables for consistent theming
+- **Responsive Design**: Mobile-first approach with perfect stacking
+- **Animations**: Smooth Framer Motion animations (fade-in, fade-up, scale-in, stagger)
+- **Component Library**: Reusable shadcn/ui components (Button, Card, Input, Modal, etc.)
 
-
-### Key feature
+### Key Features
 🔐 Advanced Authentication & Authorization
 
 - Secure JWT-based authentication system
@@ -21,15 +26,16 @@
 - Protected routes and private dashboards
 - Persistent login sessions
 - Secure logout and token handling
+- Social login (BetterAuth)
 
 🍽️ Meal Management
 - Browse all available meals
-- View meal details
+- View meal details with image gallery
 - Search meals by name
-- Filter by category, cuisine, and price
+- Filter by category, cuisine, dietary preferences, and price
 - Featured meals section
 - Browse meals from multiple providers
-
+- Skeleton loaders for better UX
 
 🛒 Cart & Checkout
 - Add meals to cart
@@ -39,14 +45,127 @@
 - Order confirmation system
 - Dynamic price calculation
 
-🔍 Search & Filter
+🔍 Advanced Search & Filter
+- Real-time search functionality
+- Multiple filter options
+- Sorting capabilities
+- Pagination support
+- Backend-powered filtering
 
-📦 Order Management
-- Place orders easily
-- Track order status
-- View order history
-- Cancel orders when allowed
-- Detailed order summary
+📊 Dashboard System (Role-Based)
+- **User Dashboard**: Order history, profile management, favorites
+- **Provider Dashboard**: Menu management, order tracking, analytics
+- **Admin Dashboard**: User management, category control, platform analytics
+- Real-time charts and statistics
+- Data tables with filtering and pagination
+
+📄 Content Pages
+- **Home**: Hero section, features, stats, testimonials, FAQ, newsletter
+- **About**: Company story, team, values, impact metrics
+- **Contact**: Contact form, business information, social links
+- **Blog**: Food industry insights and platform updates
+- **Help/Support**: FAQ, terms, privacy policy
+
+### 🛠️ Tech Stack
+
+**Frontend:**
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Framer Motion
+- React Query (for caching)
+- Zustand (state management)
+
+**Backend:**
+- Express.js (REST API)
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- JWT Authentication
+- BetterAuth
+- Zod validation
+- Multer (file uploads)
+
+**DevOps:**
+- Vercel (Frontend deployment)
+- Railway/Render (Backend deployment)
+- Cloudinary (Image storage)
+
+### 🚀 Getting Started
+
+1. **Clone the repositories**
+```bash
+git clone https://github.com/sujonbiswasdev/frontend-next-level-assignment-4.git
+git clone https://github.com/sujonbiswasdev/backend-next-level-assignment-4.git
+```
+
+2. **Install dependencies**
+```bash
+# Frontend
+cd frontend-next-level-assignment-4
+npm install
+
+# Backend
+cd backend-next-level-assignment-4
+npm install
+```
+
+3. **Environment Setup**
+- Copy `.env.example` to `.env`
+- Configure database URL, JWT secrets, API keys
+
+4. **Database Setup**
+```bash
+# Backend
+npx prisma generate
+npx prisma db push
+npm run seed:admin
+```
+
+5. **Run Development Servers**
+```bash
+# Backend
+npm run dev
+
+# Frontend
+npm run dev
+```
+
+### 🎯 Demo Credentials
+
+**Admin Account:**
+- Email: admin@foodhub.com
+- Password: admin123
+
+**Test User:**
+- Email: user@foodhub.com
+- Password: user123
+
+**Provider Account:**
+- Email: provider@foodhub.com
+- Password: provider123
+
+### 📱 Features Overview
+
+- **Responsive Design**: Works perfectly on all devices
+- **Performance Optimized**: Lazy loading, image optimization, caching
+- **SEO Friendly**: Proper meta tags, structured data
+- **Accessibility**: WCAG compliant components
+- **Security**: Input validation, XSS protection, secure headers
+- **Scalability**: Modular architecture, clean code structure
+
+### 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+### 📄 License
+
+This project is licensed under the MIT License.
 
 👨‍🍳 Provider Features
 - Add new meals

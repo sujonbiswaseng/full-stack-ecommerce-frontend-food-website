@@ -1,8 +1,8 @@
 "use client";
 
-import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
+import { Menu } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-
 import {
   Accordion,
   AccordionContent,
@@ -30,6 +30,7 @@ import { CartModal } from "../Cardmodel";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { TUser } from "@/types/user.type";
+import React from "react";
 
 interface MenuItem {
   title: string;
@@ -67,17 +68,60 @@ export interface User<T> {
   };
 }
 
-const Navbar = ({
+const NAV_CONTAINER =
+  "sticky top-0 z-50 w-full bg-background/80 border-b border-border backdrop-blur-md";
+const NAV_WRAP =
+  "mx-auto max-w-[1440px] w-full px-4 md:px-6 flex flex-col";
+const NAV_DESKTOP =
+  "hidden lg:flex w-full items-center justify-between min-h-[64px] py-4 gap-4";
+const NAV_MOBILE =
+  "flex lg:hidden w-full flex-row items-center justify-between py-4";
+const LOGO_CONTAINER = "flex items-center gap-3 min-w-[40px]";
+const LOGO_IMG =
+  "w-9 h-9 md:w-11 md:h-11 lg:w-12 lg:h-12 object-cover rounded-full bg-card border border-border";
+const LOGO_TEXT =
+  "hidden sm:inline text-lg md:text-xl font-bold tracking-tight max-w-[150px] truncate text-foreground";
+const LOGO_TEXT_MOBILE =
+  "hidden sm:inline text-base font-bold tracking-tight text-foreground";
+const NAV_LINK_LIST =
+  "flex flex-row gap-4 items-center text-base md:text-lg font-medium";
+const NAV_ACTIONS =
+  "flex items-center gap-2 sm:gap-4 min-w-fit";
+const BUTTON_BASE =
+  "h-10 px-5 rounded-full transition-colors";
+const MOBILE_SHEET_HEADER =
+  "flex items-center gap-3 py-6";
+const SHEET_CONTENT =
+  "overflow-y-auto bg-background min-w-[80vw] sm:min-w-[350px] max-w-full";
+const SHEET_ACCORDION =
+  "flex w-full flex-col gap-2";
+const SHEET_AUTH =
+  "flex flex-col gap-4 py-4";
+const MOBILE_MENU_ACTIONS =
+  "flex flex-col gap-4 pt-4";
+const NAV_MOTION_PROPS = {
+  initial: { opacity: 0, y: -8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+  transition: { duration: 0.22, ease: "easeOut" },
+};
+
+const Navbar: React.FC<Navbar1Props> = ({
   logo = {
     url: "/",
     src: "https://res.cloudinary.com/drmeagmkl/image/upload/v1772007286/logo_rcsr8h.png",
     alt: "logo",
-    title: "FoodHub",
+    title: "AppBrand",
   },
   menu = [
     { title: "Home", url: "/" },
-    { title: "meals", url: "/meals" },
-    { title: "providers", url: "/providers" },
+    { title: "Meals", url: "/meals" },
+    { title: "Providers", url: "/providers" },
+    { title: "Categories", url: "/category" },
+    { title: "About", url: "/about" },
+    { title: "Contact", url: "/contact" },
+    { title: "Blog", url: "/blog" },
+    { title: "Help", url: "/help" },
   ],
   auth = {
     login: { title: "Login", url: "/login" },
@@ -85,265 +129,273 @@ const Navbar = ({
   },
   className,
   user,
-}: Navbar1Props) => {
-  const userinfo = user as TUser;
+}) => {
+  const pathname = usePathname();
+  const isActive = (url: string) => pathname === url;
+  const userinfo = user as TUser | null;
+
   return (
-    <section
-      className={cn(
-        "fixed top-0 left-1/2 -translate-x-1/2 w-full z-50 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-border",
-        "px-1 sm:px-4 ",
-        className
-      )}
-      style={{ maxWidth: "1480px" }}
-    >
-      <div
-        className={cn(
-          "w-full mx-auto flex flex-col relative px-0 md:px-2 lg:px-4",
-        )}
-        style={{ maxWidth: 1480 }}
-      >
-        {/* Desktop Menu */}
-        <nav
-          className={cn(
-            "hidden lg:flex w-full items-center justify-between min-h-[60px] py-2 gap-2"
-          )}
-        >
-          <div className="flex items-center min-w-fit">
-            {/* Logo */}
-            <a
-              href={logo.url}
-              className="flex items-center gap-2 min-w-[40px]"
-              tabIndex={0}
-            >
-              <img
-                src={logo.src}
-                className="w-[38px] h-[38px] md:w-[44px] md:h-[44px] lg:w-[50px] lg:h-[50px] aspect-square dark:invert object-contain min-w-[32px] max-h-[56px] rounded-full"
-                alt={logo.alt}
-                style={{
-                  objectFit: "contain",
-                  height: "auto",
-                  width: "100%",
-                  minWidth: 32,
-                  maxHeight: 56,
-                }}
-              />
-              <span className="hidden xs:inline text-base md:text-lg font-semibold tracking-tighter leading-tight max-w-[150px] truncate">
-                {logo.title}
-              </span>
-            </a>
-          </div>
-          <div className="flex-1 flex justify-center items-center">
-            <NavigationMenu>
-              <NavigationMenuList className="text-base lg:text-[20px] flex flex-row gap-2 items-center">
-                {menu.map((item) => renderMenuItem(item))}
-              </NavigationMenuList>
-            </NavigationMenu>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-fit">
+    <header className={cn(NAV_CONTAINER, className)}>
+      <div className={NAV_WRAP}>
+
+        {/* Desktop Navigation */}
+        <nav className={NAV_DESKTOP} aria-label="Primary Navigation">
+          {/* Logo */}
+          <Link href={logo.url} className={LOGO_CONTAINER} tabIndex={0} aria-label="Brand logo">
+            <img
+              src={logo.src}
+              alt={logo.alt}
+              className={LOGO_IMG}
+            />
+            <span className={LOGO_TEXT}>{logo.title}</span>
+          </Link>
+          {/* Menu */}
+          <NavigationMenu>
+            <NavigationMenuList className={NAV_LINK_LIST}>
+              {menu.map((item) => (
+                <DesktopMenuItem
+                  key={item.title}
+                  item={item}
+                  isActive={isActive}
+                />
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+          {/* Actions */}
+          <div className={NAV_ACTIONS}>
             <CartModal />
             {userinfo ? (
-              <>
-                <ProfileCard profile={user as TUser} />
-              </>
+              <ProfileCard profile={userinfo} />
             ) : (
-              <div className="flex gap-2 min-w-fit">
-                <Button asChild variant="outline" size="sm" className="px-3 md:px-5 text-xs md:text-sm">
-                  <a href={auth.login.url}>{auth.login.title}</a>
+              <div className="flex gap-2">
+                <Button
+                  asChild
+                  variant="outline"
+                  className={BUTTON_BASE}
+                  size="sm"
+                >
+                  <Link href={auth.login.url}>{auth.login.title}</Link>
                 </Button>
-                <Button asChild size="sm" className="px-3 md:px-5 text-xs md:text-sm">
-                  <a href={auth.signup.url}>{auth.signup.title}</a>
+                <Button
+                  asChild
+                  variant="default"
+                  className={BUTTON_BASE}
+                  size="sm"
+                >
+                  <Link href={auth.signup.url}>{auth.signup.title}</Link>
                 </Button>
               </div>
             )}
           </div>
         </nav>
 
-        {/* Mobile Menu */}
-        <div className="flex lg:hidden w-full flex-row items-center justify-between mt-1 mb-1 py-1">
+        {/* Mobile Navigation */}
+        <nav className={NAV_MOBILE} aria-label="Mobile Navigation">
           {/* Logo */}
-          <a
+          <Link
             href={logo.url}
-            className="flex items-center gap-2 min-w-[32px]"
+            className={LOGO_CONTAINER}
             tabIndex={0}
+            aria-label="Brand logo"
           >
             <img
               src={logo.src}
-              className="max-h-8 min-w-[32px] aspect-square dark:invert object-contain"
               alt={logo.alt}
-              style={{
-                objectFit: "contain",
-                width: 36,
-                maxHeight: 36,
-              }}
+              className={cn("w-8 h-8 object-cover rounded-full border border-border bg-card")}
             />
-            <span className="hidden xs:inline text-sm font-semibold tracking-tighter">{logo.title}</span>
-          </a>
+            <span className={LOGO_TEXT_MOBILE}>{logo.title}</span>
+          </Link>
           <div className="flex items-center gap-2">
-            {/* NavigationMenu hidden on <lg */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="ml-1 sm:ml-2">
-                  <Menu className="size-4" />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="ml-1"
+                  aria-label="Open mobile menu"
+                >
+                  <Menu className="w-5 h-5 text-foreground" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="overflow-y-auto p-0 min-w-[72vw] sm:min-w-[320px] md:min-w-[350px] max-w-full">
+              <SheetContent className={SHEET_CONTENT} side="left">
                 <SheetHeader>
-                  <SheetTitle>
-                    <Link href={logo.url} className="flex items-center gap-2 my-3">
+                  <SheetTitle asChild>
+                    <Link href={logo.url} className={MOBILE_SHEET_HEADER}>
                       <img
                         src={logo.src}
-                        className="max-h-8 min-w-[32px] aspect-square dark:invert object-contain"
                         alt={logo.alt}
+                        className="w-8 h-8 object-cover rounded-full border border-border bg-card"
                       />
-                      <span className="hidden xs:inline text-base font-semibold tracking-tighter">{logo.title}</span>
+                      <span className={LOGO_TEXT}>{logo.title}</span>
                     </Link>
                   </SheetTitle>
                 </SheetHeader>
-                <div className="flex flex-col gap-6 p-4">
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="flex w-full flex-col gap-2"
-                  >
-                    {menu.map((item) => renderMobileMenuItem(item))}
+                <div className="py-6">
+                  <Accordion type="single" collapsible className={SHEET_ACCORDION}>
+                    {menu.map((item) => (
+                      <MobileMenuItem key={item.title} item={item} isActive={isActive} />
+                    ))}
                   </Accordion>
-                  {userinfo ? (
-                    <div className="py-2">
-                      <ProfileCard profile={user as TUser} />
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-3">
-                      <Button asChild variant="outline" className="text-sm">
-                        <a href={auth.login.url}>{"Login"}</a>
-                      </Button>
-                      <Button asChild className="text-sm">
-                        <a href={auth.signup.url}>{auth.signup.title}</a>
-                      </Button>
-                    </div>
-                  )}
+                  <div className={MOBILE_MENU_ACTIONS}>
+                    {userinfo ? (
+                      <ProfileCard profile={userinfo} />
+                    ) : (
+                      <div className={SHEET_AUTH}>
+                        <Button
+                          asChild
+                          variant="outline"
+                          className={BUTTON_BASE}
+                          size="sm"
+                        >
+                          <Link href={auth.login.url}>{auth.login.title}</Link>
+                        </Button>
+                        <Button
+                          asChild
+                          className={BUTTON_BASE}
+                          size="sm"
+                        >
+                          <Link href={auth.signup.url}>{auth.signup.title}</Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
-            {/* Cart on mobile */}
-            <div className="flex items-center ml-1">
+            {/* Cart Modal on mobile */}
+            <div className="ml-1">
               <CartModal />
             </div>
           </div>
-        </div>
+        </nav>
       </div>
-    </section>
+    </header>
   );
 };
 
-// Desktop navigation menu item with responsive text and spacing
-const renderMenuItem = (item: MenuItem) => {
-  if (item.items) {
+type RenderMenuItemProps = {
+  item: MenuItem;
+  isActive: (url: string) => boolean;
+};
+
+// Desktop menu item
+const DesktopMenuItem: React.FC<RenderMenuItemProps> = ({ item, isActive }) => {
+  if (item.items?.length) {
     return (
-      <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger className="text-base lg:text-[20px] px-2 md:px-3">
+      <NavigationMenuItem>
+        <NavigationMenuTrigger
+          className={cn(
+            "px-4 py-2 rounded-full font-medium bg-background text-foreground hover:bg-accent/50 transition-colors duration-200",
+            "focus-visible:ring-2 focus-visible:ring-primary outline-none"
+          )}
+        >
           {item.title}
         </NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-popover text-popover-foreground w-[90vw] max-w-md md:max-w-xl p-2">
-          {item.items.map((subItem) => (
-            <NavigationMenuLink asChild key={subItem.title} className="w-full max-w-[340px]">
-              <SubMenuLink item={subItem} />
-            </NavigationMenuLink>
-          ))}
+        <NavigationMenuContent className="bg-popover rounded-2xl shadow-lg w-[90vw] max-w-md md:max-w-xl p-4 border border-border text-popover-foreground">
+          <div className="grid grid-cols-1 gap-2">
+            {item.items.map((subItem) => (
+              <NavigationMenuLink
+                asChild
+                key={subItem.title}
+                className="w-full"
+              >
+                <SubMenuLink
+                  item={subItem}
+                  isActive={isActive}
+                />
+              </NavigationMenuLink>
+            ))}
+          </div>
         </NavigationMenuContent>
       </NavigationMenuItem>
     );
   }
-  const currentPath = usePathname();
-  const isActive = currentPath === item.url;
   return (
-    <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink
-        className={cn(
-          "group inline-flex h-12 min-w-[70px] md:min-w-[90px] md:w-auto items-center justify-center rounded-full shadow transition-all duration-200 px-4 md:px-6 text-sm md:text-[17px] font-semibold tracking-wide",
-          isActive
-            ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg scale-105"
-            : "bg-white text-gray-700 hover:bg-blue-50 hover:from-blue-500/10 hover:to-purple-500/10 hover:text-blue-700"
-        )}
-        asChild
-        style={{
-          border: isActive ? "2px solid #7C3AED" : "1.5px solid #E5E7EB",
-          boxShadow: isActive
-            ? "0 4px 20px 0 rgba(124,58,237,0.10)"
-            : "0 1px 4px 0 rgba(0,0,0,0.04)",
-        }}
-      >
+    <NavigationMenuItem>
+      <NavigationMenuLink asChild>
         <Link
           href={item.url}
           className={cn(
-            "w-full h-full flex items-center justify-center",
-            isActive ? "" : "transition-colors"
+            "group inline-flex h-10 min-w-[90px] justify-center items-center px-4 rounded-full border text-sm font-semibold transition-all duration-200",
+            isActive(item.url)
+              ? "bg-primary text-primary-foreground border-primary shadow focus-visible:ring-2 ring-primary"
+              : "bg-card text-card-foreground border-border hover:bg-accent hover:text-accent-foreground"
           )}
+          aria-current={isActive(item.url) ? "page" : undefined}
         >
-          <span
-            className={cn(
-              "relative",
-              isActive
-                ? "after:absolute after:bottom-[-8px] after:left-0 after:w-full after:h-[3px] after:bg-gradient-to-r after:from-blue-400 after:to-purple-400 after:rounded-md after:content-['']"
-                : ""
-            )}
-          >
-            {item.title}
-          </span>
+          {item.title}
         </Link>
       </NavigationMenuLink>
- 
     </NavigationMenuItem>
   );
 };
 
-// Mobile: Collapsible with good touch padding and breakpoints
-const renderMobileMenuItem = (item: MenuItem) => {
-  if (item.items) {
+// SubMenuLink: dropdown & mobile sub link
+const SubMenuLink: React.FC<{ item: MenuItem; isActive: (url: string) => boolean }> = ({ item, isActive }) => {
+  return (
+    <Link
+      href={item.url}
+      className={cn(
+        "flex flex-row items-center gap-4 rounded-md px-4 py-3 w-full transition-colors duration-200 outline-none select-none",
+        isActive(item.url)
+          ? "bg-accent/60 text-accent-foreground font-semibold"
+          : "hover:bg-accent hover:text-accent-foreground text-foreground"
+      )}
+      tabIndex={0}
+      aria-current={isActive(item.url) ? "page" : undefined}
+    >
+      {item.icon && <span className="text-foreground">{item.icon}</span>}
+      <span className="flex-1 flex flex-col">
+        <span className="text-base font-semibold">
+          {item.title}
+        </span>
+        {item.description && (
+          <span className="text-sm text-muted-foreground leading-snug">
+            {item.description}
+          </span>
+        )}
+      </span>
+    </Link>
+  );
+};
+
+// Mobile menu item with Accordion for subitems
+const MobileMenuItem: React.FC<RenderMenuItemProps> = ({ item, isActive }) => {
+  if (item.items?.length) {
     return (
-      <AccordionItem key={item.title} value={item.title} className="border-b-0">
-        <AccordionTrigger className="text-[15px] md:text-base py-1 font-semibold hover:no-underline">
+      <AccordionItem value={item.title} className="border-b-0">
+        <AccordionTrigger
+          className="text-base font-semibold text-foreground hover:no-underline px-2 py-3 rounded-lg"
+        >
           {item.title}
         </AccordionTrigger>
-        <AccordionContent className="mt-2 flex flex-col gap-2">
+        <AccordionContent className="flex flex-col gap-2 pl-2 pt-2">
           {item.items.map((subItem) => (
-            <SubMenuLink key={subItem.title} item={subItem} />
+            <SubMenuLink
+              key={subItem.title}
+              item={subItem}
+              isActive={isActive}
+            />
           ))}
         </AccordionContent>
       </AccordionItem>
     );
   }
+
   return (
-    <a
-      key={item.title}
+    <Link
       href={item.url}
-      className="block w-full py-2 text-[15px] md:text-base font-semibold pl-1"
+      className={cn(
+        "block w-full px-2 py-3 text-base font-semibold rounded-lg transition-colors",
+        isActive(item.url)
+          ? "bg-primary text-primary-foreground"
+          : "text-foreground hover:bg-accent hover:text-accent-foreground"
+      )}
+      tabIndex={0}
+      aria-current={isActive(item.url) ? "page" : undefined}
     >
       {item.title}
-    </a>
-  );
-};
-
-// Used in dropdowns and mobile for full width/clickable menu items
-const SubMenuLink = ({ item }: { item: MenuItem }) => {
-  return (
-    <a
-      className={cn(
-        "flex flex-row gap-4 rounded-md py-2 px-2 md:py-3 md:px-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground",
-        "items-center",
-        "w-full"
-      )}
-      href={item.url}
-    >
-      {item.icon && <div className="text-foreground">{item.icon}</div>}
-      <div className="flex-1">
-        <div className="text-xs md:text-sm font-semibold">{item.title}</div>
-        {item.description && (
-          <p className="text-xs md:text-sm leading-snug text-muted-foreground">
-            {item.description}
-          </p>
-        )}
-      </div>
-    </a>
+    </Link>
   );
 };
 

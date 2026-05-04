@@ -39,7 +39,7 @@ const AdminPage = async () => {
             <DashboardContent role={role as string} data={statsData.data as DashboardData} />
           </div>
         ) : (
-          <div className="text-red-600">
+          <div className="text-destructive">
             Failed to load dashboard data. Please try again later.
           </div>
         )}

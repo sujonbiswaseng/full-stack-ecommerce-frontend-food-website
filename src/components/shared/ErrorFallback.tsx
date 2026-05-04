@@ -2,6 +2,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle } from "lucide-react";
 
 export default function ErrorFallback({
   title = "Something went wrong",
@@ -13,32 +15,32 @@ export default function ErrorFallback({
   const router = useRouter();
   return (
     <div className="w-full flex flex-col items-center justify-center min-h-[60vh] px-4">
-      <div className="bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-8 text-center max-w-md w-full border border-gray-200 dark:border-gray-800">
-
-        <div className="text-5xl mb-4">
-            🚫
+      <div className="bg-card shadow-lg rounded-2xl p-8 text-center max-w-md w-full border border-border">
+        <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <AlertTriangle className="w-8 h-8 text-destructive" />
         </div>
 
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+        <h2 className="text-xl font-semibold text-card-foreground mb-2">
           {title}
         </h2>
-        <p className="text-gray-500 text-sm mb-6">
+        <p className="text-muted-foreground text-sm mb-6">
           {message}
         </p>
         <div className="flex gap-3 justify-center">
-          <button
+          <Button
             onClick={() => router.refresh()}
-            className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition"
+            size="sm"
           >
             Refresh
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={() => router.push("/")}
-            className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white hover:bg-gray-300 transition"
+            variant="outline"
+            size="sm"
           >
             Go Home
-          </button>
+          </Button>
         </div>
       </div>
     </div>

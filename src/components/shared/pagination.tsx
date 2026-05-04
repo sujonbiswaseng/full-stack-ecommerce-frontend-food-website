@@ -15,22 +15,16 @@ const PaginationPage = ({ pagination }: { pagination: Ipagination }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // ********* Ensures stable URLSearchParams usage for deterministic server/client renders
+  // Ensures stable URLSearchParams usage for deterministic server/client renders
   const navigateToPage = React.useCallback((targetPage: number) => {
     if (targetPage < 1 || targetPage > totalpage) return;
-    // Build a new URLSearchParams from the current params
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", targetPage.toString());
     router.push(`?${params.toString()}`);
   }, [searchParams, router, totalpage]);
 
-  // Number of page buttons to display at once
   const pageWindow = 4;
 
-  /**
-   * Deterministically computes the pagination button list.
-   * This ensures it's always the same on both server and client
-   */
   const getPageNumbers = React.useCallback(() => {
     const windowIndex = Math.floor((Number(page) - 1) / pageWindow);
     const start = windowIndex * pageWindow + 1;
@@ -38,12 +32,10 @@ const PaginationPage = ({ pagination }: { pagination: Ipagination }) => {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }, [page, totalpage, pageWindow]);
 
-  // Always renders a div->nav>ul structure (never switching to div or any dynamic nodes)
   return (
     <div className="flex justify-center items-center my-8">
       <Pagination>
-        {/* PaginationContent renders as <ul> */}
-        <PaginationContent className="flex flex-row items-center gap-2 flex-wrap px-2 py-3 bg-white rounded-lg border shadow-sm">
+        <PaginationContent className="flex flex-row items-center gap-2 flex-wrap px-2 py-3 bg-card rounded-lg border border-border shadow-sm">
           {/* Previous Button */}
           <PaginationItem>
             <Button
@@ -51,15 +43,17 @@ const PaginationPage = ({ pagination }: { pagination: Ipagination }) => {
               size="sm"
               disabled={Number(page) === 1}
               onClick={() => navigateToPage(Number(page) - 1)}
-              className={`min-w-[40px] font-semibold rounded transition 
-                ${Number(page) === 1
-                  ? 'border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed'
-                  : 'border-blue-500 text-blue-600 hover:bg-blue-50'}`}
+              className={`min-w-[40px] font-semibold rounded transition ${
+                Number(page) === 1
+                  ? 'border-border text-muted-foreground bg-muted cursor-not-allowed opacity-50'
+                  : 'border-primary text-primary hover:bg-primary/10'
+              }`}
               aria-label="Previous page"
             >
               Prev
             </Button>
           </PaginationItem>
+
           {/* Page Number Buttons */}
           {getPageNumbers().map((currentpage) => (
             <PaginationItem key={currentpage}>
@@ -70,8 +64,8 @@ const PaginationPage = ({ pagination }: { pagination: Ipagination }) => {
                 className={[
                   'min-w-[36px] px-3 py-1 mx-1 font-semibold rounded border text-sm transition',
                   Number(currentpage) === Number(page)
-                    ? 'bg-blue-600 text-white border-blue-600 shadow-md'
-                    : 'bg-white text-blue-700 border-blue-300 hover:bg-blue-50'
+                    ? 'bg-primary text-primary-foreground border-primary shadow-md'
+                    : 'bg-card text-card-foreground border-border hover:bg-accent hover:text-accent-foreground'
                 ].join(' ')}
                 aria-current={Number(currentpage) === Number(page) ? "page" : undefined}
               >
@@ -79,6 +73,7 @@ const PaginationPage = ({ pagination }: { pagination: Ipagination }) => {
               </Button>
             </PaginationItem>
           ))}
+
           {/* Next Button */}
           <PaginationItem>
             <Button
@@ -86,18 +81,20 @@ const PaginationPage = ({ pagination }: { pagination: Ipagination }) => {
               size="sm"
               disabled={Number(page) === Number(totalpage)}
               onClick={() => navigateToPage(Number(page) + 1)}
-              className={`min-w-[40px] font-semibold rounded transition 
-                ${Number(page) === Number(totalpage)
-                  ? 'border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed'
-                  : 'border-blue-500 text-blue-600 hover:bg-blue-50'}`}
+              className={`min-w-[40px] font-semibold rounded transition ${
+                Number(page) === Number(totalpage)
+                  ? 'border-border text-muted-foreground bg-muted cursor-not-allowed opacity-50'
+                  : 'border-primary text-primary hover:bg-primary/10'
+              }`}
               aria-label="Next page"
             >
               Next
             </Button>
           </PaginationItem>
-          {/* Page info is outside of PaginationItem to avoid extra <li> elements and maintain structure */}
-          <span className="ml-8 text-sm text-gray-500 font-semibold whitespace-nowrap">
-            Page <span className="text-blue-800">{page}</span> of <span className="text-blue-800">{totalpage}</span>
+
+          <span className="ml-6 text-sm text-muted-foreground font-semibold whitespace-nowrap">
+            Page <span className="text-primary font-bold">{page}</span> of{' '}
+            <span className="text-primary font-bold">{totalpage}</span>
           </span>
         </PaginationContent>
       </Pagination>

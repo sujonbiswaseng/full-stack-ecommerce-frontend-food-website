@@ -1,7 +1,6 @@
 "use client";
 import { useStore } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
-import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -73,24 +72,24 @@ export function SignupForm() {
   const handleGoLogin = () => router.push("/login");
 
   return (
-    <div className="flex min-h-[85vh] items-center justify-center bg-gradient-to-br from-gray-100 via-white to-purple-50 p-3">
-      <Card className="w-full max-w-lg rounded-2xl shadow-[0_2px_32px_rgba(120,70,255,0.09)] border-2 border-purple-100/80 bg-white/95 backdrop-blur-sm">
+    <div className="flex min-h-[85vh] items-center justify-center bg-background p-3">
+      <Card className="w-full max-w-lg rounded-2xl shadow-xl border border-border bg-card">
         <CardHeader className="flex flex-col items-center pb-2 gap-1">
-          <span className="rounded-full bg-gradient-to-tr from-purple-500 to-indigo-400 p-2 mb-1 shadow-md">
-            <UserPlus className="text-white w-7 h-7" />
+          <span className="rounded-full bg-primary/10 p-3 mb-1">
+            <UserPlus className="text-primary w-6 h-6" />
           </span>
-          <CardTitle className="font-extrabold tracking-tight text-2xl text-zinc-900 text-center">
-            FoodHub
+          <CardTitle className="font-extrabold tracking-tight text-2xl text-foreground text-center">
+            Create an Account
           </CardTitle>
-          <p className="text-xs text-zinc-500 font-semibold mt-1 text-center">
-            Create your account to discover, order, or provide amazing food experiences.
+          <p className="text-sm text-muted-foreground font-medium mt-1 text-center">
+            Join FoodHub to discover, order, or provide amazing food experiences.
           </p>
         </CardHeader>
         <CardContent>
           <form
             id="sign-up-user"
             autoComplete="off"
-            className="space-y-6"
+            className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
               form.handleSubmit();
@@ -104,8 +103,8 @@ export function SignupForm() {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid} className="mb-2">
-                      <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                    <Field data-invalid={isInvalid} className="mb-1">
+                      <FieldLabel htmlFor={field.name} className="text-foreground">Full Name</FieldLabel>
                       <Input
                         id={field.name}
                         name={field.name}
@@ -113,11 +112,11 @@ export function SignupForm() {
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
-                        placeholder="Your full name"
-                        className="focus:border-purple-500 transition"
+                        placeholder="John Doe"
+                        className="bg-background border-input"
                       />
                       {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
+                        <FieldError errors={field.state.meta.errors} className="text-destructive text-xs mt-1" />
                       )}
                     </Field>
                   );
@@ -130,21 +129,22 @@ export function SignupForm() {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid} className="mb-2">
-                      <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <Field data-invalid={isInvalid} className="mb-1">
+                      <FieldLabel htmlFor={field.name} className="text-foreground">Email Address</FieldLabel>
                       <Input
                         id={field.name}
                         name={field.name}
+                        type="email"
                         value={field.state.value}
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
-                        placeholder="you@email.com"
+                        placeholder="you@example.com"
                         autoComplete="off"
-                        className="focus:border-purple-500 transition"
+                        className="bg-background border-input"
                       />
                       {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
+                        <FieldError errors={field.state.meta.errors} className="text-destructive text-xs mt-1" />
                       )}
                     </Field>
                   );
@@ -157,7 +157,7 @@ export function SignupForm() {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid} className="mb-2">
+                    <Field data-invalid={isInvalid} className="mb-1">
                       <FormInput
                       field={field}
                       label="Password"
@@ -165,112 +165,121 @@ export function SignupForm() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-                      placeholder="please enter your password"
+                      placeholder="Create a strong password"
                       name={field.name}
                       value={field.state.value}
-                      autoComplete="off"
+                      autoComplete="new-password"
+                      className="bg-background border-input"
                     />
                     {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
+                      <FieldError errors={field.state.meta.errors} className="text-destructive text-xs mt-1" />
                     )}
                     </Field>
                   );
                 }}
               />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form.Field
+                  name="role"
+                  validators={{ onChange: createUserSchema.shape.role }}
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid;
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor={field.name} className="text-foreground">Account Type</FieldLabel>
+                        <select
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition"
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
+                        >
+                          <option value="">Select a role</option>
+                          <option value="Customer">Customer</option>
+                          <option value="Provider">Provider</option>
+                        </select>
+
+                        {isInvalid && <FieldError errors={field.state.meta.errors} className="text-destructive text-xs mt-1" />}
+                      </Field>
+                    );
+                  }}
+                />
+
+                <form.Field
+                  name="phone"
+                  validators={{ onChange: createUserSchema.shape.phone }}
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid;
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor={field.name} className="text-foreground">Phone Number</FieldLabel>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
+                          placeholder="+880..."
+                          className="bg-background border-input"
+                          autoComplete="tel"
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} className="text-destructive text-xs mt-1" />
+                        )}
+                      </Field>
+                    );
+                  }}
+                />
+              </div>
+
               <form.Field
-                name="role"
-                validators={{ onChange: createUserSchema.shape.role }}
-                children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
-                  return (
-                    <Field data-invalid={isInvalid} className="mb-2">
-                      <FieldLabel htmlFor={field.name}>Role</FieldLabel>
-                      <select
-                        className="border border-zinc-300 px-3 py-2 rounded-lg shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition"
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                      >
-                        <option value="">Select a role</option>
-                        <option value="Customer">Customer</option>
-                        <option value="Provider">Provider</option>
-                      </select>
+                name="image"
+                children={(field) => (
+                  <Field>
+                    <FieldLabel className="text-foreground">Profile Image *</FieldLabel>
 
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                    </Field>
-                  );
-                }}
-              />
-
-<form.Field
-              name="image"
-              children={(field) => (
-                <Field>
-                  <FieldLabel>profile Image *</FieldLabel>
-
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 1 * 1024 * 1024) {
-                          toast.error("Image size must be less than 1MB!");
-                          e.target.value = "";
-                          field.handleChange(null);
-                          setPreview(null);
-                          return;
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      className="cursor-pointer file:cursor-pointer file:bg-primary file:text-primary-foreground file:border-0 file:rounded-md file:px-4 file:py-1 file:mr-4 file:font-semibold hover:file:bg-primary/90 bg-background border-input py-1"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 1 * 1024 * 1024) {
+                            toast.error("Image size must be less than 1MB!");
+                            e.target.value = "";
+                            field.handleChange(null);
+                            setPreview(null);
+                            return;
+                          }
+                          field.handleChange(file);
+                          setPreview(URL.createObjectURL(file));
                         }
-                        field.handleChange(file);
-                        setPreview(URL.createObjectURL(file));
-                      }
-                    }}
-                  />
-
-                  {preview && (
-                    <img
-                      src={preview}
-                      className="h-32 rounded-md object-cover mt-2"
+                      }}
                     />
-                  )}
-                </Field>
-              )}
-            />
 
-              <form.Field
-                name="phone"
-                validators={{ onChange: createUserSchema.shape.phone }}
-                children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
-                  return (
-                    <Field data-invalid={isInvalid} className="mb-2">
-                      <FieldLabel htmlFor={field.name}>Phone</FieldLabel>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="Your phone number"
-                        className="focus:border-purple-500 transition"
-                        autoComplete="off"
-                      />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
-                    </Field>
-                  );
-                }}
+                    {preview && (
+                      <div className="mt-3">
+                         <img
+                          src={preview}
+                          className="w-24 h-24 rounded-full object-cover border-2 border-primary/20 shadow-sm"
+                          alt="Profile preview"
+                        />
+                      </div>
+                    )}
+                  </Field>
+                )}
               />
 
               {role === "Provider" && (
-                <>
+                <div className="space-y-4 pt-4 mt-2 border-t border-border">
+                  <h4 className="font-semibold text-foreground">Provider Details</h4>
                   <form.Field
                     name="restaurantName"
                     validators={{
@@ -281,8 +290,8 @@ export function SignupForm() {
                         field.state.meta.isTouched && !field.state.meta.isValid;
                       return (
                         <Field data-invalid={isInvalid} className="mb-2">
-                          <FieldLabel htmlFor={field.name}>
-                            Restaurant Name
+                          <FieldLabel htmlFor={field.name} className="text-foreground">
+                            Restaurant/Business Name
                           </FieldLabel>
                           <Input
                             id={field.name}
@@ -291,11 +300,11 @@ export function SignupForm() {
                             onBlur={field.handleBlur}
                             onChange={(e) => field.handleChange(e.target.value)}
                             aria-invalid={isInvalid}
-                            placeholder="Restaurant name"
-                            className="focus:border-purple-500 transition"
+                            placeholder="Awesome Kitchen"
+                            className="bg-background border-input"
                           />
                           {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
+                            <FieldError errors={field.state.meta.errors} className="text-destructive text-xs mt-1" />
                           )}
                         </Field>
                       );
@@ -312,7 +321,7 @@ export function SignupForm() {
                         field.state.meta.isTouched && !field.state.meta.isValid;
                       return (
                         <Field data-invalid={isInvalid} className="mb-2">
-                          <FieldLabel htmlFor={field.name}>Address</FieldLabel>
+                          <FieldLabel htmlFor={field.name} className="text-foreground">Address</FieldLabel>
                           <Input
                             id={field.name}
                             name={field.name}
@@ -320,11 +329,11 @@ export function SignupForm() {
                             onBlur={field.handleBlur}
                             onChange={(e) => field.handleChange(e.target.value)}
                             aria-invalid={isInvalid}
-                            placeholder="Full address"
-                            className="focus:border-purple-500 transition"
+                            placeholder="Full business address"
+                            className="bg-background border-input"
                           />
                           {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
+                            <FieldError errors={field.state.meta.errors} className="text-destructive text-xs mt-1" />
                           )}
                         </Field>
                       );
@@ -340,8 +349,8 @@ export function SignupForm() {
                       const isInvalid =
                         field.state.meta.isTouched && !field.state.meta.isValid;
                       return (
-                        <Field data-invalid={isInvalid} className="mb-2">
-                          <FieldLabel htmlFor={field.name}>
+                        <Field data-invalid={isInvalid}>
+                          <FieldLabel htmlFor={field.name} className="text-foreground">
                             Restaurant Description
                           </FieldLabel>
                           <Textarea
@@ -351,17 +360,18 @@ export function SignupForm() {
                             onBlur={field.handleBlur}
                             onChange={(e) => field.handleChange(e.target.value)}
                             aria-invalid={isInvalid}
-                            placeholder="Describe your restaurant"
-                            className="focus:border-purple-500 transition"
+                            placeholder="Briefly describe what you offer..."
+                            className="bg-background border-input resize-none"
+                            rows={3}
                           />
                           {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
+                            <FieldError errors={field.state.meta.errors} className="text-destructive text-xs mt-1" />
                           )}
                         </Field>
                       );
                     }}
                   />
-                </>
+                </div>
               )}
             </FieldGroup>
 
@@ -370,7 +380,7 @@ export function SignupForm() {
                 type="button"
                 variant="ghost"
                 onClick={handleGoHome}
-                className="flex items-center gap-2 font-medium"
+                className="flex items-center gap-2 font-medium text-muted-foreground hover:text-foreground"
               >
                 <Home className="w-4 h-4 mr-1" /> Home
               </Button>
@@ -378,38 +388,38 @@ export function SignupForm() {
                 type="button"
                 variant="link"
                 onClick={handleGoLogin}
-                className="flex items-center gap-1 text-indigo-500 font-bold"
+                className="flex items-center gap-1 text-primary font-bold"
               >
-                <LogIn className="w-4 h-4" /> Login
+                <LogIn className="w-4 h-4 mr-1" /> Login instead
               </Button>
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col items-center gap-4 pt-2 border-t border-zinc-100 mt-3">
-          <Field orientation="horizontal" className="gap-4 w-full">
+        <CardFooter className="flex flex-col items-center gap-4 pt-4 border-t border-border mt-2">
+          <Field orientation="horizontal" className="flex gap-4 w-full">
             <Button
               type="button"
               variant="outline"
               onClick={() => form.reset()}
-              className="w-1/2 hover:border-purple-500"
+              className="w-1/3 border-border bg-background hover:bg-accent hover:text-accent-foreground"
             >
-              <RefreshCw className="w-4 h-4 mr-2" /> Reset
+              <RefreshCw className="w-4 h-4 sm:mr-2" /> <span className="hidden sm:inline">Reset</span>
             </Button>
             <Button
               type="submit"
               form="sign-up-user"
-              className="w-1/2 bg-gradient-to-tr from-purple-500 to-indigo-500 text-white font-bold hover:scale-[1.03] transition"
+              className="w-2/3 shadow-md font-semibold"
             >
-              Sign Up <ArrowRight className="w-4 h-4 ml-2" />
+              Create Account <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Field>
-          <span className="text-xs text-zinc-500 font-medium pt-2">
+          <span className="text-xs text-muted-foreground font-medium text-center">
             By signing up, you agree to our{" "}
-            <a href="#" className="font-semibold text-purple-500 hover:underline">
+            <a href="#" className="font-semibold text-primary hover:underline">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="font-semibold text-purple-500 hover:underline">
+            <a href="#" className="font-semibold text-primary hover:underline">
               Privacy Policy
             </a>
             .

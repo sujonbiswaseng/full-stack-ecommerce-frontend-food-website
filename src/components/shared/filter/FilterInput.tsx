@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const FilterPanel = ({
   fields,
@@ -25,9 +26,9 @@ export const FilterPanel = ({
   onReset?: () => void;
   onApply?: () => void;
   isPending?: boolean;
-  className?:string
-  classRoot?:string
-  buttonClassName?:string
+  className?: string
+  classRoot?: string
+  buttonClassName?: string
 }) => {
   const [isApplySpinning, setIsApplySpinning] = useState(false);
   const [isResetSpinning, setIsResetSpinning] = useState(false);
@@ -56,13 +57,9 @@ export const FilterPanel = ({
   };
 
   return (
-    <section className={cn("relative isolate w-full overflow-hidden p-4 sm:p-6 md:p-8 rounded-[28px] border border-white/20 dark:border-white/10 backdrop-blur-2xl bg-white/60 dark:bg-gray-900/60 shadow-lg transition-all duration-300",classRoot)}>
-      <div
-        className={cn("pointer-events-none absolute inset-0 -z-10 bg-gradient-to-tr from-indigo-100/70 via-blue-100/70 to-transparent dark:from-blue-950/30 dark:via-slate-950/30 dark:to-transparent blur-2xl opacity-50",classRoot)}
-        aria-hidden
-      />
+    <section className={cn("relative isolate w-full overflow-hidden p-4 sm:p-6 md:p-8 rounded-[28px] border border-border bg-card shadow-lg transition-all duration-300", classRoot)}>
       <form
-        className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6",className)}
+        className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6", className)}
         style={{ position: "relative", zIndex: 1 }}
         autoComplete="off"
         onSubmit={(e) => { e.preventDefault(); onApply?.(); }}
@@ -70,10 +67,10 @@ export const FilterPanel = ({
         {fields.map((field) => {
           // Common class for input-like elements
           const base =
-            "w-full rounded-lg px-4 py-2 text-base outline-none border bg-white/90 dark:bg-gray-900/90 border-gray-300 dark:border-gray-700 shadow-sm transition focus:ring-2 focus:ring-blue-400 focus:border-blue-400 dark:focus:ring-blue-600 dark:focus:border-blue-600";
+            "w-full rounded-lg px-4 py-2 text-base outline-none border bg-background border-input shadow-sm transition focus:ring-2 focus:ring-ring focus:border-ring text-foreground";
           // Field card container
           const card =
-            "group flex flex-col gap-2 p-4 rounded-2xl bg-white/80 dark:bg-gray-900/70 border border-gray-200 dark:border-gray-800 shadow hover:shadow-xl hover:bg-gradient-to-br hover:from-blue-50 hover:to-white/95 dark:hover:from-blue-950/40 dark:hover:to-gray-950/40 transition-all";
+            "group flex flex-col gap-2 p-4 rounded-2xl bg-muted/20 border border-border shadow hover:shadow-md transition-all";
 
           // 🔹 TEXT-LIKE
           if (
@@ -86,11 +83,11 @@ export const FilterPanel = ({
           ) {
             return (
               <div key={field.name} className={card}>
-                <label className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1 tracking-wide">
+                <label className="text-sm font-semibold text-foreground mb-1 tracking-wide">
                   {field.label ?? field.name}
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-400 group-focus-within:scale-110 transition" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition" />
                   <input
                     type={field.type}
                     value={field.value}
@@ -107,7 +104,7 @@ export const FilterPanel = ({
           if (field.type === "number") {
             return (
               <div key={field.name} className={card}>
-                <label className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1 tracking-wide">
+                <label className="text-sm font-semibold text-foreground mb-1 tracking-wide">
                   {field.label}
                 </label>
 
@@ -122,7 +119,7 @@ export const FilterPanel = ({
                   }}
                   className={base}
                 />
-          
+
 
               </div>
             );
@@ -138,7 +135,7 @@ export const FilterPanel = ({
           ) {
             return (
               <div key={field.name} className={card}>
-                <label className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1 tracking-wide">
+                <label className="text-sm font-semibold text-foreground mb-1 tracking-wide">
                   {field.label}
                 </label>
                 <input
@@ -159,11 +156,11 @@ export const FilterPanel = ({
                   type="checkbox"
                   checked={field.value}
                   onChange={(e) => field.onChange(e.target.checked)}
-                  className="w-5 h-5 rounded accent-indigo-500 dark:accent-blue-700 border-gray-400 dark:border-gray-700 focus:ring-2 focus:ring-indigo-400 transition-all checked:scale-110"
+                  className="w-5 h-5 rounded accent-primary border-input focus:ring-2 focus:ring-ring transition-all checked:scale-110"
                   id={field.name}
                   style={{ minWidth: 10, minHeight: 10 }}
                 />
-                <label htmlFor={field.name} className="text-base font-medium text-gray-800 dark:text-gray-100 select-none">
+                <label htmlFor={field.name} className="text-base font-medium text-foreground select-none">
                   {field.label}
                 </label>
               </div>
@@ -175,7 +172,7 @@ export const FilterPanel = ({
             const selectedValue = field.value ? String(field.value) : "__all__";
             return (
               <div key={field.name} className={card}>
-                <label className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1 tracking-wide">
+                <label className="text-sm font-semibold text-foreground mb-1 tracking-wide">
                   {field.label}
                 </label>
                 <Select
@@ -184,11 +181,11 @@ export const FilterPanel = ({
                     field.onChange(value === "__all__" ? "" : value)
                   }
                 >
-                  <SelectTrigger className={`${base} cursor-pointer bg-white/80 dark:bg-gray-900/80`}>
+                  <SelectTrigger className={`${base} cursor-pointer bg-background`}>
                     <SelectValue placeholder="All" />
                   </SelectTrigger>
-                  <SelectContent className="max-h-[320px] bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800 ring-1 ring-blue-100 dark:ring-blue-900">
-                    <SelectItem value="__all__" className="font-normal py-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded">
+                  <SelectContent className="max-h-[320px] bg-popover text-popover-foreground rounded-lg shadow-lg border border-border ring-1 ring-border">
+                    <SelectItem value="__all__" className="font-normal py-2 hover:bg-accent hover:text-accent-foreground rounded">
                       All
                     </SelectItem>
                     {field.options
@@ -197,7 +194,7 @@ export const FilterPanel = ({
                         <SelectItem
                           key={String(opt.value)}
                           value={String(opt.value)}
-                          className="font-normal py-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded"
+                          className="font-normal py-2 hover:bg-accent hover:text-accent-foreground rounded"
                         >
                           {opt.label}
                         </SelectItem>
@@ -212,7 +209,7 @@ export const FilterPanel = ({
           if (field.type === "range") {
             return (
               <div key={field.name} className={card + " gap-3"}>
-                <label className="text-sm font-semibold text-gray-900 dark:text-gray-200 tracking-wide">
+                <label className="text-sm font-semibold text-foreground tracking-wide">
                   {field.label}
                 </label>
                 <div className="flex items-center gap-3">
@@ -222,13 +219,13 @@ export const FilterPanel = ({
                     max={field.max}
                     value={field.value}
                     onChange={(e) => field.onChange(Number(e.target.value))}
-                    className="w-full accent-indigo-500 dark:accent-blue-600 h-2 rounded transition"
+                    className="w-full accent-primary h-2 rounded transition"
                   />
-                  <span className="ml-2 text-base font-bold text-indigo-600 dark:text-blue-300">
-                  ৳{field.value}
+                  <span className="ml-2 text-base font-bold text-primary">
+                    ৳{field.value}
                   </span>
                 </div>
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
+                <div className="flex justify-between text-xs text-muted-foreground px-1">
                   <span>৳{field.min}</span>
                   <span>৳{field.max}</span>
                 </div>
@@ -240,34 +237,33 @@ export const FilterPanel = ({
         })}
       </form>
       <div className={cn("mt-10 flex flex-wrap justify-center gap-4")}>
-        <button
+        <Button
           onClick={handleApplyClick}
           disabled={isPending}
-          className={cn("flex items-center justify-center gap-2 px-10 py-3 rounded-lg text-white font-semibold shadow-lg bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 disabled:opacity-50 transition-all text-base tracking-wide outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2",buttonClassName)}
-          type="button"
+          className={cn("px-10 py-6 text-base shadow-lg", buttonClassName)}
         >
           {isApplySpinning && isPending && onApply
             ? (
-              <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="mr-2 h-5 w-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
             ) : (
-              <Filter className="w-5 h-5" />
+              <Filter className="mr-2 w-5 h-5" />
             )}
           Apply Filters
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleResetClick}
           disabled={isPending}
-          className={cn("flex items-center justify-center gap-2 px-10 py-3 rounded-lg text-gray-700 dark:text-gray-300 font-semibold shadow border border-gray-300 dark:border-gray-700 bg-white/70 dark:bg-gray-900/60 hover:bg-gray-100 dark:hover:bg-gray-800/90 hover:shadow-xl transition-all disabled:opacity-50 text-base tracking-wide outline-none focus:ring-2 focus:ring-blue-400",buttonClassName)}
-          type="button"
+          variant="outline"
+          className={cn("px-10 py-6 text-base shadow-sm border-border bg-card hover:bg-accent hover:text-accent-foreground", buttonClassName)}
         >
           {isResetSpinning && isPending && onReset
             ? (
-              <div className="h-6 w-6 border-2 border-gray-400/30 border-t-green-600 dark:border-t-green-300 rounded-full animate-spin" />
+              <div className="mr-2 h-5 w-5 border-2 border-muted-foreground/30 border-t-foreground rounded-full animate-spin" />
             ) : (
-              <RotateCcw className="w-5 h-5" />
+              <RotateCcw className="mr-2 w-5 h-5" />
             )}
           Reset
-        </button>
+        </Button>
       </div>
     </section>
   );

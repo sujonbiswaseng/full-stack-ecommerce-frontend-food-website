@@ -37,23 +37,27 @@ export function ReusableTable<T extends { id: string }>({
   return (
     <section className={cn('w-full flex justify-center px-4 sm:px-6 lg:px-8 py-6', className)}>
       <div className="w-full max-w-[1480px]">
-        <div className="w-full overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm">
+        <div className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
           <div className="w-full overflow-x-auto">
             <div className="min-h-[420px]">
               <table className="w-full min-w-[700px] border-collapse">
-                
+
                 {/* HEADER */}
-                <thead className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b">
+                <thead className="sticky top-0 z-10 bg-card border-b border-border">
                   <tr style={{ height: 52 }}>
                     {columns.map((col) => (
                       <th
                         key={String(col.key)}
-                        className="px-6 text-left text-xs font-semibold uppercase text-gray-500"
+                        className="px-6 text-left text-xs font-semibold uppercase text-muted-foreground tracking-wider"
                       >
                         {col.label}
                       </th>
                     ))}
-                    {actions && <th className="px-6 text-left text-xs font-semibold">Actions</th>}
+                    {actions && (
+                      <th className="px-6 text-left text-xs font-semibold uppercase text-muted-foreground tracking-wider">
+                        Actions
+                      </th>
+                    )}
                   </tr>
                 </thead>
 
@@ -61,7 +65,10 @@ export function ReusableTable<T extends { id: string }>({
                 <tbody>
                   {data.length === 0 ? (
                     <tr>
-                      <td colSpan={columns.length + (actions ? 1 : 0)} className="px-6 py-12 text-center">
+                      <td
+                        colSpan={columns.length + (actions ? 1 : 0)}
+                        className="px-6 py-12 text-center text-muted-foreground"
+                      >
                         {emptyMessage}
                       </td>
                     </tr>
@@ -70,12 +77,12 @@ export function ReusableTable<T extends { id: string }>({
                       <tr
                         key={item.id}
                         className={cn(
-                          'hover:bg-gray-50 dark:hover:bg-gray-800',
-                          index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                          'hover:bg-accent/50 transition-colors duration-150',
+                          index % 2 === 0 ? 'bg-card' : 'bg-muted/20'
                         )}
                       >
                         {columns.map((col) => (
-                          <td key={String(col.key)} className="px-6 py-3 text-sm">
+                          <td key={String(col.key)} className="px-6 py-3 text-sm text-card-foreground">
                             {col.render
                               ? col.render(item)
                               : (item[col.key] as React.ReactNode)}
@@ -88,13 +95,14 @@ export function ReusableTable<T extends { id: string }>({
                               {actions.map((action, i) => (
                                 <button
                                   key={i}
-                                  onClick={() => action.onClick(item)} // ✅ FIXED
+                                  onClick={() => action.onClick(item)}
+                                  aria-label={action.label}
                                   className={cn(
-                                    'p-2 rounded-lg border hover:bg-gray-100 transition',
+                                    'p-2 rounded-lg border border-border hover:bg-accent transition-colors duration-150',
                                     action.className
                                   )}
                                 >
-                                  <action.icon className="w-4 h-4" />
+                                  <action.icon className="w-4 h-4 text-card-foreground" />
                                 </button>
                               ))}
                             </div>
