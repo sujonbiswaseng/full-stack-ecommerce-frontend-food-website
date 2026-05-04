@@ -9,7 +9,7 @@ import { IgetReviewData } from "@/types/reviews.type";
 import { Ipagination } from "@/types/pagination.type";
 import { TGetCategory } from "@/types/category";
 import { TUser } from "@/types/user.type";
-const api_url = env.API_URL;
+const api_url = env.BACKEND_URL;
 
 export interface ServiceOptionds {
   cache?: RequestCache;

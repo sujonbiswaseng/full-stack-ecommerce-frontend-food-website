@@ -285,8 +285,6 @@ Run the cmd:
 
 BACKEND_URL=http://localhost:5000
 FRONTEND_URL=http://loacalhost:3000
-AUTH_URL=http://localhost:5000
-API_URL=http://localhost:5000
 
 ACCESS_TOKEN_SECRET=accestoken_secret
 REFRESH_TOKEN_SECRET=refreshtoken_secret

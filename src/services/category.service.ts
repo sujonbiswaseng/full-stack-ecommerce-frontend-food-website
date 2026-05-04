@@ -6,7 +6,7 @@ import { ApiErrorResponse, ApiResponse } from "@/types/response.type";
 import { TUser } from "@/types/user.type";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
-const api_url = env.API_URL
+const api_url = env.BACKEND_URL
 
 export interface Icategory {
   name?: string,

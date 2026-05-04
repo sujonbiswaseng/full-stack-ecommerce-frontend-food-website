@@ -6,7 +6,7 @@ import { ApiErrorResponse, ApiResponse } from "@/types/response.type";
 import { Ilogin, TAuthData } from "@/types/auth.type";
 import { TUser, UserCreateInput } from "@/types/user.type";
 import { cookies } from "next/headers";
-const api_url = env.API_URL;
+const api_url = env.BACKEND_URL;
 
 
 

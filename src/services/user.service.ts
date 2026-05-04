@@ -6,7 +6,7 @@ import { ApiErrorResponse, ApiResponse } from '@/types/response.type';
 import { IProviderInfo } from '@/types/provider.type';
 import { Ipagination } from '@/types/pagination.type';
 
-const api_url=env.API_URL
+const api_url=env.BACKEND_URL
 
 export const userService={
     updateUser:async(updateUser:TUpdateUserInput)=>{  

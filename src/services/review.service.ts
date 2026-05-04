@@ -11,7 +11,7 @@ export interface IModerateData {
   status:string;
 }
 
-const api_url = env.API_URL;
+const api_url = env.BACKEND_URL;
 
 export const reviewService = {
   createReview: async (mealid: string, data: ICreatereviewData) => {
