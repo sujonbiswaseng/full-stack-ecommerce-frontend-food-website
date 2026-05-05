@@ -80,7 +80,7 @@ export default function Navbar({ user }: NavbarProps) {
         {/* Logo */}
         <Link
           href="/"
-          aria-label="Lumen Home"
+          aria-label="bitebase Home"
           className="flex items-center gap-4 group"
         >
           <div className="flex h-10 w-10 items-center justify-center relative">
@@ -98,7 +98,7 @@ export default function Navbar({ user }: NavbarProps) {
             </div>
           </div>
           <span className="hidden sm:inline font-bold text-lg text-primary transition-colors group-hover:text-primary/80 select-none">
-            Lumen
+            bitebase
           </span>
         </Link>
         {/* Center navigation (desktop) */}

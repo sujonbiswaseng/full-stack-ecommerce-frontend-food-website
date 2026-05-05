@@ -1,5 +1,6 @@
 'use client'
-import { userLogout } from '@/actions/auth.actions';
+
+import { userLogout } from '@/actions/auth.actions'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,73 +10,142 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { authClient } from '@/lib/authClient';
-import { TUser } from '@/types/user.type';
-import {
-  LogOut,
-  Settings,
-} from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
-import { Button } from '../ui/button';
-export default function ProfileCard({ profile }: { profile: TUser }) {
-  const defaultProfile = 'https://res.cloudinary.com/drmeagmkl/image/upload/v1766941482/chatgpt_m8tmep.png'
+} from '@/components/ui/dropdown-menu'
+import { TUser } from '@/types/user.type'
+import { LogOut, Settings, User, BarChart3 } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { toast } from 'react-toastify'
+import { Button } from '../ui/button'
+import { motion } from 'framer-motion'
 
+const getProfileLink = (role: string) =>
+  role === 'Customer'
+    ? '/profile/user'
+    : role === 'Admin'
+    ? '/admin/dashboard/profile'
+    : role === 'Provider'
+    ? '/provider/dashboard/profile'
+    : '/'
+
+const getSettingsLink = (role: string) =>
+  role === 'Customer'
+    ? '/settings'
+    : role === 'Provider'
+    ? '/provider/dashboard/setting'
+    : role === 'Admin'
+    ? '/admin/dashboard/setting'
+    : '/'
+
+export default function ProfileCard({ profile }: { profile: TUser }) {
+  const defaultProfile =
+    'https://res.cloudinary.com/drmeagmkl/image/upload/v1766941482/chatgpt_m8tmep.png'
 
   const router = useRouter()
+
   const handleLogout = async () => {
-    const toastId=toast.loading("user logouting........")
-    const res=await userLogout()
-    if(!res.data || !res.success){
+    const toastId = toast.loading('Logging out...')
+    const res = await userLogout()
+    if (!res.data || !res.success) {
       toast.dismiss(toastId)
-      toast.error("user logout failed")
-      return;
+      toast.error('Logout failed')
+      return
     }
     toast.dismiss(toastId)
-    toast.success(res.message || "user logout successfully")
+    toast.success(res.message || 'Logged out successfully')
     router.refresh()
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="relative w-8 h-8 rounded-full overflow-hidden border-primary shadow-md">
+        <motion.button
+          aria-label="Open profile menu"
+          className="relative w-10 h-10 rounded-full border border-primary bg-card shadow-md flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          whileTap={{ scale: 0.96 }}
+        >
           <Image
             src={profile.image || defaultProfile}
             alt={profile.name}
-            width={100}
-            height={100}
-            className="object-cover w-full h-full"
+            width={40}
+            height={40}
+            className="object-cover w-10 h-10 rounded-full border-2 border-background"
+            priority
           />
-        </div>
+        </motion.button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-64">
-        {/* Account Section */}
-        <DropdownMenuLabel>
-          My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+      <DropdownMenuContent className="w-80 p-0 rounded-xl shadow-lg border border-border bg-card mt-3 overflow-hidden">
+        <div className="px-6 py-6 flex items-center gap-4 border-b border-border bg-background">
+          <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-primary bg-input flex-shrink-0">
+            <Image
+              src={profile.image || defaultProfile}
+              alt={profile.name}
+              width={56}
+              height={56}
+              className="object-cover w-14 h-14"
+              loading="lazy"
+            />
+          </div>
+          <div className="min-w-0">
+            <div className="font-semibold text-foreground truncate max-w-[160px]">{profile.name}</div>
+            <div className="text-xs text-muted-foreground truncate">{profile.email}</div>
+          </div>
+        </div>
+        <DropdownMenuLabel className="mt-2 text-primary font-medium px-6 py-4 bg-card">
+          My Account
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-border h-px opacity-75" />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Link className='w-full' href={`${profile.role == 'Customer' ? "/profile/user" : profile.role == "Admin" ? "/admin/dashboard/profile" : profile.role == 'Provider' ? "/provider/dashboard/profile" : "/"}`}>👤 profile</Link>
+          <DropdownMenuItem asChild>
+            <Link
+              href={getProfileLink(profile.role)}
+              className="flex items-center gap-3 w-full px-6 py-4 text-foreground hover:bg-accent hover:text-accent-foreground rounded-md transition-colors text-base"
+              tabIndex={0}
+            >
+              <User className="w-4 h-4 text-muted-foreground" aria-hidden />
+              <span className="flex-1 font-medium">Profile</span>
+            </Link>
           </DropdownMenuItem>
-          {profile.role === 'Customer' ? "" : <DropdownMenuItem><Link className='w-full' href={'/dashboard'}> 📊 Dashboard</Link></DropdownMenuItem>}
-          <DropdownMenuItem>
-            <Settings />
-            <Link href={profile.role==="Customer"?"/settings":profile.role=="Provider"?"/provider/dashboard/setting":profile.role==="Admin"?"/admin/dashboard/setting":"/"}><span>Settings</span></Link>
-            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+          {profile.role !== 'Customer' && (
+            <DropdownMenuItem asChild>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-3 w-full px-6 py-4 text-foreground hover:bg-accent hover:text-accent-foreground rounded-md transition-colors text-base"
+                tabIndex={0}
+              >
+                <BarChart3 className="w-4 h-4 text-muted-foreground" aria-hidden />
+                <span className="flex-1 font-medium">Dashboard</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem asChild>
+            <Link
+              href={getSettingsLink(profile.role)}
+              className="flex items-center gap-3 w-full px-6 py-4 text-foreground hover:bg-accent hover:text-accent-foreground rounded-md transition-colors text-base"
+              tabIndex={0}
+            >
+              <Settings className="w-4 h-4 text-muted-foreground" aria-hidden />
+              <span className="flex-1 font-medium">Settings</span>
+              <DropdownMenuShortcut className="text-muted-foreground">⌘S</DropdownMenuShortcut>
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        {/* Logout */}
-        <DropdownMenuSeparator />
-        <Button onClick={handleLogout}>
-          <LogOut />
-          Log out
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-        </Button>
+        <DropdownMenuSeparator className="bg-border h-px opacity-75" />
+        <div className="px-6 py-4 bg-card rounded-b-xl">
+          <Button
+            
+            className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-3 font-medium text-card-foreground bg-primary transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-primary/90 disabled:opacity-70"
+            onClick={handleLogout}
+            aria-label="Log out"
+          >
+            <LogOut className="w-4 h-4 text-card-foreground" aria-hidden />
+            <span className="flex-1 text-base font-medium text-card-foreground">Log out</span>
+            <DropdownMenuShortcut className="text-muted-foreground">⇧⌘Q</DropdownMenuShortcut>
+          </Button>
+        </div>
+   
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }
