@@ -18,6 +18,9 @@ import FAQSection from "@/components/modules/home/faq-section";
 import NewsletterSection from "@/components/modules/home/newsletter-section";
 import CTASection from "@/components/modules/home/cta-section";
 import Footer from "@/components/shared/footer";
+import Statics from "@/components/modules/home/stats-section";
+import { getPublicStatsAction } from "@/actions/stats.actions";
+import { PublicStats } from "@/types/stats.type";
 
 export default async function HomePage() {
   const mealdata = await getAllMeals();
@@ -32,6 +35,7 @@ export default async function HomePage() {
       />
     );
   }
+  const res=await getPublicStatsAction()
 
   return (
     <div className="min-h-screen">
@@ -55,7 +59,7 @@ export default async function HomePage() {
       </ErrorBoundary>
 
       <FeaturesSection />
-
+     <Statics stats={res.data as PublicStats}/>
       <div className="space-y-8 py-8 px-4 max-w-[1440px] mx-auto">
         <div className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -101,7 +105,7 @@ export default async function HomePage() {
         </ErrorBoundary>
       </div>
 
-      <StatsSection />
+      <StatsSection stats={res.data as PublicStats} />
 
       <ErrorBoundary
         fallback={

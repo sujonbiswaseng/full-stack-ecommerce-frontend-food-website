@@ -8,6 +8,42 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail, Phone, MapPin, Clock, Facebook, Instagram, Twitter } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PublicStats } from "@/types/stats.type";
+
+// Define the contactInfo array to resolve the error
+type ContactInfo = {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  sub?: string;
+};
+
+const contactInfo: ContactInfo[] = [
+  {
+    icon: Mail,
+    label: "Email",
+    value: "dev.sujonbiswas@gmail.com",
+    sub: "We'll reply within 24 hours",
+  },
+  {
+    icon: Phone,
+    label: "Phone",
+    value: "01345191043",
+    sub: "9am - 5pm, Mon - Fri",
+  },
+  {
+    icon: MapPin,
+    label: "Address",
+    value: "bangladesh,sylhet",
+    sub: "Visit us by appointment",
+  },
+  {
+    icon: Clock,
+    label: "Working Hours",
+    value: "Mon - Fri: 9am - 5pm",
+    sub: "Closed on weekends",
+  },
+];
 
 export default function ContactContent() {
   const [formData, setFormData] = useState({
@@ -18,39 +54,40 @@ export default function ContactContent() {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const onSubmit = async (event:any) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const toastid=toast.loading("sending......")
-    const formData = new FormData(event.target);
-    const name = formData.get("name")?.toString().trim();
-    const email = formData.get("email")?.toString().trim();
-    console.log(email,'dsf',name,'na')
+    setIsLoading(true);
+    const toastid = toast.loading("sending......");
+    const formDataEvt = new FormData(event.target as HTMLFormElement);
+    const name = formDataEvt.get("name")?.toString().trim();
+    const email = formDataEvt.get("email")?.toString().trim();
 
     if (!email) {
       toast.dismiss(toastid);
       toast.error("Please fill in all fields before submitting.");
+      setIsLoading(false);
       return;
     }
-    formData.append("access_key", "a6e254d6-1e3c-4309-9ef9-58f65f27d1d4");
+    formDataEvt.append("access_key", "a6e254d6-1e3c-4309-9ef9-58f65f27d1d4");
 
     const response = await fetch("https://api.web3forms.com/submit", {
       method: "POST",
-      body: formData
+      body: formDataEvt,
     });
 
-    if(!response.ok){
-      toast.dismiss(toastid)
-    toast.error("failed to message send");
-    return;
-
+    if (!response.ok) {
+      toast.dismiss(toastid);
+      toast.error("Failed to send message");
+      setIsLoading(false);
+      return;
     }
 
     const data = await response.json();
     if (data.success) {
-     toast.dismiss(toastid)
-     toast.success("Message sent successfully!")
-      return
+      toast.dismiss(toastid);
+      toast.success("Message sent successfully!");
     }
+    setIsLoading(false);
   };
 
   const handleChange = (
@@ -61,33 +98,6 @@ export default function ContactContent() {
       [e.target.name]: e.target.value,
     }));
   };
-
-  const contactInfo = [
-    {
-      icon: Mail,
-      label: "Email",
-      value: "dev.sujonbiswas@gmail.com",
-      sub: "We'll respond within 24 hours",
-    },
-    {
-      icon: Phone,
-      label: "Phone",
-      value: "+880 1788477912",
-      sub: "Mon-Fri 9AM-6PM",
-    },
-    {
-      icon: MapPin,
-      label: "Address",
-      value: "Sylhet, Bangladesh",
-      sub: "Serving the local community",
-    },
-    {
-      icon: Clock,
-      label: "Business Hours",
-      value: "Mon-Fri: 9AM – 6PM",
-      sub: "Sat-Sun: 10AM – 4PM",
-    },
-  ];
 
   return (
     <div className="min-h-screen py-16 px-4">
@@ -118,7 +128,9 @@ export default function ContactContent() {
           >
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-card-foreground">Send us a message</CardTitle>
+                <CardTitle className="text-card-foreground">
+                  Send us a message
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={onSubmit} className="space-y-6">
@@ -212,14 +224,17 @@ export default function ContactContent() {
               </CardHeader>
               <CardContent className="space-y-6">
                 {contactInfo.map(({ icon: Icon, label, value, sub }) => (
-                  <div key={label} className="flex items-start gap-4">
+                  <div
+                    key={label}
+                    className="flex items-start gap-4"
+                  >
                     <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <Icon className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-card-foreground">{label}</h3>
                       <p className="text-muted-foreground text-sm">{value}</p>
-                      <p className="text-muted-foreground text-xs">{sub}</p>
+                      {sub && <p className="text-muted-foreground text-xs">{sub}</p>}
                     </div>
                   </div>
                 ))}
@@ -235,41 +250,67 @@ export default function ContactContent() {
                   Stay connected and get the latest updates on new features and
                   offers.
                 </p>
-                <div className="flex gap-3">
-                  <Button variant="outline" size="sm" asChild>
+                <div className="flex flex-wrap gap-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    asChild
+                    className="flex-1 flex items-center justify-center gap-2 bg-input border border-border text-card-foreground hover:bg-accent hover:text-accent-foreground transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-ring min-h-[44px]"
+                    aria-label="Facebook"
+                  >
                     <a
                       href="https://facebook.com/sujonbiswasdev"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2"
+                      title="Facebook"
+                      tabIndex={0}
                     >
-                      <Facebook className="w-4 h-4" />
-                      Facebook
+                      <Facebook className="w-5 h-5" aria-hidden />
+                      <span className="sr-only">Facebook</span>
+                      <span className="hidden md:inline text-card-foreground font-medium">Facebook</span>
                     </a>
                   </Button>
-                  <Button variant="outline" size="sm" asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    asChild
+                    className="flex-1 flex items-center justify-center gap-2 bg-input border border-border text-card-foreground hover:bg-accent hover:text-accent-foreground transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-ring min-h-[44px]"
+                    aria-label="Instagram"
+                  >
                     <a
                       href="https://instagram.com/sujonbiswasdev"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2"
+                      title="Instagram"
+                      tabIndex={0}
                     >
-                      <Instagram className="w-4 h-4" />
-                      Instagram
+                      <Instagram className="w-5 h-5" aria-hidden />
+                      <span className="sr-only">Instagram</span>
+                      <span className="hidden md:inline text-card-foreground font-medium">Instagram</span>
                     </a>
                   </Button>
-                  <Button variant="outline" size="sm" asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    asChild
+                    className="flex-1 flex items-center justify-center gap-2 bg-input border border-border text-card-foreground hover:bg-accent hover:text-accent-foreground transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-ring min-h-[44px]"
+                    aria-label="Twitter"
+                  >
                     <a
                       href="https://twitter.com/sujonbiswasdev"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2"
+                      title="Twitter"
+                      tabIndex={0}
                     >
-                      <Twitter className="w-4 h-4" />
-                      Twitter
+                      <Twitter className="w-5 h-5" aria-hidden />
+                      <span className="sr-only">Twitter</span>
+                      <span className="hidden md:inline text-card-foreground font-medium">Twitter</span>
                     </a>
                   </Button>
                 </div>
+           
+           
               </CardContent>
             </Card>
           </motion.div>

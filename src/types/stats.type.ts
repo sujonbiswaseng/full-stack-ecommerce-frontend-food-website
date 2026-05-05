@@ -23,6 +23,18 @@ export interface IOrderStatus {
 }
 
 
+export type PublicStats = {
+  totalmeals: number;
+  totalUsers: number;
+  totalCustomer: number;
+  totalprovider: number;
+  totalAdmins: number;
+  totalorders: number;
+  totalcategory: number;
+  totalReviews: number;
+  totalNewsletters: number;
+};
+
 export interface IMealsStatus {
     approvedmeals: number;
     pendingmeals: number;
