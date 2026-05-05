@@ -246,26 +246,12 @@ const CategoryTable = ({
 
       <section className="relative w-full rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
         <AnimatePresence>
-          {isPending && (
-            <motion.div
-              key="category-table-skeleton"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm"
-            >
-              <Skeleton className="h-10 w-10 rounded-full mb-4" />
-              <div className="w-full max-w-lg">
-                <Skeleton className="h-8 w-full mb-2" />
-                <Skeleton className="h-8 w-full mb-2" />
-                <Skeleton className="h-8 w-full" />
-              </div>
-              <p className="text-sm font-medium text-muted-foreground mt-4">
-                Filtering data...
-              </p>
-            </motion.div>
-          )}
+        {isPending && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/50 dark:bg-black/50 backdrop-blur-sm">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-2"></div>
+            <p className="text-sm font-medium">Filtering data...</p>
+          </div>
+        )}
         </AnimatePresence>
         <div className="overflow-x-auto bg-card rounded-2xl">
           {tableData && Array.isArray(tableData) && tableData.length > 0 ? (
@@ -323,7 +309,7 @@ const CategoryTable = ({
               viewMode={viewMode}
             />
             {!viewMode && selectedcategoryid && (
-              <div className="mt-6">
+              <div className="-mt-8">
                 <Categoryupdate categoryid={selectedcategoryid} />
               </div>
             )}

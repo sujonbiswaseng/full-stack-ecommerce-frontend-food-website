@@ -34,7 +34,7 @@ export const createCategoryColumns = () => [
         <CopyableId
           id={row.id}
           href={`/category/${row.id}`}
-          className="bg-muted text-secondary rounded-md px-2 py-1 group-hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring outline-none"
+          className="bg-primary text-white rounded-md px-2 py-1 group-hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring outline-none"
           showShort={row.id ? row.id.slice(0, 8) + "..." : ""}
           key={row.id}
         />
@@ -66,7 +66,7 @@ export const createCategoryColumns = () => [
         <CopyableId
           id={row.adminId}
           href={`/profile/user/${row.adminId}`}
-          className="bg-muted text-secondary rounded-md px-2 py-1 group-hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring outline-none"
+          className="bg-primary text-white rounded-md px-2 py-1 group-hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring outline-none"
           showShort={row.adminId ? row.adminId.slice(0, 8) + "..." : ""}
           key={row.adminId}
         />
