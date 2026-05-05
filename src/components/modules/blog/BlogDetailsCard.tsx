@@ -8,7 +8,14 @@ import { AnimatePresence, motion, Variants } from "framer-motion";
 import { TResponseBlog } from "@/types/blog.type";
 import { TResponseUserData } from "@/types/user.type";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent, CardFooter, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 
 const imageVariants: Variants = {
   hidden: { opacity: 0, scale: 0.97 },
@@ -59,20 +66,20 @@ export function BlogDetailsCard({
 
   return (
     <section
-      className="bg-background min-h-[calc(100dvh-5rem)] pt-8 pb-8"
+      className="bg-background min-h-[calc(100dvh-5rem)] py-8"
       aria-labelledby="blog-title"
     >
-      <div className="mx-auto max-w-[1440px] w-full px-4">
+      <div className="container max-w-[1440px] mx-auto w-full px-4 flex justify-center">
         <motion.article
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="flex flex-col min-h-[68vh] rounded-2xl border border-border bg-card shadow-sm overflow-hidden"
+          className="w-full flex flex-col min-h-[68vh] rounded-2xl border border-border bg-card shadow-sm overflow-hidden"
         >
-          <div className="w-full flex flex-col lg:flex-row gap-0">
-            {/* --- Image Gallery (Left) --- */}
-            <div className="flex flex-col gap-6 border-b border-border bg-card p-6 lg:border-b-0 lg:border-r lg:w-2/5 justify-center min-h-[20rem]">
-              <div className="relative flex items-center justify-center rounded-2xl border border-border bg-muted aspect-[4/4.6] min-h-[20rem] overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-8 w-full">
+            {/* Image Gallery Section */}
+            <div className="flex flex-col gap-6 border-b border-border lg:border-b-0 lg:border-r bg-card justify-center p-6 lg:p-8 min-h-[20rem]">
+              <div className="relative flex items-center justify-center aspect-[4/4.6] min-h-[16rem] rounded-2xl border border-border bg-muted overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeImage}
@@ -93,11 +100,14 @@ export function BlogDetailsCard({
                     />
                   </motion.div>
                 </AnimatePresence>
-                <span className="absolute top-4 left-4 rounded-full border border-border bg-background/95 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-foreground shadow backdrop-blur-sm">
+                <span className="absolute top-4 left-4 rounded-full border border-border bg-background/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-foreground shadow-sm backdrop-blur-md focus:outline-none">
                   Featured Article
                 </span>
               </div>
-              <div className="flex gap-4 mt-2 w-full flex-wrap" aria-label="gallery thumbnails">
+              <div
+                className="flex gap-4 w-full flex-wrap mt-2"
+                aria-label="gallery thumbnails"
+              >
                 {images.map((img, idx) => (
                   <button
                     key={idx}
@@ -110,6 +120,7 @@ export function BlogDetailsCard({
                         ? "border-primary ring-2 ring-primary"
                         : "border-border hover:border-primary hover:ring-primary/10",
                     ].join(" ")}
+                    tabIndex={0}
                   >
                     <Image
                       src={img}
@@ -122,8 +133,8 @@ export function BlogDetailsCard({
                 ))}
               </div>
             </div>
-            {/* --- Blog Details (Right) --- */}
-            <div className="flex flex-col min-h-[20rem] flex-1 bg-card px-6 py-8">
+            {/* Blog Details Section */}
+            <div className="flex flex-col min-h-[20rem] bg-card px-6 py-8 md:p-8">
               <motion.div
                 variants={stagger}
                 initial="visible"
@@ -133,14 +144,14 @@ export function BlogDetailsCard({
                 <CardHeader className="px-0 pb-4">
                   <motion.span
                     variants={fadeUp}
-                    className="inline-flex items-center rounded-full bg-secondary px-4 py-1.5 mb-2 text-xs font-semibold uppercase tracking-wide text-secondary-foreground"
+                    className="inline-flex items-center rounded-full bg-secondary px-4 py-1.5 mb-4 text-xs font-semibold uppercase tracking-wide text-secondary-foreground"
                   >
                     Modern SaaS Blog
                   </motion.span>
                   <motion.h1
                     id="blog-title"
                     variants={fadeUp}
-                    className="mt-2 text-2xl sm:text-4xl font-bold leading-tight tracking-tight text-card-foreground"
+                    className="mt-1 text-2xl md:text-4xl font-bold leading-tight tracking-tight text-card-foreground"
                   >
                     {blog.title}
                   </motion.h1>
@@ -157,10 +168,14 @@ export function BlogDetailsCard({
                 <CardContent className="px-0 flex flex-col gap-8">
                   <motion.div
                     variants={fadeUp}
-                    className="flex items-center bg-background border border-border rounded-2xl p-4 gap-4 mt-2"
+                    className="flex items-center bg-background border border-border rounded-2xl p-4 gap-4"
                   >
                     <div className="relative h-12 w-12 rounded-full overflow-hidden border border-border">
-                      <Link href={blog.author.id} tabIndex={-1} aria-label={`${blog.author.name}'s Profile`}>
+                      <Link
+                        href={blog.author.id}
+                        tabIndex={-1}
+                        aria-label={`${blog.author.name}'s Profile`}
+                      >
                         <Image
                           src={blog.author.image || "/placeholder.png"}
                           alt={blog.author.name}
@@ -171,14 +186,23 @@ export function BlogDetailsCard({
                       </Link>
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-medium text-card-foreground text-base truncate" title={blog.author.name}>
+                      <span
+                        className="font-medium text-card-foreground text-base truncate"
+                        title={blog.author.name}
+                      >
                         {blog.author.name}
                       </span>
-                      <span className="text-xs text-muted-foreground truncate" title={blog.author.email}>
+                      <span
+                        className="text-xs text-muted-foreground truncate"
+                        title={blog.author.email}
+                      >
                         {blog.author.email}
                       </span>
                       {blog.author.phone && (
-                        <span className="text-xs text-muted-foreground truncate" title={blog.author.phone}>
+                        <span
+                          className="text-xs text-muted-foreground truncate"
+                          title={blog.author.phone}
+                        >
                           {blog.author.phone}
                         </span>
                       )}
@@ -204,17 +228,34 @@ export function BlogDetailsCard({
                 </CardContent>
                 <CardFooter className="px-0 pt-8 mt-auto border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
                   <div>
-                    <h3 className="text-base font-semibold text-foreground mb-0.5">Continue Reading</h3>
-                    <p className="text-sm text-muted-foreground">Explore the complete story and full details.</p>
+                    <h3 className="text-base font-semibold text-foreground mb-0.5">
+                      Continue Reading
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Explore the complete story and full details.
+                    </p>
                   </div>
                   <motion.div
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", duration: 0.3, stiffness: 350, damping: 22 }}
+                    transition={{
+                      type: "spring",
+                      duration: 0.3,
+                      stiffness: 350,
+                      damping: 22,
+                    }}
                     className="inline-flex"
                   >
-                    <Link href={`/blogs/${blog.id}`} tabIndex={0} aria-label="Explore Now">
-                      <Button variant="default" className="rounded-full px-7 py-3 text-sm font-semibold">
+                    <Link
+                      href={`/blogs/${blog.id}`}
+                      tabIndex={0}
+                      aria-label="Explore Now"
+                      passHref
+                    >
+                      <Button
+                        variant="default"
+                        className="rounded-full px-7 py-3 text-sm font-semibold"
+                      >
                         Explore Now
                       </Button>
                     </Link>
