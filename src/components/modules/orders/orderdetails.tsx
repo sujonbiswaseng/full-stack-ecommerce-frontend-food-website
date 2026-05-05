@@ -51,7 +51,7 @@ export default function OrderDetails({ orderdetails }: { orderdetails: IGetOrder
                     <div key={idx} className="flex flex-row max-[370px]:flex-col items-center max-[370px]:justify-center space-y-1 mt-2">
                         <img
                             src={item.meal.image || defaultProfile}
-                            alt={item.meal.meals_name}
+                            alt={item.meal.title}
                             className="w-20 h-20 rounded-lg object-cover mr-4"
                         />
 
@@ -62,7 +62,7 @@ export default function OrderDetails({ orderdetails }: { orderdetails: IGetOrder
                             >
                                 {item.meal.id.slice(0, 8)}...
                             </Link>
-                            <h3 className="font-semibold text-gray-800">{item.meal.meals_name}</h3>
+                            <h3 className="font-semibold text-gray-800">{item.meal.title}</h3>
                             <p className="text-gray-500 text-sm">{item.meal.category_name}</p>
                             {item.meal.cuisine && <p className="text-gray-400 text-sm">{item.meal.cuisine}</p>}
                         </div>

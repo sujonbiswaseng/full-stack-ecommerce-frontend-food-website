@@ -3,7 +3,7 @@ import { cuisines, dietaryPreferences } from "@/types/meals.type";
 import z from "zod";
 
 export const CreateMealData = z.object({
-  meals_name: z.string().min(1, "meals name is required"),
+  title: z.string().min(1, "meals name is required"),
   description: z.string().min(5, "description atleast 5 character"),
   deliverycharge: z.number(),
   image: z.any(),
@@ -26,7 +26,7 @@ export const CreateMealData = z.object({
 // update meals
 
 export const UpdatemealData = z.object({
-  meals_name: z.string().optional(),
+  title: z.string().optional(),
   description: z.string().optional(),
   image: z.any().optional(),
   price: z.number().min(60,"price must be al least 60 taka").optional(),

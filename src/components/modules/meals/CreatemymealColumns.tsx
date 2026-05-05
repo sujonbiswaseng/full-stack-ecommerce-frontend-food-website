@@ -20,8 +20,8 @@ export const createMyMealColumns = () => [
     render: (row: any) =>
       row.image ? (
         <img
-          alt={row.meals_name}
-          src={row.image}
+          alt={row.title}
+          src={row.images[0]}
           className="w-14 h-14 rounded-full object-cover border border-gray-300 shadow"
           style={{ backgroundColor: "#f3f4f6" }}
         />
@@ -32,11 +32,11 @@ export const createMyMealColumns = () => [
       ),
   },
   {
-    key: "meals_name",
+    key: "title",
     label: "Meal Name",
     render: (row: any) => (
       <span className="font-semibold text-indigo-900 truncate max-w-[160px] block">
-        {row.meals_name}
+        {row.title}
       </span>
     ),
   },

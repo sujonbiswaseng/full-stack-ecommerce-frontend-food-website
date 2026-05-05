@@ -30,7 +30,7 @@ export function UpdateMealsForm({
 }) {
   const form = useForm({
     defaultValues: {
-      meals_name: initialData.meals_name || "",
+      title: initialData.title || "",
       description: initialData.description || "",
       image: initialData.image || "",
       price: initialData.price ?? "",
@@ -86,8 +86,8 @@ export function UpdateMealsForm({
         >
           <FieldGroup>
             <form.Field
-              name="meals_name"
-              validators={{ onChange: UpdatemealData.shape.meals_name as any }}
+              name="title"
+              validators={{ onChange: UpdatemealData.shape.title as any }}
             >
               {(field) => (
                 <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>

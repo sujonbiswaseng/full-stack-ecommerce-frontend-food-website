@@ -33,7 +33,7 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
   const router = useRouter()
   const form = useForm({
     defaultValues: {
-      meals_name: "",
+      title: "",
       deliverycharge:0,
       description: "",
       image: null as File | null,
@@ -82,14 +82,14 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
         >
           <FieldGroup>
             <form.Field
-              name="meals_name"
-                 validators={{ onChange: CreateMealData.shape.meals_name }}
+              name="title"
+                 validators={{ onChange: CreateMealData.shape.title }}
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>meals_name</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>title</FieldLabel>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -97,7 +97,7 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-                      placeholder="please enter your meals_name"
+                      placeholder="please enter your title"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />

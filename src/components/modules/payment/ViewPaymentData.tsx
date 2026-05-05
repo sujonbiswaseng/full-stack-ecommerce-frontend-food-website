@@ -56,7 +56,7 @@ const ViewPaymentData: React.FC<ViewPaymentDataProps> = ({ viewData }) => {
             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{meal.id}</p>
 
             <p className="text-sm text-gray-500 dark:text-gray-400">meal Name:</p>
-            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{viewData.meal.meals_name}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{viewData.meal.title}</p>
 
             <p className="text-sm text-gray-500 dark:text-gray-400">createdAt:</p>
             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">

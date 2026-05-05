@@ -236,8 +236,8 @@ const MealCard = ({ meal, onAddToCart, cartItems }: any) => {
       {/* Meal Image */}
       <div className="relative w-full h-60 overflow-hidden rounded-lg">
         <img
-          src={meal.image}
-          alt={meal.meals_name}
+          src={meal.images[0]}
+          alt={meal.title}
           loading="lazy"
           className="object-cover transition-transform duration-700 hover:scale-110"
         />
@@ -262,7 +262,7 @@ const MealCard = ({ meal, onAddToCart, cartItems }: any) => {
 
         <Link href={`/meals/${meal.id}`}>
           <h4 className="text-xl font-bold text-gray-900 hover:text-blue-700 hover:underline line-clamp-2 leading-tight">
-            {meal.meals_name.slice(0, 8)}...
+            {meal.title.slice(0, 8)}...
           </h4>
         </Link>
         <p className="text-gray-600 text-base line-clamp-2 leading-relaxed">

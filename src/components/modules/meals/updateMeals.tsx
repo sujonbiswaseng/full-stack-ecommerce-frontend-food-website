@@ -62,8 +62,8 @@ const UpdateMeal = ({ mealId }: { mealId: string }) => {
               id="mealName"
               type="text"
               placeholder="Meal name"
-              value={mealData.meals_name ?? ""}
-              onChange={(e) => handleInput("meals_name", e.target.value)}
+              value={mealData.title ?? ""}
+              onChange={(e) => handleInput("title", e.target.value)}
               className="w-full border border-gray-300 dark:border-gray-800 p-3 rounded-lg focus:ring-2 focus:ring-green-400 outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition"
               autoComplete="off"
             />

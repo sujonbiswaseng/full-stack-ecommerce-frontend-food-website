@@ -28,10 +28,10 @@ const ViewMealsData = ({
       <div className="rounded-2xl border border-gray-100 bg-white shadow-xl px-4 sm:px-6 py-6 space-y-8 overflow-y-scroll">
         <div className="flex flex-col sm:flex-row gap-6 items-center">
           <div className="flex-shrink-0 w-28 h-28 flex items-center justify-center border border-blue-100 rounded-xl bg-gradient-to-tr from-blue-50 to-indigo-50 shadow-inner overflow-hidden">
-            {viewData.image ? (
+            {viewData.images ? (
               <img
-                src={viewData.image}
-                alt={viewData.meals_name ?? 'Meal'}
+                src={viewData?.images[0]}
+                alt={viewData.title ?? 'Meal'}
                 className="w-full h-full object-cover rounded-lg"
               />
             ) : (
@@ -54,7 +54,7 @@ const ViewMealsData = ({
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="mb-1 font-bold text-2xl text-indigo-900 truncate">
-              {viewData.meals_name.slice(0,10)}....
+              {viewData.title.slice(0,10)}....
             </h3>
            
             <div className="flex flex-wrap items-center gap-4 mt-2">

@@ -35,7 +35,7 @@ export default async function SingleMealPage({
             message="We couldn't find the meal you were looking for, or there was a problem fetching its details."
           />
         ) : (
-          <div className="p-4">
+          <div className="p-4 max-w-[1440px] mx-auto">
             <SignleMealByid
               meal={
                 res.result.data as TResponseMeals<{

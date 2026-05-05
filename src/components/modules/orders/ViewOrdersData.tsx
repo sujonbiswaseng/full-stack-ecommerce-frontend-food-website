@@ -8,7 +8,7 @@ interface OrderItem {
   id: string;
   meal: {
     id: string;
-    meals_name: string;
+    title: string;
     description: string;
     price: number;
   };
@@ -169,7 +169,7 @@ const ViewOrdersData = ({
               >
                 <div className="flex-1">
                   <div className="font-semibold text-indigo-800 text-[16px]">
-                    {item.meal.meals_name}
+                    {item.meal.title}
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 text-[15px] mt-1">
                     <span>

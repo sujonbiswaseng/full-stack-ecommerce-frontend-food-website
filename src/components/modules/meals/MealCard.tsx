@@ -50,7 +50,7 @@ const MealCard = ({ meal, className }: MealCardProps) => {
         {meal.images ? (
           <ImageWithSkeleton
             src={meal.images[0]}
-            alt={meal.meals_name}
+            alt={meal.title}
             
             className="object-cover w-full h-full"
           />
@@ -81,7 +81,7 @@ const MealCard = ({ meal, className }: MealCardProps) => {
       <div className="flex flex-col flex-1 p-6 gap-4">
         <div className="flex items-start justify-between gap-4">
           <h2 className="line-clamp-1 text-lg font-bold text-card-foreground">
-            {meal.meals_name}
+            {meal.title}
           </h2>
           <span className="shrink-0 text-xl font-bold text-primary ">
           ৳{meal.price.toFixed(1)}
@@ -193,7 +193,7 @@ const MealCard = ({ meal, className }: MealCardProps) => {
               addToCart({
                 id: meal.id,
                 mealid: meal.id,
-                name: meal.meals_name,
+                name: meal.title,
                 restaurantName: meal.provider?.restaurantName || "Unknown Restaurant",
                 price: meal.price,
                 deliverycharge: meal.deliverycharge ?? 0,

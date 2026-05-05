@@ -134,7 +134,7 @@ const ViewReviewData = ({ viewData }:{viewData: TResponseReviewData<{meal:IGetMe
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-7">
           <div>
             <span className="font-semibold text-gray-700 dark:text-gray-300">Title</span>
-            <div className="text-gray-900 dark:text-gray-100">{viewData.meal.meals_name ?? <span className="italic text-gray-400">No Title</span>}</div>
+            <div className="text-gray-900 dark:text-gray-100">{viewData.meal.title ?? <span className="italic text-gray-400">No Title</span>}</div>
           </div>
           <div>
             <span className="font-semibold text-gray-700 dark:text-gray-300">Meal ID</span>

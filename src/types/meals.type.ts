@@ -64,7 +64,7 @@ export interface MealReview {
 
 export interface IGetMealData {
   id: string;
-  meals_name: string;
+  title: string;
   description: string | null;
   images: string[] | null;
   price: number;
@@ -92,7 +92,7 @@ export type TResponseMeals<T = unknown> = IGetMealData & T;
 
 
 export type UpdateMealsData = {
-  meals_name?: string;
+  title?: string;
   description?: string;
   image?: any;
   price?: number;

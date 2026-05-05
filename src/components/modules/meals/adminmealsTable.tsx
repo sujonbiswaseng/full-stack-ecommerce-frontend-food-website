@@ -11,7 +11,7 @@ import { DeleteMeals } from "@/actions/meals.action";
 const columns = [
   { key: "id", label: "ID" },
   { key: "image", label: "Image" },
-  { key: "meals_name", label: "Name" },
+  { key: "title", label: "Name" },
   { key: "description", label: "Description" },
   { key: "price", label: "Price" },
   { key: "category_name", label: "Category" },
@@ -101,16 +101,16 @@ const AdminMealsTable = ({ initialmeals }: { initialmeals: IGetMealData[] }) => 
 
                     <td className="px-5 py-4">
                       <img
-                        src={meal.image ?? "/images/default-meal.jpg"}
-                        alt={meal.meals_name}
+                        src={meal.images[0] ?? "/images/default-meal.jpg"}
+                        alt={meal.title}
                         className="w-14 h-14 object-cover rounded-xl shadow-md"
                       />
                     </td>
 
                     <td className="px-5 py-4 font-semibold text-indigo-600">
                       <Link href={`/meals/${meal.id}`} className="hover:underline">
-                        {meal.meals_name.substring(0, 8)}
-                        {meal.meals_name.length > 8 && "..."}
+                        {meal.title.substring(0, 8)}
+                        {meal.title.length > 8 && "..."}
                       </Link>
                     </td>
 

@@ -12,8 +12,8 @@ export default function ProductCard({ meal }: any) {
     <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col h-full">
       <div className="relative h-48 sm:h-56 overflow-hidden bg-muted">
         <img
-          src={meal.image || defaultImage}
-          alt={meal.meals_name || meal.name}
+          src={meal.images[0] || defaultImage}
+          alt={meal.title || meal.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         {/* Optional: Add badge if meal is unavailable or special */}
@@ -26,8 +26,8 @@ export default function ProductCard({ meal }: any) {
 
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-1">
-          <h2 className="text-lg font-bold text-card-foreground line-clamp-1 flex-1 pr-2" title={meal.meals_name || meal.name}>
-            {meal.meals_name || meal.name}
+          <h2 className="text-lg font-bold text-card-foreground line-clamp-1 flex-1 pr-2" title={meal.title || meal.name}>
+            {meal.title || meal.name}
           </h2>
         </div>
         
@@ -49,7 +49,7 @@ export default function ProductCard({ meal }: any) {
               addToCart({
                 id: meal.id as string,
                 mealid: meal.id as string,
-                name: meal.meals_name as string,
+                name: meal.title as string,
                 price: meal.price,
                 restaurantName: meal.provider?.restaurantName,
                 deliverycharge: meal.deliverycharge ?? 0,

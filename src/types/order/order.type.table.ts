@@ -6,7 +6,7 @@ export type OrderStatus =
   | "CANCELLED";
 export type MealType = {
   id: string;
-  meals_name: string;
+  title: string;
   category_name: string;
   price: number;
   image: string;
