@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 interface Props {
   id: string;
   href?: string;
-  showShort?: boolean;
+  showShort?: string;
   className?:string;
 }
 

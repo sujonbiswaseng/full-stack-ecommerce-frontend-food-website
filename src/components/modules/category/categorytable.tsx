@@ -1,10 +1,9 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { Eye, Pen, Pencil, Trash2, X } from "lucide-react";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { TResponseOrderData } from "@/types/order/order.type";
 import { useRouter } from "next/navigation";
 import { useFilter } from "@/components/shared/filter/ReuseableFilter";
-import { createMyMealColumns } from "../meals/CreatemymealColumns";
 import { TFilterField } from "@/types/filter.types";
 import { FilterPanel } from "@/components/shared/filter/FilterInput";
 import { ReusableTable } from "@/components/shared/ReuseableTable";
@@ -22,20 +21,28 @@ import { toast } from "react-toastify";
 import { deleteCategory } from "@/actions/category";
 import ViewCategoryData from "./ViewCategory";
 import Categoryupdate from "./UpdateCategoryForm";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { motion, AnimatePresence } from "framer-motion";
 
-const CategoryTable = ({pagination, category }: {pagination:Ipagination, category: TResponseCategoryData[] }) => {
+const CategoryTable = ({
+  pagination,
+  category,
+}: {
+  pagination: Ipagination;
+  category: TResponseCategoryData[];
+}) => {
   const router = useRouter();
-  const [orders, setOrders] = useState(category);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [status, setstatus] = useState("");
-
   const [tableData, setTableData] = useState<TResponseCategoryData[]>(category);
   const [viewData, setViewData] = useState<TResponseOrderData | null>(null);
   const { updateFilters, reset, isPending } = useFilter();
   const [open, setOpen] = useState(false);
 
-  const [selectedcategoryid, setselectedcategoryid] = useState<string | null>(null);
+  const [selectedcategoryid, setselectedcategoryid] = useState<string | null>(
+    null
+  );
   const [viewMode, setViewMode] = useState(false);
+  const [status, setstatus] = useState("");
   const [form, setForm] = useState({
     name: "",
     image: "",
@@ -129,123 +136,157 @@ const CategoryTable = ({pagination, category }: {pagination:Ipagination, categor
         setOpen(true);
       },
     },
-
     {
       icon: Trash2,
       label: "Delete",
       onClick: (category: TGetCategory) => {
         handleDelete(category.id);
       },
-      className: "text-red-500",
+      className: "text-destructive",
     },
   ];
 
-  const handleDelete = useCallback(async (categoryId: string) => {
-    try {
-      if (
-        !window.confirm(
-          "Are you sure you want to delete this category? This action cannot be undone.",
-        )
-      ) {
-        return;
-      }
-      const toastId = toast.loading("Deleting category. Please wait...");
-
-      const resp = await deleteCategory(categoryId);
-      toast.dismiss(toastId);
-      if (resp.success) {
-        router.refresh();
-        setTableData((prev) =>
-          prev.filter((category) => category.id !== categoryId),
-        );
-        toast.success("Category deleted successfully.");
-      } else {
+  const handleDelete = useCallback(
+    async (categoryId: string) => {
+      try {
+        if (
+          !window.confirm(
+            "Are you sure you want to delete this category? This action cannot be undone.",
+          )
+        ) {
+          return;
+        }
+        const toastId = toast.loading("Deleting category. Please wait...");
+        const resp = await deleteCategory(categoryId);
+        toast.dismiss(toastId);
+        if (resp.success) {
+          router.refresh();
+          setTableData((prev) =>
+            prev.filter((category) => category.id !== categoryId),
+          );
+          toast.success("Category deleted successfully.");
+        } else {
+          toast.error(
+            resp.message ||
+              "Failed to delete the category. Please try again. If the issue persists, contact technical support for assistance.",
+          );
+        }
+      } catch (error: any) {
+        toast.dismiss();
         toast.error(
-          resp.message ||
-            "Failed to delete the category. Please try again. If the issue persists, contact technical support for assistance.",
+          "An unexpected error occurred while deleting the category. Please try again." +
+            (error?.message ? ` (${error.message})` : ""),
         );
       }
-    } catch (error: any) {
-      toast.dismiss();
-      toast.error(
-        "An unexpected error occurred while deleting the category. Please try again." +
-          (error?.message ? ` (${error.message})` : ""),
-      );
-    }
-  }, []);
+    },
+    [router],
+  );
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-8">
-     <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
-       <h1 className="flex items-center gap-3 text-2xl md:text-4xl font-extrabold text-indigo-950 dark:text-indigo-100 tracking-tight">
-         <span>
-           <svg
-             className="w-8 h-8 text-indigo-500 dark:text-indigo-300"
-             viewBox="0 0 24 24"
-             fill="none"
-             stroke="currentColor"
-             strokeWidth={2.2}
-             strokeLinecap="round"
-             strokeLinejoin="round"
-             aria-hidden="true"
-           >
-             <rect x="3" y="4" width="18" height="16" rx="4" />
-             <path d="M7 8h10M7 12h10M7 16h4" />
-           </svg>
-         </span>
-         <span>Category Management</span>
-       </h1>
-       <div>
-         <button
-         onClick={()=>router.push('/admin/dashboard/create-category')}
-           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold shadow hover:from-blue-700 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition text-base md:text-lg"
-           type="button"
-         >
-           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-             <circle cx="12" cy="12" r="10" />
-             <path d="M12 8v8M8 12h8" />
-           </svg>
-           <span>Add Category</span>
-         </button>
-       </div>
-     </div>
+    <main className="w-full max-w-[1440px] mx-auto px-4 md:px-6 lg:px-10 py-8">
+      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <span className="rounded-xl bg-accent p-2 flex items-center justify-center">
+            <svg
+              className="w-8 h-8 text-primary"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="4" />
+              <path d="M7 8h10M7 12h10M7 16h4" />
+            </svg>
+          </span>
+          <h1 className="text-2xl md:text-4xl font-bold text-foreground tracking-tight">
+            Category Management
+          </h1>
+        </div>
+        <Button
+          className="flex gap-2"
+          size="lg"
+          onClick={() => router.push("/admin/dashboard/create-category")}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            viewBox="0 0 24 24"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v8M8 12h8" />
+          </svg>
+          <span>Add Category</span>
+        </Button>
+      </header>
 
-
-      <div className="mb-6 bg-white dark:bg-gray-950 p-3 sm:p-4 md:p-6 rounded-xl shadow border border-gray-100 dark:border-gray-800 transition-all">
-        <section className="mb-8 w-full">
-          <FilterPanel
-            fields={fields}
-            onApply={handleApply}
-            onReset={handleReset}
-            isPending={isPending}
-          />
-        </section>
-      </div>
-
-      {/* Table */}
-      <div className="relative w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
-        {isPending && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/50 dark:bg-black/50 backdrop-blur-sm">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-2"></div>
-            <p className="text-sm font-medium">Filtering data...</p>
+      <AnimatePresence>
+        <motion.section
+          key="filter-panel"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 12 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="mb-8 bg-card rounded-2xl border border-border shadow-sm"
+        >
+          <div className="p-6">
+            <FilterPanel
+              fields={fields}
+              onApply={handleApply}
+              onReset={handleReset}
+              isPending={isPending}
+            />
           </div>
-        )}
-        <div className="mb-6 overflow-x-auto rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
+        </motion.section>
+      </AnimatePresence>
+
+      <section className="relative w-full rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+        <AnimatePresence>
+          {isPending && (
+            <motion.div
+              key="category-table-skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm"
+            >
+              <Skeleton className="h-10 w-10 rounded-full mb-4" />
+              <div className="w-full max-w-lg">
+                <Skeleton className="h-8 w-full mb-2" />
+                <Skeleton className="h-8 w-full mb-2" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+              <p className="text-sm font-medium text-muted-foreground mt-4">
+                Filtering data...
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <div className="overflow-x-auto bg-card rounded-2xl">
           {tableData && Array.isArray(tableData) && tableData.length > 0 ? (
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
               <ReusableTable
                 columns={columns as any}
                 data={tableData}
                 actions={actions}
               />
-            </div>
+            </motion.div>
           ) : (
-            <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-base select-none">
+            <div className="p-8 text-center text-muted-foreground text-base select-none">
               No category data found.
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       <Dialog
         open={open}
@@ -257,49 +298,43 @@ const CategoryTable = ({pagination, category }: {pagination:Ipagination, categor
           }
         }}
       >
-        <DialogContent className="max-w-md w-full rounded-xl p-0 sm:p-0 bg-white dark:bg-gray-950">
-          <DialogHeader className="flex flex-col items-center justify-center px-6 pt-8 pb-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-t-xl shadow-none">
-            <DialogTitle className="text-[1.45rem] sm:text-2xl font-bold text-indigo-900 dark:text-indigo-100 mb-1 sm:mb-2 tracking-tight text-center">
+        <DialogContent className="max-w-md w-full rounded-2xl p-0 bg-card text-card-foreground">
+          <DialogHeader className="flex flex-col items-center justify-center p-6 pb-4 border-b border-border rounded-t-2xl shadow-none">
+            <DialogTitle className="text-2xl font-bold text-foreground mb-2 text-center">
               {viewMode ? "Category Details" : "Edit Category"}
-         
             </DialogTitle>
             <p
               id="dialog-description"
-              className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-0 text-center"
+              className="text-base text-muted-foreground text-center"
             >
               {viewMode
                 ? "Please review all the details of your selected category below."
                 : "You can update the details of your selected category in the form below."}
-           
             </p>
           </DialogHeader>
 
-          {/* Make ONLY the modal content scrollable */}
-          <div
-            className="py-6 px-4 sm:px-8"
-            style={{
-              maxHeight: "70vh",
-              overflowY: "auto",
-            }}
-          >
+          <div className="py-6 px-4 sm:px-8" style={{ maxHeight: "70vh", overflowY: "auto" }}>
             <ViewCategoryData
-              viewData={Array.isArray(viewData) ? viewData[0] : viewData ?? undefined}
+              viewData={
+                Array.isArray(viewData)
+                  ? viewData[0]
+                  : viewData ?? undefined
+              }
               viewMode={viewMode}
             />
-
             {!viewMode && selectedcategoryid && (
               <div className="mt-6">
-                <Categoryupdate categoryid={selectedcategoryid}/>
+                <Categoryupdate categoryid={selectedcategoryid} />
               </div>
             )}
           </div>
         </DialogContent>
       </Dialog>
 
-      <div className="mt-6">
-        <PaginationPage pagination={pagination}/>
-      </div>
-    </div>
+      <footer className="mt-8">
+        <PaginationPage pagination={pagination} />
+      </footer>
+    </main>
   );
 };
 
