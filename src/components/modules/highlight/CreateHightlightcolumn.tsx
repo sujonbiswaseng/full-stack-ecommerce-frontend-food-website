@@ -1,5 +1,5 @@
+import CopyableId from "@/components/shared/CopyAndRoutebyId";
 import { motion } from "framer-motion";
-import CopyableId from "@/components/shared/CopyId";
 
 // FIELDS FROM @file_context_0:
 // id, title, description, image, userId, createdAt

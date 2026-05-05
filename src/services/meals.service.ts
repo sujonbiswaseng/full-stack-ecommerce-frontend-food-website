@@ -48,7 +48,7 @@ export const mealsService = {
       revalidateTag("meal",'max')
 
       const data = await res.json();
-      console.log(data,'data')
+      
 
       const result = data as ApiResponse<TCreateMealsData>;
       if (!res.ok) {

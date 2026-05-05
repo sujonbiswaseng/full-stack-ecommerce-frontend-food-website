@@ -145,10 +145,7 @@ export default function BlogsTable({ blogs, pagination, role }: MyBlogsTableProp
           <div className="mb-4 flex w-full justify-center">
             <button
               className="bg-blue-600 px-4 py-2 text-sm font-semibold text-white rounded-lg"
-              onClick={() => router.push(
-                role === "ADMIN"
-                  ? "/admin/dashboard/blogs/create"
-                  : "/manager/dashboard/create-blog")}
+              onClick={() => router.push("/admin/dashboard/create-blog")}
             >
               + Add Blog
             </button>

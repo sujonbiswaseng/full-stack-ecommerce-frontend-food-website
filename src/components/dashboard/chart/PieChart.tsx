@@ -1,51 +1,43 @@
 "use client";
 
-import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import React from "react";
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
+import { Card } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface PieChartProps {
-  percentage: number; // % value (0-100)
-  amount?: number;    // achieved amount
-  total?: number;     // total possible amount
+  percentage: number;
+  amount?: number;
+  total?: number;
 }
 
+const chartGradientId = "dashboard-pie-gradient";
+
 const PieChart: React.FC<PieChartProps> = ({ percentage, amount, total }) => {
-  const safeAmount = typeof amount === 'number' ? amount : undefined;
-  const safeTotal = typeof total === 'number' ? total : undefined;
+  const safeAmount = typeof amount === "number" ? amount : undefined;
+  const safeTotal = typeof total === "number" ? total : undefined;
 
-  // Color settings for more unique/professional design
-  const mainColor = "rgba(16, 185, 129, 1)"; // emerald-500
-  const accentColor = "rgba(8, 145, 178, 1)"; // cyan-600
-  const bgTrack = "rgba(229, 231, 235, 0.15)"; // light glassy gray
-
-  const gradientId = "pieGradient";
-
-  // Chart Data (same logic, enhanced colors)
+  // Colors via tokens
   const data = {
     datasets: [
       {
         data: [percentage, 100 - percentage],
         backgroundColor: [
-          `url(#${gradientId})`, // SVG gradient for pro look
-          bgTrack
+          `url(#${chartGradientId})`,
+          "var(--muted, theme('colors.muted.DEFAULT'))"
         ],
         borderColor: [
-          "rgba(8, 145, 178, 0.85)", // border accent
-          bgTrack
+          "var(--accent, theme('colors.accent.DEFAULT'))",
+          "var(--border, theme('colors.border'))"
         ],
-        borderWidth: 3,
-        cutout: "74%",
+        borderWidth: 2,
+        cutout: "72%",
         rotation: -135,
         circumference: 270,
-        hoverOffset: 4,
-        // Extra shadow for achieved slice
-        shadowOffsetX: 0,
-        shadowOffsetY: 3,
-        shadowBlur: 18,
-        shadowColor: mainColor,
+        hoverOffset: 4
       },
     ],
   };
@@ -57,117 +49,116 @@ const PieChart: React.FC<PieChartProps> = ({ percentage, amount, total }) => {
       legend: { display: false },
       tooltip: { enabled: false },
     },
-    cutout: "74%",
-    layout: { padding: { top: 8, bottom: 8, left: 0, right: 0 } },
+    cutout: "72%",
+    layout: {
+      padding: { top: 0, bottom: 0, left: 0, right: 0 }
+    },
     animation: {
       animateRotate: true,
-      duration: 1200,
-      easing: "easeOutQuart"
+      duration: 300,
+      easing: "easeOutCubic"
     }
   };
 
   return (
-    <div
+    <Card
       className="
-        relative mx-auto flex items-center justify-center isolate
-        w-full max-w-[365px] min-h-[160px] min-w-[180px]
-        sm:min-h-[170px] md:min-h-[200px] md:max-w-[330px] md:h-[222px]
-        xl:max-w-[370px] xl:h-[240px]
-        rounded-[28px] overflow-visible shadow-[0_4px_24px_-6px_#14b8a680,0_1.5px_6px_0_#0891b241]
-        bg-gradient-to-br from-white/85 via-cyan-50/85 to-emerald-50/90
-        ring-2 ring-emerald-100/40 hover:ring-cyan-300/60 transition-all
+        relative flex flex-col items-center justify-center bg-card rounded-2xl
+        w-full max-w-[380px] min-h-[186px] 
+        md:max-w-[310px] md:min-h-[200px] 
+        xl:max-w-[356px] xl:min-h-[224px]
+        ring-1 ring-border
+        transition-shadow focus-visible:ring-2 focus-visible:ring-ring
+        overflow-visible mx-auto
       "
     >
-      {/* Custom SVG gradient for donut */}
+      {/* SVG gradient for Chart */}
       <svg width="0" height="0">
         <defs>
-          <linearGradient id={gradientId} x1="0" x2="90%" y1="0" y2="100%">
-            <stop offset="0%" stopColor="#14b8a68e" />
-            <stop offset="75%" stopColor="#06b6d463" />
-            <stop offset="100%" stopColor="#2563eb4a" />
+          <linearGradient id={chartGradientId} x1="0%" y1="0%" x2="100%" y2="90%">
+            <stop offset="0%" stopColor="var(--primary, #06b6d4)" stopOpacity="0.26" />
+            <stop offset="65%" stopColor="var(--accent, #14b8a6)" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="var(--secondary, #0ea5e9)" stopOpacity="0.48" />
           </linearGradient>
         </defs>
       </svg>
 
-      <Doughnut
-        data={data as any}
-        options={options as any}
-        style={{
-          zIndex: 2,
-          // "half-float" illusion
-          filter: "drop-shadow(0 4px 16px #14b8a63f)"
-        }}
-      />
-
-      {/* Main Info overlay */}
-      <div className="
-        absolute inset-0 flex flex-col items-center justify-center pointer-events-none
-        z-10
-      ">
-        <span className="
-          text-[8vw] sm:text-[34px] md:text-[40px] lg:text-[48px] font-black
-          bg-gradient-to-br from-emerald-500 via-cyan-600 to-blue-500
-          text-transparent bg-clip-text drop-shadow-[0_2px_16px_rgba(34,197,94,0.16)]
-          tracking-tight
-          transition-all duration-300
-        ">
-          {percentage}%
-        </span>
-        <span
+      <motion.div
+        initial={{ opacity: 0, scale: 0.97, y: 22 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="relative w-full flex items-center justify-center"
+        style={{ minHeight: "158px", maxHeight: "230px" }}
+      >
+        <Doughnut
+          data={data as any}
+          options={options as any}
+          style={{ width: "100%", height: "100%" }}
+        />
+        <div
           className="
-            flex items-end gap-1 text-[3.8vw] sm:text-[12px] md:text-base
-            font-semibold tracking-widest
-            text-emerald-800/75 dark:text-white/75 uppercase mt-1 drop-shadow
+            absolute inset-0 flex flex-col items-center justify-center pointer-events-none
+            z-10
           "
         >
-          {safeAmount !== undefined && safeTotal !== undefined ? (
-            <>
-              <span className="
-                font-bold text-emerald-600 dark:text-emerald-200
-                bg-emerald-50/60 dark:bg-teal-900/30 px-1.5 py-[2px] rounded-lg mx-1 ring-1 ring-emerald-200/30
-              ">
-                ৳&nbsp;{safeAmount.toLocaleString()}
+          <span
+            className="
+              text-[8vw] sm:text-[32px] md:text-[38px] xl:text-[44px]
+              font-black 
+              bg-gradient-to-br 
+              from-primary via-accent to-secondary
+              text-transparent bg-clip-text
+              tracking-tight
+              leading-tight
+            "
+          >
+            {percentage}%
+          </span>
+          <span
+            className="
+              flex items-end gap-2 text-xs md:text-sm font-medium uppercase
+              text-muted-foreground tracking-wider mt-1
+              transition-colors
+            "
+          >
+            {safeAmount !== undefined && safeTotal !== undefined ? (
+              <>
+                <span
+                  className="font-semibold text-primary bg-primary/5 px-2 py-[2px] rounded-lg ring-1 ring-border"
+                >
+                  ৳&nbsp;{safeAmount.toLocaleString()}
+                </span>
+                <span className="text-muted-foreground font-medium">of</span>
+                <span
+                  className="font-semibold text-accent bg-accent/10 px-2 py-[2px] rounded-lg ring-1 ring-border"
+                >
+                  ৳&nbsp;{safeTotal.toLocaleString()}
+                </span>
+              </>
+            ) : (
+              <span
+                className="font-semibold text-secondary px-2 py-[2px] rounded-lg bg-secondary/10 ring-1 ring-border"
+              >
+                Progress
               </span>
-              <span className="mx-0.5 text-xs font-semibold text-cyan-800/70 dark:text-cyan-100/70">of</span>
-              <span className="
-                font-bold text-cyan-600 dark:text-cyan-200
-                bg-gradient-to-l from-cyan-50/60 dark:from-teal-900/35 to-teal-100/55 px-1.5 py-[2px] rounded-lg ring-1 ring-cyan-100/25
-              ">
-                ৳&nbsp;{safeTotal.toLocaleString()}
-              </span>
-            </>
-          ) : (
-            <span
-              className="
-                font-semibold text-cyan-700 dark:text-cyan-200
-                px-2 py-[3px] rounded-lg bg-teal-50/40 dark:bg-cyan-900/20
-                ring-1 ring-cyan-100/15
-              "
-            >
-              Progress
-            </span>
-          )}
-        </span>
-      </div>
+            )}
+          </span>
+        </div>
+      </motion.div>
 
-      {/* Decorative layered gloss and neon border */}
+      {/* Decorative Glow - strictly with tokens */}
       <div
+        aria-hidden="true"
         className="
-          absolute -top-4 -left-4 w-[105%] h-[62%] 
-          bg-gradient-to-b from-white/60 via-transparent to-transparent 
-          rounded-t-[36px] blur-[2.5px] pointer-events-none
-          z-0
+          absolute inset-0 z-0 rounded-full pointer-events-none
         "
-      />
-      {/* Subtle neon halo ring */}
-      <div
-        className="absolute inset-0 m-auto w-[97%] h-[98%] rounded-full pointer-events-none z-0"
         style={{
           boxShadow:
-            "0 0 36px 4px #14b8a621, 0 1.5px 9px 0 #06b6d459"
+            "0 0 30px 0 var(--accent, theme('colors.accent.DEFAULT') / 0.08)"
         }}
       />
-      {/* Decorative dotted accent ring */}
+
+      {/* Dotted Accent Ring */}
       <svg
         className="pointer-events-none absolute inset-0 w-full h-full z-0"
         aria-hidden="true"
@@ -177,13 +168,13 @@ const PieChart: React.FC<PieChartProps> = ({ percentage, amount, total }) => {
           cy="54%"
           r="48%"
           fill="none"
-          stroke="url(#pieGradient)"
+          stroke={`url(#${chartGradientId})`}
           strokeWidth="3.5"
           strokeDasharray="7, 8"
-          opacity="0.23"
+          opacity="0.16"
         />
       </svg>
-    </div>
+    </Card>
   );
 };
 

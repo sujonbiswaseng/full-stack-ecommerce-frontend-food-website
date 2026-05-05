@@ -9,104 +9,105 @@ import { Separator } from "../ui/separator";
 import { ScrollArea } from "../ui/scroll-area";
 
 interface DashboardSidebarContentProps {
-    userInfo : any,
-    navItems : NavSection[],
-    dashboardHome : string,
-
+  userInfo: any;
+  navItems: NavSection[];
+  dashboardHome: string;
 }
 
-
-
-const DashboardSidebarContent = ({dashboardHome, navItems, userInfo} : DashboardSidebarContentProps) => {
-    const pathname = usePathname()
+const DashboardSidebarContent = ({
+  dashboardHome,
+  navItems,
+  userInfo,
+}: DashboardSidebarContentProps) => {
+  const pathname = usePathname();
   return (
-    <div className="hidden md:flex h-full w-64 flex-col border-r bg-card overflow-y-auto">
-      {/* Logo / Brand */}
-      <div className="flex h-8 items-center border-b px-6">
-        <Link href={dashboardHome} className="mb-4">
-          <span className="text-xl font-bold text-primary">BiteBase</span>
+    <aside className="hidden md:flex h-full w-64 flex-col border-r border-border bg-card overflow-y-auto">
+      <div className="flex items-center h-10 border-b border-border px-6 bg-background">
+        <Link href={dashboardHome} className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-ring rounded-md transition-colors">
+          <span className="text-xl mb-4 font-bold text-primary tracking-tight select-none">
+            BiteBase
+          </span>
         </Link>
       </div>
-
-      {/* Navigation Area */}
-      <ScrollArea className="flex-1 px-3 py-4">
-        <nav className="space-y-6">
+      <ScrollArea className="flex-1 px-4 py-6">
+        <nav className="flex flex-col gap-8">
           {navItems.map((section, sectionId) => (
             <div key={sectionId}>
               {section.title && (
-                <h4 className="mb-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <h4 className="mb-2 px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide select-none">
                   {section.title}
                 </h4>
               )}
-
-              <div className="space-y-1">
+              <ul className="flex flex-col gap-2">
                 {section.items.map((item, id) => {
                   const isActive = pathname === item.href;
-                  // Icon Mapper Function
                   const Icon = getIconComponent(item.icon);
-
                   return (
-                    <Link
-                      href={item.href}
-                      key={id}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                      )}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span>{item.title}</span>
-                    </Link>
+                    <li key={id}>
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200",
+                          isActive
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        )}
+                        tabIndex={0}
+                        aria-current={isActive ? "page" : undefined}
+                      >
+                        <Icon
+                          className={cn(
+                            "w-5 h-5 transition-colors",
+                            isActive
+                              ? "text-primary-foreground"
+                              : "text-muted-foreground group-hover:text-white"
+                          )}
+                          aria-hidden="true"
+                        />
+                        <span className="truncate">{item.title}</span>
+                      </Link>
+                    </li>
                   );
                 })}
-              </div>
-
+              </ul>
               {sectionId < navItems.length - 1 && (
-                <Separator className="my-4" />
+                <Separator className="my-6" />
               )}
             </div>
           ))}
         </nav>
       </ScrollArea>
-
-      {/* User Info At Bottom */}
-      <div className="border-t px-3 py-4">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="text-sm font-semibold text-primary">
-              {userInfo.image ? (
-                <img
-                  src={userInfo.image}
-                  alt={userInfo.name}
-                  className="object-cover rounded-full w-8 h-8 border border-primary"
-                  style={{ minWidth: "2rem", minHeight: "2rem" }}
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <span
-                  className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white font-semibold text-base"
-                  aria-label={userInfo.name}
-                  style={{ minWidth: "2rem", minHeight: "2rem" }}
-                >
-                  {userInfo.name.charAt(0).toUpperCase()}
-                </span>
-              )}
-
-            </span>
+      <div className="border-t border-border px-4 py-6 bg-background">
+        <div className="flex items-center gap-4">
+          <div className="h-10 w-10 flex-shrink-0 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+            {userInfo.image ? (
+              <img
+                src={userInfo.image}
+                alt={userInfo.name}
+                className="object-cover rounded-full w-10 h-10 border-2 border-primary"
+                referrerPolicy="no-referrer"
+                width={40}
+                height={40}
+              />
+            ) : (
+              <span
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-semibold text-base uppercase"
+                aria-label={userInfo.name}
+              >
+                {userInfo.name.charAt(0).toUpperCase()}
+              </span>
+            )}
           </div>
-
-          <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-medium truncate">{userInfo.name}</p>
-            <p className="text-xs text-muted-foreground capitalize">
-              {userInfo.role.toLocaleLowerCase().replace("_", " ")}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate text-card-foreground">{userInfo.name}</p>
+            <p className="text-xs text-muted-foreground truncate capitalize">
+              {userInfo.role?.toLocaleLowerCase().replace("_", " ")}
             </p>
           </div>
         </div>
       </div>
-    </div>
+    </aside>
   );
-}
+};
 
-export default DashboardSidebarContent
+export default DashboardSidebarContent;

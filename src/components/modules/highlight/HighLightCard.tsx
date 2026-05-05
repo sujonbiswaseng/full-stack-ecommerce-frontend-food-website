@@ -1,24 +1,24 @@
 "use client";
-import { TResponseBlog } from "@/types/blog.type";
-import { IBaseEvent, TPagination } from "@/types/event.types";
-import { IBaseUser } from "@/types/user.types";
-import { useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import ImageSkeleton from "@/components/ImageSkeleton";
+import { useFilter } from "@/components/shared/Filter";
+import { FilterPanel } from "@/components/shared/filter/FilterInput";
 import BlogCardSkeleton from "@/components/Skeleton/BlogCardSkeleton";
-import Image from "next/image";
-import PaginationPage from "../event/Pagination";
-import { useFilter } from "@/components/ReusableFilter";
+import CardSkeleton from "@/components/Skeleton/CardSkeleton";
+import { TResponseBlog } from "@/types/blog.type";
 import { TFilterField } from "@/types/filter.types";
-import { FilterPanel } from "@/components/Filter";
+import { TResponseMeals } from "@/types/meals.type";
+import { Ipagination } from "@/types/pagination.type";
+import { TUser } from "@/types/user.type";
+import { AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import PaginationPage from "../meals/Pagination";
 
 const DEFAULT_AUTHOR_AVATAR = "/logo.png";
 const DEFAULT_BLOG_IMAGE = "/logo.png";
 
 interface BlogCardProps {
-  blogs: TResponseBlog<{ author: IBaseUser; event: IBaseEvent }>[];
-  pagination: TPagination;
+  blogs: TResponseBlog<{ author: TUser; event: TResponseMeals }>[];
+  pagination: Ipagination;
 }
 
 // Framer motion variants
@@ -38,7 +38,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blogs, pagination }) => {
   const router = useRouter();
 
   const [BlogsData, setBlogsData] = useState<
-    TResponseBlog<{ author: IBaseUser; event: IBaseEvent }>[]
+    TResponseBlog<{ author: TUser; event: TResponseMeals }>[]
   >(blogs);
 
   useEffect(() => {
@@ -112,7 +112,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blogs, pagination }) => {
         {isLoading ? (
           <div className="w-full flex justify-center gap-6">
             {Array.from({ length: 3 }).map((_, idx) => (
-              <BlogCardSkeleton
+              <CardSkeleton
                 key={idx}
                 className="max-w-[400px] min-w-[320px] w-full"
                 contentLines={4}

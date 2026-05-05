@@ -1,4 +1,5 @@
-import { CreateHighlightForm } from '@/components/module/highlight/CreateHightlight'
+
+import { CreateHighlightForm } from '@/components/modules/highlight/CreateHightlight'
 import React from 'react'
 
 const CreateHightLightPage = () => {

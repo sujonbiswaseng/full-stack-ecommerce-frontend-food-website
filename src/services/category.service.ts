@@ -105,7 +105,7 @@ export const CategoriesService = {
       if (image) {
         formData.append("file", image);
       }
-      console.log(updateUser,'sdf')
+    
       const res = await fetch(`${api_url}/api/v1/admin/category/${id}`, {
         method: "PUT",
         credentials: "include",
@@ -116,7 +116,7 @@ export const CategoriesService = {
       });
       revalidateTag('category', 'max')
       const data = await res.json();
-      console.log(data,'dat')
+    
       const result = data as ApiResponse<TGetCategory>
       if (!res.ok) {
         const error = data as ApiErrorResponse

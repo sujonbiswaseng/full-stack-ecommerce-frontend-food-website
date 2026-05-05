@@ -1,173 +1,224 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { motion } from "framer-motion";
+
+const footerLinks = [
+  {
+    heading: "Products",
+    links: [
+      { href: "/meals", label: "Browse Meals" },
+      { href: "/providers", label: "Providers" },
+      { href: "/login", label: "Login" },
+      { href: "/register", label: "Register" },
+    ],
+  },
+  {
+    heading: "For Customers",
+    links: [
+      { href: "/cart", label: "Cart" },
+      { href: "/orders", label: "My Orders" },
+      { href: "/profile/user", label: "Profile" },
+      { href: "/checkout", label: "Checkout" },
+    ],
+  },
+  {
+    heading: "For Providers",
+    links: [
+      { href: "/provider/dashboard", label: "Dashboard" },
+      { href: "/provider/dashboard/my-menu", label: "Manage Menu" },
+      { href: "/provider/dashboard/orders", label: "Orders" },
+    ],
+  },
+  {
+    heading: "Support",
+    links: [
+      { href: "/help", label: "Help Center" },
+      { email: "dev.sujonbiswas@gmail.com", label: "dev.sujonbiswas@gmail.com" },
+      { phone: "+880 1788477912", label: "+880 1788477912" },
+      { location: "Sylhet, Bangladesh", label: "Sylhet, Bangladesh" },
+    ],
+  },
+];
+
+function FooterColumn({
+  heading,
+  links,
+}: {
+  heading: string;
+  links: any[];
+}) {
+  return (
+    <div className="flex flex-col gap-4 min-w-[180px]">
+      <h3 className="text-xs font-semibold text-foreground">{heading}</h3>
+      <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
+        {links.map((link, i) => {
+          if (link.href)
+            return (
+              <li key={i}>
+                <Link
+                  href={link.href}
+                  className="transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            );
+          if (link.email)
+            return (
+              <li
+                key={i}
+                className="break-all transition-colors hover:text-primary cursor-pointer"
+                tabIndex={0}
+                aria-label={`Email: ${link.label}`}
+                onClick={() => window.open(`mailto:${link.label}`)}
+                onKeyDown={e => {
+                  if (e.key === "Enter") window.open(`mailto:${link.label}`);
+                }}
+              >
+                {link.label}
+              </li>
+            );
+          if (link.phone)
+            return (
+              <li
+                key={i}
+                className="transition-colors hover:text-primary cursor-pointer"
+                tabIndex={0}
+                aria-label={`Phone: ${link.label}`}
+                onClick={() => window.open(`tel:${link.label.replace(/\s/g, "")}`)}
+                onKeyDown={e => {
+                  if (e.key === "Enter") window.open(`tel:${link.label.replace(/\s/g, "")}`);
+                }}
+              >
+                {link.label}
+              </li>
+            );
+          if (link.location)
+            return <li key={i}>{link.label}</li>;
+          return null;
+        })}
+      </ul>
+    </div>
+  );
+}
 
 export default function Footer() {
   return (
-    <footer className="bg-card border-t border-border mt-24 w-full">
-      <div className="mx-auto px-4 sm:px-6 md:px-8 2xl:px-0 py-10 md:py-16 max-w-[1480px] w-full">
-        {/* Top Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-8 md:gap-10 lg:gap-12">
-          {/* Brand Section */}
-          <div className="space-y-4 flex flex-col items-start">
-            <div className="flex items-center space-x-3 md:space-x-4">
-              <img
-                src="https://res.cloudinary.com/drmeagmkl/image/upload/v1772007286/logo_rcsr8h.png"
-                className="w-[54px] h-[54px] xs:w-[60px] xs:h-[60px] sm:w-[64px] sm:h-[64px] md:w-[70px] md:h-[70px] rounded-full object-cover"
+    <footer className="bg-card border-t border-border pt-8 pb-4 w-full">
+      <div className="max-w-[1440px] mx-auto w-full px-4 md:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+        >
+          {/* Brand */}
+          <div className="flex flex-col gap-4 min-w-[220px]">
+            <div className="flex items-center gap-4">
+              <Image
+                src="/logo.png"
+                width={56}
+                height={56}
+                className="rounded-full object-cover bg-background border border-border"
                 alt="BiteBase logo"
+                priority
               />
-              <h2 className="text-xl xs:text-2xl sm:text-2xl md:text-2xl font-bold text-primary tracking-tight">
+              <span className="text-2xl font-bold text-primary tracking-tight">
                 BiteBase
-              </h2>
+              </span>
             </div>
-            <p className="text-muted-foreground text-xs xs:text-sm md:text-sm leading-relaxed max-w-xs md:max-w-[240px]">
-              Discover &amp; order delicious meals from trusted providers near you.
-              Fresh food. Fast delivery. Simple experience.
+            <p className="text-xs text-muted-foreground max-w-[240px] leading-relaxed">
+              Discover &amp; order delicious meals from trusted providers near you. Fresh food. Fast delivery. Simple experience.
             </p>
-          </div>
-
-          {/* Products */}
-          <div>
-            <h3 className="text-xs xs:text-sm font-semibold text-foreground mb-3 xs:mb-4">
-              Products
-            </h3>
-            <ul className="space-y-2 xs:space-y-2.5 md:space-y-3 text-xs xs:text-sm md:text-sm text-muted-foreground">
-              <li>
-                <Link href="/meals" className="hover:text-primary transition-colors">
-                  Browse Meals
-                </Link>
-              </li>
-              <li>
-                <Link href="/providers" className="hover:text-primary transition-colors">
-                  Providers
-                </Link>
-              </li>
-              <li>
-                <Link href="/login" className="hover:text-primary transition-colors">
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link href="/register" className="hover:text-primary transition-colors">
-                  Register
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Customers */}
-          <div>
-            <h3 className="text-xs xs:text-sm font-semibold text-foreground mb-3 xs:mb-4">
-              For Customers
-            </h3>
-            <ul className="space-y-2 xs:space-y-2.5 md:space-y-3 text-xs xs:text-sm md:text-sm text-muted-foreground">
-              <li>
-                <Link href="/cart" className="hover:text-primary transition-colors">
-                  Cart
-                </Link>
-              </li>
-              <li>
-                <Link href="/orders" className="hover:text-primary transition-colors">
-                  My Orders
-                </Link>
-              </li>
-              <li>
-                <Link href="/profile/user" className="hover:text-primary transition-colors">
-                  Profile
-                </Link>
-              </li>
-              <li>
-                <Link href="/checkout" className="hover:text-primary transition-colors">
-                  Checkout
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Providers */}
-          <div>
-            <h3 className="text-xs xs:text-sm font-semibold text-foreground mb-3 xs:mb-4">
-              For Providers
-            </h3>
-            <ul className="space-y-2 xs:space-y-2.5 md:space-y-3 text-xs xs:text-sm md:text-sm text-muted-foreground">
-              <li>
-                <Link href="/provider/dashboard" className="hover:text-primary transition-colors">
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link href="/provider/dashboard/my-menu" className="hover:text-primary transition-colors">
-                  Manage Menu
-                </Link>
-              </li>
-              <li>
-                <Link href="/provider/dashboard/orders" className="hover:text-primary transition-colors">
-                  Orders
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h3 className="text-xs xs:text-sm font-semibold text-foreground mb-3 xs:mb-4">
-              Support
-            </h3>
-            <ul className="space-y-2 xs:space-y-2.5 md:space-y-3 text-xs xs:text-sm md:text-sm text-muted-foreground">
-              <li>
-                <Link href="/help" className="hover:text-primary transition-colors">
-                  Help Center
-                </Link>
-              </li>
-              <li className="hover:text-primary transition-colors cursor-pointer break-all">
-                dev.sujonbiswas@gmail.com
-              </li>
-              <li className="hover:text-primary transition-colors cursor-pointer">
-                +880 1788477912
-              </li>
-              <li>Sylhet, Bangladesh</li>
-            </ul>
-
-            {/* Social Icons */}
-            <div className="flex items-center gap-3 xs:gap-4 mt-4 xs:mt-6">
-              <Link href={"https://facebook.com/sujonbiswasdev"} aria-label="Facebook">
-                <Facebook className="w-5 h-5 xs:w-6 xs:h-6 text-muted-foreground hover:text-primary transition-colors cursor-pointer" />
-              </Link>
-              <Link href={"https://instagram.com/sujonbiswasdev"} aria-label="Instagram">
-                <Instagram className="w-5 h-5 xs:w-6 xs:h-6 text-muted-foreground hover:text-primary transition-colors cursor-pointer" />
-              </Link>
-              <Link href={"https://linkedin.com/in/sujonbiswasdev"} aria-label="LinkedIn">
-                <Linkedin className="w-5 h-5 xs:w-6 xs:h-6 text-muted-foreground hover:text-primary transition-colors cursor-pointer" />
-              </Link>
-              <Link href={"https://twitter.com/sujonbiswasdev"} aria-label="Twitter">
-                <Twitter className="w-5 h-5 xs:w-6 xs:h-6 text-muted-foreground hover:text-primary transition-colors cursor-pointer" />
-              </Link>
+            <div className="flex items-center gap-4 mt-2">
               <Link
-                href={`https://wa.me/01804935939`}
+                href="https://facebook.com/sujonbiswasdev"
+                aria-label="Facebook"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="WhatsApp"
+                className="rounded-full hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors p-2"
               >
-                <img src="/whatsapp.png" className="w-7 h-7 xs:w-8 xs:h-8 hover:opacity-80 transition-opacity cursor-pointer" alt="WhatsApp" />
+                <Facebook className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
+              </Link>
+              <Link
+                href="https://instagram.com/sujonbiswasdev"
+                aria-label="Instagram"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors p-2"
+              >
+                <Instagram className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
+              </Link>
+              <Link
+                href="https://linkedin.com/in/sujonbiswasdev"
+                aria-label="LinkedIn"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors p-2"
+              >
+                <Linkedin className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
+              </Link>
+              <Link
+                href="https://twitter.com/sujonbiswasdev"
+                aria-label="Twitter"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors p-2"
+              >
+                <Twitter className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
+              </Link>
+              <Link
+                href="https://wa.me/01804935939"
+                aria-label="WhatsApp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors p-1"
+              >
+                <Image
+                  src="/whatsapp.png"
+                  width={26}
+                  height={26}
+                  className="object-contain"
+                  alt="WhatsApp"
+                  loading="lazy"
+                />
               </Link>
             </div>
           </div>
-        </div>
-
+          {/* Footer Columns */}
+          {footerLinks.slice(0, 3).map((col) => (
+            <FooterColumn key={col.heading} heading={col.heading} links={col.links} />
+          ))}
+          {/* Support Column on desktop, after others */}
+          <div className="mt-8 md:mt-0">
+            <FooterColumn heading={footerLinks[3].heading} links={footerLinks[3].links} />
+          </div>
+        </motion.div>
         {/* Bottom Bar */}
-        <div className="border-t border-border mt-8 md:mt-16 pt-4 md:pt-6 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 text-xs xs:text-sm text-muted-foreground w-full">
-          <p className="text-center md:text-left w-full md:w-auto">
+        <div className="border-t border-border mt-8 pt-4 flex flex-col md:flex-row items-center justify-between gap-4 text-muted-foreground text-xs">
+          <span className="w-full md:w-auto text-center md:text-left">
             © {new Date().getFullYear()} BiteBase. All rights reserved.
-          </p>
-
-          <div className="flex flex-wrap justify-center md:justify-end gap-4 xs:gap-6">
-            <Link href="/privacy-policy" className="hover:text-primary transition-colors">
+          </span>
+          <div className="flex flex-wrap gap-4 justify-center md:justify-end">
+            <Link
+              href="/privacy-policy"
+              className="hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+            >
               Privacy Policy
             </Link>
-            <Link href="/terms" className="hover:text-primary transition-colors">
+            <Link
+              href="/terms"
+              className="hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+            >
               Terms &amp; Conditions
             </Link>
-            <Link href="/help" className="hover:text-primary transition-colors">
+            <Link
+              href="/help"
+              className="hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+            >
               Help Center
             </Link>
           </div>

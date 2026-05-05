@@ -91,7 +91,11 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                   field.state.meta.isTouched && !field.state.meta.isValid
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>title</FieldLabel>
+                   
+                    <div className="flex gap-1">
+                       <FieldLabel htmlFor={field.name}>title</FieldLabel>
+                    <span style={{ color: "red" }}>*</span>
+                    </div>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -184,7 +188,11 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                   field.state.meta.isTouched && !field.state.meta.isValid
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>price</FieldLabel>
+                   
+                    <div className="flex gap-1">
+                       <FieldLabel htmlFor={field.name}>price</FieldLabel>
+                    <span style={{ color: "red" }}>*</span>
+                    </div>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -240,7 +248,11 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                   field.state.meta.isTouched && !field.state.meta.isValid
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>deliverycharge</FieldLabel>
+                   
+                    <div className="flex gap-1">
+                       <FieldLabel htmlFor={field.name}>deliverycharge</FieldLabel>
+                    <span style={{ color: "red" }}>*</span>
+                    </div>
                     <select
                       id={field.name}
                       name={field.name}
@@ -302,7 +314,11 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                   field.state.meta.isTouched && !field.state.meta.isValid
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>cuisine</FieldLabel>
+                    
+                    <div className="flex gap-1">
+<FieldLabel htmlFor={field.name}>cuisine</FieldLabel>
+                    <span style={{ color: "red" }}>*</span>
+                    </div>
                     <select
                        className={`
                         w-full
@@ -359,7 +375,11 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                   field.state.meta.isTouched && !field.state.meta.isValid
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Category Name</FieldLabel>
+                  
+                    <div className="flex gap-1">
+                        <FieldLabel htmlFor={field.name}>Category Name</FieldLabel>
+                    <span style={{ color: "red" }}>*</span>
+                    </div>
 
                     <div className="relative">
                       <select
@@ -467,7 +487,11 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                   field.state.meta.isTouched && !field.state.meta.isValid
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>dietaryPreference</FieldLabel>
+                   
+                    <div className="flex gap-1">
+                       <FieldLabel htmlFor={field.name}>dietaryPreference</FieldLabel>
+                    <span style={{ color: "red" }}>*</span>
+                    </div>
                     
                     <select
                        className={`
@@ -510,9 +534,12 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                               padding: "8px 12px",
                             }}  value={item} >{item}</option>)}
                     </select>
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
+                  <div className="text-[10px]">
+                  {isInvalid && (
+                      <p className="text-destructive text-red-500"> This field is required</p>
+                 
                     )}
+                  </div>
                   </Field>
                 )
               }}

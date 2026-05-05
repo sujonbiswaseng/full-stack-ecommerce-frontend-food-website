@@ -52,7 +52,7 @@ export default function UserTable({
     emailVerified: false,
   });
 
-  console.log(viewData, "id");
+  
   useEffect(() => {
     setTableData(users ?? []);
   }, [users]);

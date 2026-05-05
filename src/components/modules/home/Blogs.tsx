@@ -60,7 +60,7 @@ const BlogsContent = ({blogs}:{blogs:TResponseBlog<{ author: TUser; event: TResp
 
           {BlogsData && BlogsData.length > 0 ? (
             <motion.div
-              className="w-full max-w-[1440px] mx-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8"
+              className="w-full max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
               initial="hidden"
               animate="visible"
               variants={{

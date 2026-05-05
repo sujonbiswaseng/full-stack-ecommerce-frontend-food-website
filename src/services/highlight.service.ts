@@ -1,8 +1,10 @@
+
+import { env } from "@/env";
 import { ICreateHighlightInput } from "@/types/highlight.types";
 import { ApiErrorResponse } from "@/types/response.type";
 import { cookies } from "next/headers";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = env.BACKEND_URL;
 if (!API_BASE_URL) {
   throw new Error("API_BASE_URL is not defined. Please set NEXT_PUBLIC_API_BASE_URL in your environment variables.");
 }
@@ -21,7 +23,7 @@ export const HighlightService = {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/highlight`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/highlight`, {
         credentials: "include",
         method: "POST",
         headers: { Cookie: storeCookies.toString() },
@@ -48,7 +50,7 @@ export const HighlightService = {
   // Get all highlights
   getAllHighlights: async (params?: any, options?: { cache?: RequestCache; revalidate?: number }) => {
     try {
-      const url = new URL(`${API_BASE_URL}/highlights`);
+      const url = new URL(`${API_BASE_URL}/api/v1/highlights`);
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== "") {
@@ -88,7 +90,7 @@ export const HighlightService = {
   // Get single highlight
   getSingleHighlight: async (id: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/highlight/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/highlight/${id}`, {
         method: "GET",
         next: { tags: [`getSingleHighlight-${id}`] }
       });
@@ -123,7 +125,7 @@ export const HighlightService = {
       formData.append("file", image);
     }
     try {
-      const response = await fetch(`${API_BASE_URL}/highlight/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/highlight/${id}`, {
         credentials: "include",
         method: "PUT",
         headers: { Cookie: storeCookies.toString() },
@@ -151,7 +153,7 @@ export const HighlightService = {
   deleteHighlight: async (id: string) => {
     const storeCookies = await cookies();
     try {
-      const response = await fetch(`${API_BASE_URL}/highlight/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/highlight/${id}`, {
         credentials: "include",
         method: "DELETE",
         headers: {

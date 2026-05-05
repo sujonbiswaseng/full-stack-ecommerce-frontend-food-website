@@ -73,15 +73,6 @@ const Statics: FC<StaticsProps> = ({ stats }) => (
                 <CardDescription className="text-center text-muted-foreground text-sm">
                   {item.description}
                 </CardDescription>
-                <Button 
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2 h-8 text-primary"
-                  tabIndex={-1}
-                  aria-label={`Learn more about ${item.label}`}
-                >
-                  Learn More
-                </Button>
               </CardContent>
             </Card>
           </motion.div>

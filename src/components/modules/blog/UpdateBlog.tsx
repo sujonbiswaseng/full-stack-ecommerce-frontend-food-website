@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { updateBlogSchema } from "@/validations/blog.validation";
 import { updateBlogAction } from "@/actions/blog.actions";
 import { motion, AnimatePresence } from "framer-motion";
-import { fadein } from "@/lib/frammer.motion";
 
 type IUpdateBlogData = z.infer<typeof updateBlogSchema>;
 

@@ -24,6 +24,10 @@ import { PublicStats } from "@/types/stats.type";
 import BlogsContent from "@/components/modules/home/Blogs";
 import { getAllBlogsAction } from "@/actions/blog.actions";
 import { TResponseBlog } from "@/types/blog.type";
+import Services from "@/components/modules/home/Services";
+import { getAllHighlightsAction } from "@/actions/highlight.action";
+import HighLightContent from "@/components/modules/home/HighLight";
+import { TResponseHighlight } from "@/types/highlight.types";
 
 export default async function HomePage({
   searchParams,
@@ -45,6 +49,27 @@ export default async function HomePage({
   }
   const res=await getPublicStatsAction()
   const blogsResponse = await getAllBlogsAction(search);
+  
+if(!blogsResponse.success){
+  <Notfounddata 
+    content="No blogs found." 
+    emoji="📚"
+    btntext="Back to Home"
+    path="/"
+  />
+}
+
+let highlightResponse;
+try {
+  highlightResponse = await getAllHighlightsAction(search);
+} catch (err) {
+  console.error("Highlights fetch error:", err);
+  highlightResponse = {
+    data: [],
+    pagination: { total: 0, page: 1, limit: 10, totalpage: 1 },
+    success: false,
+  };
+}
 
   return (
     <div className="min-h-screen">
@@ -66,9 +91,18 @@ export default async function HomePage({
           />
         )}
       </ErrorBoundary>
+      <Services/>
 
       <FeaturesSection />
-     <Statics stats={res.data as PublicStats}/>
+
+      <HighLightContent
+          highlight={
+            highlightResponse.data as TResponseHighlight<{ user: TUser }>[]
+          }
+        />
+          <StatsSection stats={res.data as PublicStats} />
+
+    
       <div className="space-y-8 py-8 px-4 max-w-[1440px] mx-auto">
         <div className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -114,8 +148,20 @@ export default async function HomePage({
         </ErrorBoundary>
       </div>
 
-      <StatsSection stats={res.data as PublicStats} />
+    
 
+      <BlogsContent
+          blogs={
+            blogsResponse.data as TResponseBlog<{
+              author: TUser;
+              event: TResponseMeals;
+            }>[]
+          }
+        />
+
+      <FAQSection />
+      <CTASection />
+      <NewsletterSection/>
       <ErrorBoundary
         fallback={
           <Notfounddata
@@ -134,19 +180,6 @@ export default async function HomePage({
           />
         )}
       </ErrorBoundary>
-
-      <BlogsContent
-          blogs={
-            blogsResponse.data as TResponseBlog<{
-              author: TUser;
-              event: TResponseMeals;
-            }>[]
-          }
-        />
-
-      <FAQSection />
-      <CTASection />
-      <NewsletterSection/>
     </div>
   );
 }

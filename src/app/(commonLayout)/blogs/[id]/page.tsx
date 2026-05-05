@@ -29,7 +29,6 @@ const BlogDetailsPage = async ({
     }
     await getSession();
     const blog = blogRes.data;
-    console.log(blog,'blog')
 
     return (
       <section className="max-w-[1440px] mx-auto w-full px-4 py-8 md:py-12 animate-in fade-in motion-reduce:animate-none">

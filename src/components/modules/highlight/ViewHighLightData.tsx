@@ -1,6 +1,6 @@
 import React from "react";
 import { format } from "date-fns";
-import CopyableId from "@/components/shared/CopyId";
+import CopyableId from "@/components/shared/CopyAndRoutebyId";
 
 interface ViewHighLightDataProps {
   viewData: {

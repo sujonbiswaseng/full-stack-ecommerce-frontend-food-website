@@ -71,10 +71,10 @@ export const createBlogColumns = () => [
     ),
   },
   {
-    key: "eventId",
-    label: "Event",
+    key: "mealid",
+    label: "mealid",
     render: (row: any) =>
-      row.eventId ? (
+      row.mealid ? (
         <motion.div
           initial={{ opacity: 0, x: 8 }}
           animate={{ opacity: 1, x: 0 }}
@@ -82,8 +82,8 @@ export const createBlogColumns = () => [
           className="flex items-center"
         >
           <CopyableId
-            id={row.eventId}
-            showShort={row.eventId?.slice(0, 8)}
+            id={row.mealid}
+            showShort={row.mealid?.slice(0, 8)}
             className="font-mono tracking-tight text-xs md:text-xs text-accent-foreground bg-accent rounded-md px-2 py-1 hover:bg-accent/80 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
           />
         </motion.div>

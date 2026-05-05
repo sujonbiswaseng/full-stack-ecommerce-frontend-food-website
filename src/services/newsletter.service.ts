@@ -1,7 +1,8 @@
+import { env } from "@/env";
 import { ApiErrorResponse } from "@/types/response.type";
 import { cookies } from "next/headers";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL =env.BACKEND_URL;
 if (!API_BASE_URL) {
   throw new Error(
     "API_BASE_URL is not defined. Please set NEXT_PUBLIC_API_BASE_URL in your environment variables."
@@ -12,10 +13,9 @@ export const NewsletterService = {
   // Create a new newsletter
   createNewsletter: async (value: any) => {
     const storeCookies = await cookies();
-    console.log(value,'value')
-   
+    
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletter`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/newsletter`, {
         credentials: "include",
         method: "POST",
         headers: {
@@ -51,7 +51,7 @@ export const NewsletterService = {
     options?: { cache?: RequestCache; revalidate?: number }
   ) => {
     try {
-      const url = new URL(`${API_BASE_URL}/newsletters`);
+      const url = new URL(`${API_BASE_URL}/api/v1/newsletters`);
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== "") {
@@ -77,6 +77,7 @@ export const NewsletterService = {
 
       const response = await fetch(url.toString(), config);
       const body = await response.json();
+  
       if (!response.ok) {
         const error = body as ApiErrorResponse;
         return {
@@ -101,7 +102,7 @@ export const NewsletterService = {
   // Get single newsletter
   getSingleNewsletter: async (id: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletter/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/newsletter/${id}`, {
         method: "GET",
         next: { tags: [`getSingleNewsletter-${id}`] },
       });
@@ -138,7 +139,7 @@ export const NewsletterService = {
       formData.append("file", file);
     }
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletter/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/newsletter/${id}`, {
         credentials: "include",
         method: "PUT",
         headers: { Cookie: storeCookies.toString() },
@@ -169,7 +170,7 @@ export const NewsletterService = {
   deleteNewsletter: async (id: string) => {
     const storeCookies = await cookies();
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletter/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/newsletter/${id}`, {
         credentials: "include",
         method: "DELETE",
         headers: {

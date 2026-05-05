@@ -26,7 +26,6 @@ const GetMeals = async ({
   if (!categories || (categories.success === false) || !categories.data) {
     return <Notfounddata content="No categories found." emoji="📂" />;
   }
-  console.log(response,'resp')
   return (
     <div className="px-4">
       {/* Error Boundary for meal data rendering */}

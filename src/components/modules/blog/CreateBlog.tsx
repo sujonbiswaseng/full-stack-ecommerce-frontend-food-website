@@ -32,7 +32,7 @@ export function CreateBlog() {
       title: "",
       content: "",
       images: [] as File[],
-      eventId: "",
+      mealid: "",
     },
     validators: {
       onSubmit: createBlogSchema as any,
@@ -194,8 +194,8 @@ export function CreateBlog() {
             />
 
             <form.Field
-              name="eventId"
-              validators={{ onChange: createBlogSchema.shape.eventId as any }}
+              name="mealid"
+              validators={{ onChange: createBlogSchema.shape.mealid as any }}
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;

@@ -1,10 +1,11 @@
-import LoadingContentPage from '@/components/LoadingPage'
+
+import LoadingContent from '@/components/LoadingContent'
 import React from 'react'
 
 const LoadignPage = () => {
   return (
     <div>
-       <LoadingContentPage data='HighLight page'/>
+       <LoadingContent data='HighLight page'/>
     </div>
   )
 }

@@ -31,7 +31,6 @@ export default function ReviewItem({
 }: ReviewItemProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
-  // console.log(reviews.user,'review')
 
   // Add state and handler for editing the review comment
   const [editComment, setEditComment] = useState(review.comment || "");
@@ -50,7 +49,7 @@ export default function ReviewItem({
         comment: editComment,
         rating: editRating,
       });
-      console.log(result,'dsdfds')
+      
       if (result?.success) {
         toast.dismiss(toastId)
         toast.success("review updated successfully")

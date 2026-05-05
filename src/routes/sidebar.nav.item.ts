@@ -85,12 +85,47 @@ export const adminNavItems: NavSection[] = [
         ]
     },
     {
+        title: "Blog Management",
+        items: [
+            {
+                title: "Blogs",
+                href: "/admin/dashboard/blogs",
+                icon: "FileText"
+            },
+            {
+                title: "Create Blog",
+                href: "/admin/dashboard/create-blog",
+                icon: "PlusSquare"
+            }
+        ]
+    },
+    {
+        title: "Highlight Management",
+        items: [
+            {
+                title: "Highlights",
+                href: "/admin/dashboard/highlights",
+                icon: "FileText"
+            },
+            {
+                title: "Create Highlight",
+                href: "/admin/dashboard/create-highlight",
+                icon: "PlusSquare"
+            }
+        ]
+    },
+    {
         title: "users Management",
         items: [
             {
                 title: "users",
                 href: "/admin/dashboard/users",
                 icon: "UserCog"
+            },
+            {
+                title: "Newsletter",
+                href: "/admin/dashboard/newsletters",
+                icon: "MailOpen"
             },
         ]
     },

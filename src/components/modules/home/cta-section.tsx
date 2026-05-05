@@ -5,55 +5,88 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight, UtensilsCrossed } from "lucide-react";
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: "easeOut" },
+  },
+};
+
 export default function CTASection() {
   return (
-    <section className="py-16 px-4 max-w-[1440px] mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="relative overflow-hidden bg-primary rounded-2xl p-8 md:p-14 text-center text-primary-foreground"
-      >
-        {/* Decorative blobs */}
-        <div
-          className="pointer-events-none absolute -top-16 -left-16 w-64 h-64 rounded-full bg-primary-foreground/10 blur-3xl"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-primary-foreground/10 blur-3xl"
-          aria-hidden
-        />
+    <section
+      className="w-full bg-gradient-to-br from-primary/10 via-background to-accent/10 border-t border-border"
+      aria-labelledby="cta-heading"
+    >
+      <div className="max-w-[1440px] mx-auto w-full px-4 md:px-8 py-8 flex items-center justify-center">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="relative overflow-hidden bg-card rounded-2xl w-full max-w-xl md:max-w-2xl mx-auto p-6 md:p-8 flex flex-col items-center justify-center text-center shadow-lg border border-border"
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-8 -left-8 w-40 h-40 rounded-full bg-primary/10 blur-3xl"
+          />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-8 -right-8 w-40 h-40 rounded-full bg-accent/10 blur-3xl"
+          />
 
-        <div className="relative z-10">
-          <div className="w-16 h-16 bg-primary-foreground/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <UtensilsCrossed className="w-8 h-8" />
-          </div>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            Ready to Experience Amazing Food?
-          </h2>
-          <p className="text-primary-foreground/85 text-lg mb-8 max-w-2xl mx-auto">
-            Join thousands of satisfied customers and discover your new favorite
-            dishes today.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" variant="secondary" className="text-primary font-semibold">
-              <Link href="/meals">
-                Order Now
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+          <div className="relative z-10 flex flex-col items-center w-full">
+            <div className="w-14 h-14 bg-accent/20 rounded-full flex items-center justify-center mb-4 border border-accent/30">
+              <UtensilsCrossed
+                className="w-7 h-7 text-accent"
+                aria-hidden="true"
+              />
+            </div>
+            <h2
+              id="cta-heading"
+              className="text-2xl md:text-4xl font-bold text-card-foreground tracking-tight mb-2"
             >
-              <Link href="/register">Become a Provider</Link>
-            </Button>
+              Ready to Experience Amazing Food?
+            </h2>
+            <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-6">
+              Join thousands of satisfied customers and discover your new favorite dishes today.
+            </p>
+            <div className="flex flex-col gap-4 sm:flex-row w-full max-w-md mx-auto">
+              <Button
+                asChild
+                size="lg"
+                className="w-full sm:w-auto font-semibold"
+              >
+                <Link
+                  href="/meals"
+                  tabIndex={0}
+                  aria-label="Order Meals"
+                >
+                  <span className="flex items-center justify-center">
+                    Order Now
+                    <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
+                  </span>
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="secondary"
+                className="w-full sm:w-auto font-semibold"
+              >
+                <Link
+                  href="/provider/dashboard/create-meals"
+                  tabIndex={0}
+                  aria-label="Create Meal"
+                >
+                  <span className="capitalize">Create Meal</span>
+                </Link>
+              </Button>
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 }

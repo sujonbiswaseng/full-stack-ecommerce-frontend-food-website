@@ -18,6 +18,7 @@ import { TResponseCategoryData } from "@/types/category";
 import { TUser } from "@/types/user.type";
 import { motion, AnimatePresence } from "framer-motion";
 import Notfounddata from "@/components/Notfounddata";
+import { useSearchParams } from "next/navigation";
 
 export default function RetrieveAllmeals({
   categories,
@@ -42,13 +43,19 @@ export default function RetrieveAllmeals({
     }
   }, [categories]);
 
+  const searchParams = useSearchParams()
+ 
+  const rating = searchParams.get('rating')
+
   const [form, setForm] = useState({
     search: "",
     cuisine: "",
     category_name: "",
     isAvailable: true,
     price: null,
+    rating:5,
     dietaryPreference: "",
+    date:""
   });
 
   const handleChange = useCallback(
@@ -67,7 +74,9 @@ export default function RetrieveAllmeals({
       category_name: "",
       isAvailable: true,
       price: null,
+      rating:5,
       dietaryPreference: "",
+      date:""
     });
     reset();
   };
@@ -80,6 +89,15 @@ export default function RetrieveAllmeals({
       placeholder: "Search meal name...",
       label: "search",
       onChange: (val) => handleChange("search", val),
+    },
+    {
+      type: "range",
+      name: "rating",
+      label: "Minimum Rating",
+      min: 0,
+      max: 5,
+      value: form.rating,
+      onChange: (val) => handleChange("rating", Number(val)),
     },
     {
       type: "select",
@@ -110,6 +128,14 @@ export default function RetrieveAllmeals({
       ],
     },
     {
+      type: "date",
+      name: "date",
+      label: "date",
+      placeholder: "YYYY-MM-DD",
+      value: form.date,
+      onChange: (val: string) => handleChange("date", val),
+    },
+    {
       type: "number",
       name: "price",
       label: "Price",
@@ -127,6 +153,7 @@ export default function RetrieveAllmeals({
     },
   ];
 
+  const filterData=mealsData?.filter((item)=>item.avgRating===Number(rating))
   return (
     <section className="w-full bg-background min-h-screen">
       <div className="container max-w-[1440px] mx-auto w-full p-6">
@@ -164,7 +191,9 @@ export default function RetrieveAllmeals({
               onApply={handleApply}
               onReset={handleReset}
               isPending={isPending}
+              
             />
+            
           </div>
         </motion.section>
 
@@ -214,11 +243,11 @@ export default function RetrieveAllmeals({
             ) : null}
       
        
-            {isPending || isLoading
+            {(isPending || isLoading) && filterData?.length!==0
               ? Array.from({ length: initialMeals.length || 8 }).map((_, i) => (
                   <MealCardSkeleton key={i} />
                 ))
-              : mealsData?.map((meal) => {
+              : filterData?.map((meal) => {
                   return (
                     <MealCard
                       key={meal.id}

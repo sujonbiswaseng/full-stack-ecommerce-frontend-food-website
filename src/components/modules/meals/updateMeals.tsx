@@ -41,15 +41,13 @@ const UpdateMeal = ({ mealId }: { mealId: string }) => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[70vh] px-2 py-8 bg-gradient-to-tr from-green-50 to-blue-50">
+    <div className="">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-2xl bg-white dark:bg-gray-950 rounded-2xl shadow-xl p-6 md:p-10 space-y-7 transition"
         autoComplete="off"
       >
-        <h2 className="text-2xl md:text-3xl font-bold text-center text-indigo-900 dark:text-indigo-100 mb-4">
-          Update Meal
-        </h2>
+      
 
         {/* Name & Price Row */}
         <div className="flex flex-col md:flex-row gap-6">

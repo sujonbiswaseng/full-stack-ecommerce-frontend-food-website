@@ -22,6 +22,7 @@ export const FilterPanel = ({
   className,
   classRoot,
   buttonClassName,
+  tk=false,
 }: {
   fields: TFilterField[];
   onReset?: () => void;
@@ -30,6 +31,7 @@ export const FilterPanel = ({
   className?: string;
   classRoot?: string;
   buttonClassName?: string;
+  tk?:boolean
 }) => {
   const [isApplySpinning, setIsApplySpinning] = useState(false);
   const [isResetSpinning, setIsResetSpinning] = useState(false);
@@ -272,12 +274,12 @@ export const FilterPanel = ({
                     className="w-full h-2 accent-primary bg-input rounded"
                   />
                   <span className="ml-2 text-base font-semibold text-primary min-w-[48px] text-right">
-                    ৳{field.value}
+                   {tk && "৳"}{field.value}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs text-muted-foreground px-1">
-                  <span>৳{field.min}</span>
-                  <span>৳{field.max}</span>
+                  <span>{tk && "৳"}{field.min}</span>
+                  <span>{tk && "৳"}{field.max}</span>
                 </div>
               </div>
             );

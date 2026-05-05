@@ -316,7 +316,6 @@ const PaymentSuccessPage = async ({
       </main>
     );
   } catch (error) {
-    console.log(error);
     return (
       <Notfounddata
         content="Something went wrong. Please try again."

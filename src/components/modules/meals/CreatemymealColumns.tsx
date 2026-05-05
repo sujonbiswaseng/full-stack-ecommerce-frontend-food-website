@@ -165,7 +165,7 @@ export const createMyMealColumns = () => [
           });
       return (
         <span className="text-xs px-2 py-1 rounded bg-input text-muted-foreground border border-border font-medium">
-          {value}
+          {value.slice(0,11)}
         </span>
       );
     },

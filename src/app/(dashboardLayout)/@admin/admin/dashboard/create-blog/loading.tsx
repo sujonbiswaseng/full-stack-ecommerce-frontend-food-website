@@ -5,7 +5,7 @@ import React from 'react'
 const LoadignPage = () => {
   return (
     <div>
-       <LoadingContent data='newsletters page'/>
+       <LoadingContent data='create blog page'/>
     </div>
   )
 }

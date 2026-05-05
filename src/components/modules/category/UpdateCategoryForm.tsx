@@ -25,7 +25,7 @@ const Categoryupdate = ({ categoryid }: { categoryid: string }) => {
     setLoading(true);
     const toastId = toast.loading("Updating category...");
     const data = await updatecategory(categoryid, parsedata.data!);
-    console.log(data,'data')
+  
     if (data.error || !data.success) {
       toast.dismiss(toastId);
       toast.error(data?.message || "Failed to update category");

@@ -17,6 +17,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageWithSkeleton from "@/components/ImageSkeleton";
 import PaginationPage from "@/components/shared/pagination";
+import Notfounddata from "@/components/Notfounddata";
 
 const DEFAULT_AUTHOR_AVATAR = "/logo.png";
 const DEFAULT_BLOG_IMAGE = "/logo.png";
@@ -119,7 +120,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blogs, pagination }) => {
             <p className="text-sm font-medium">Filtering data...</p>
           </div>
         )}
-        {(isLoading || isLoading) ? (
+        {(isLoading || isLoading ) && blogs.length!==0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 w-full max-w-[1440px] mx-auto">
             {Array.from({ length: blogs.length || 4 }).map((_, idx) => (
               <CardSkeleton

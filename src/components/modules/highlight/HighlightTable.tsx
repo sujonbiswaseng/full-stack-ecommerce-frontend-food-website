@@ -5,23 +5,24 @@ import { useRouter } from "next/navigation";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 
-import { ReusableTable } from "../table/Table";
-import { FilterPanel } from "@/components/Filter";
-import { TPagination } from "@/types/event.types";
-import { TFilterField } from "@/types/filter.types";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { useFilter } from "@/components/ReusableFilter";
-import { TResponseBlog } from "@/types/blog.type";
-import { createBlogColumns } from "./CreateHightlightcolumn";
-import PaginationPage from "../event/Pagination";
-import UpdateBlog from "./UpdateHighLight";
+
 import { deleteBlogAction } from "@/actions/blog.actions";
 import ViewHighLightData from "./ViewHighLightData";
 import { deleteHighlightAction } from "@/actions/highlight.action";
+import { TResponseBlog } from "@/types/blog.type";
+import { useFilter } from "@/components/shared/Filter";
+import { Ipagination } from "@/types/pagination.type";
+import { createBlogColumns } from "./CreateHightlightcolumn";
+import { TFilterField } from "@/types/filter.types";
+import { FilterPanel } from "@/components/shared/filter/FilterInput";
+import { ReusableTable } from "@/components/shared/ReuseableTable";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import UpdateBlog from "../blog/UpdateBlog";
+import PaginationPage from "@/components/shared/pagination";
 
 interface MyHighlightsTableProps {
   highlights: TResponseBlog[];
-  pagination?: TPagination;
+  pagination?: Ipagination;
   role: string;
 }
 
@@ -188,7 +189,7 @@ export default function HighlightTable({ highlights, pagination, role }: MyHighl
       </Dialog>
 
       <div className="flex justify-center py-4">
-        <PaginationPage pagination={pagination as TPagination}/>
+        <PaginationPage pagination={pagination as Ipagination}/>
       </div>
     </div>
   );
