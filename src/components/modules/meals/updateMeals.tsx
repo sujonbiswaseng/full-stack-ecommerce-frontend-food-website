@@ -14,7 +14,6 @@ import { UpdatemealData } from "@/validations/meal.validations";
 import { Input } from "@/components/ui/input";
 
 const UpdateMeal = ({ mealId }: { mealId: string }) => {
-  const [preview, setPreview] = useState<string | null>(null);
   const [mealData, setMealData] = useState<UpdateMealsData>({});
   const parsedata = UpdatemealData.safeParse(mealData);
   const [loading, setLoading] = useState(false);
@@ -104,34 +103,33 @@ const UpdateMeal = ({ mealId }: { mealId: string }) => {
           <Input
             type="file"
             accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                if (file.size > 1 * 1024 * 1024) {
-                  toast.error("Image size must be less than 1MB!");
-                  e.target.value = "";
-                  setMealData((prev: UpdateMealsData) => ({
-                    ...prev,
-                    image: undefined,
-                  }));
-                  setPreview(null);
-                  return;
-                }
-                setMealData((prev: UpdateMealsData) => ({
-                  ...prev,
-                  image: file,
-                }));
-                setPreview(URL.createObjectURL(file));
-              } else {
-                // If file cleared, set as undefined (optional)
-                setMealData((prev: UpdateMealsData) => ({
-                  ...prev,
-                  image: undefined,
-                }));
-                setPreview(null);
-              }
-            }}
+            multiple
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+
+                        if (!files.length) return;
+
+                        if (files.length > 3) {
+                          toast.error("Maximum 3 images allowed");
+                          return;
+                        }
+
+                        const oversized = files.find(
+                          (file) => file.size > 6 * 1024 * 1024,
+                        );
+
+                        if (oversized) {
+                          toast.error("Each image must be less than 6MB");
+                          return;
+                        }
+                        const urls = files.map((file) =>
+                          URL.createObjectURL(file),
+                        );
+                      }}
           />
+
+
+
           {/* Optional note for user */}
           <span className="text-xs text-gray-500">Image is optional. If not selected, existing image will remain.</span>
  

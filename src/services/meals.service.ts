@@ -224,12 +224,15 @@ export const mealsService = {
     try {
       const cookieStore = await cookies();
       const formData = new FormData();
-
+  
       const { images, ...rest } = mealsdata;
   
       formData.append("data", JSON.stringify(rest));
-      if (images) {
-        formData.append("files", images);
+  
+      if (images && images.length > 0) {
+        images.forEach((image:any) => {
+          formData.append("files", image);
+        });
       }
       revalidateTag("meal",'max')
       const res = await fetch(`${api_url}/api/v1/provider/meal/${id}`, {
