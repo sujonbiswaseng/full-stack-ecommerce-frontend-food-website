@@ -1,89 +1,92 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Eye, Pen, Pencil, X } from "lucide-react";
-import { toast } from "react-toastify";
-import { Status, StatusIndicator, StatusLabel } from "@/components/ui/status";
-import { updateorderstatus } from "@/actions/order.action";
+import { Eye, Pencil } from "lucide-react";
 import { IGetOrderData, TResponseOrderData } from "@/types/order/order.type";
 import { useRouter } from "next/navigation";
-import { TGetCategory } from "@/types/category";
 import { useFilter } from "@/components/shared/filter/ReuseableFilter";
 import { TFilterField } from "@/types/filter.types";
 import { createOrderColumns } from "./CreateordersColumns";
 import { FilterPanel } from "@/components/shared/filter/FilterInput";
 import { ReusableTable } from "@/components/shared/ReuseableTable";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import ViewOrdersData from "./ViewOrdersData";
 import { UpdateOrderStatusForm } from "./UpdateOrderFrom";
+import { motion, AnimatePresence } from "framer-motion";
+
 export interface IOrderUpdateStatus {
-  status: string
+  status: string;
 }
 
-const CustomerOrderTable = ({ role,initialorder }: {role:string,initialorder: IGetOrderData[]}) => {
+const CustomerOrderTable = ({
+  role,
+  initialorder,
+}: {
+  role: string;
+  initialorder: IGetOrderData[];
+}) => {
   const router = useRouter();
-  const [meals, setMeals] = useState(initialorder);
-  const [search, setSearch] = useState("");
   const [tableData, setTableData] = useState<TResponseOrderData[]>(initialorder);
   const [viewData, setViewData] = useState<TResponseOrderData | null>(null);
   const { updateFilters, reset, isPending } = useFilter();
   const [open, setOpen] = useState(false);
   const [selectedmealid, setSelectedmealId] = useState<string | null>(null);
-
   const [viewMode, setViewMode] = useState(false);
-
 
   const [form, setForm] = useState({
     search: "",
-      status: "",
-      phone: "",
-      paymentStatus:'',
-      totalPrice: 5000000,
-      createdAt: "",
+    status: "",
+    phone: "",
+    paymentStatus: "",
+    totalPrice: 5000000,
+    createdAt: "",
   });
 
   const columns = createOrderColumns();
 
-
   useEffect(() => {
     setTableData(initialorder ?? []);
-  }, [initialorder,form]);
+  }, [initialorder, form]);
 
-  const handleChange = useCallback((key: keyof typeof form, value: string | number | boolean) => {
-    setForm(prev => ({
-      ...prev,
-      [key]: typeof value === "string" ? value : String(value)
-    }));
-  }, []);
-
+  const handleChange = useCallback(
+    (key: keyof typeof form, value: string | number | boolean) => {
+      setForm((prev) => ({
+        ...prev,
+        [key]: typeof value === "string" ? value : String(value),
+      }));
+    },
+    []
+  );
 
   const handleApply = () => {
     updateFilters(form);
   };
 
-
   const handleReset = () => {
-    const defaultForm = {
+    setForm({
       search: "",
-            status: "",
-            phone: "",
-            paymentStatus:'',
-            totalPrice: 5000000,
-            createdAt: "",
-
-    };
-    setForm(defaultForm);
+      status: "",
+      phone: "",
+      paymentStatus: "",
+      totalPrice: 5000000,
+      createdAt: "",
+    });
     reset();
   };
 
-  // Filter fields for important column data as per @file_context_0
   const fields: TFilterField[] = [
     {
       type: "text",
       name: "search",
       label: "Search",
-      placeholder: "search by name...",
+      placeholder: "Search by name...",
       value: form.search,
       onChange: (val: string) => handleChange("search", val),
     },
@@ -105,13 +108,13 @@ const CustomerOrderTable = ({ role,initialorder }: {role:string,initialorder: IG
     {
       type: "select",
       name: "paymentStatus",
-      label: "paymentStatus",
+      label: "Payment Status",
       value: form.paymentStatus,
       onChange: (val: string) => handleChange("paymentStatus", val),
       options: [
         { label: "All", value: "" },
-        { label: "paid", value: "PAID" },
-        { label: "unpaid", value: "UNPAID" },
+        { label: "Paid", value: "PAID" },
+        { label: "Unpaid", value: "UNPAID" },
       ],
     },
     {
@@ -124,24 +127,20 @@ const CustomerOrderTable = ({ role,initialorder }: {role:string,initialorder: IG
     },
     {
       type: "date",
-      name: "createdat",
+      name: "createdAt",
       label: "Created At",
       placeholder: "YYYY-MM-DD",
       value: form.createdAt,
       onChange: (val: string) => handleChange("createdAt", val),
     },
- 
     {
       type: "number",
-      name: "total price",
-      label: "totla price",
+      name: "totalPrice",
+      label: "Total Price",
       value: form.totalPrice,
       onChange: (val) => handleChange("totalPrice", Number(val)),
     },
-
-
   ];
-
 
   const actions = [
     {
@@ -159,60 +158,75 @@ const CustomerOrderTable = ({ role,initialorder }: {role:string,initialorder: IG
       onClick: (item: any) => {
         setSelectedmealId(item.id);
         setViewMode(false);
-        setViewData(item)
+        setViewData(item);
         setOpen(true);
       },
     },
-  ]
-      
-
-    
+  ];
 
   return (
-    <div className="w-full px-4 md:px-8 py-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-          Orders Management
-        </h1>
-        <div className="text-sm text-gray-500">
+    <div className="w-full mx-auto w-full px-0 py-0" style={{ width: '100%' }}>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">
+            Orders Management
+          </h1>
+          <p className="text-muted-foreground mt-2 text-base">
+            Manage, filter, and update your orders with ease.
+          </p>
+        </div>
+        <div className="text-sm rounded-md bg-secondary px-4 py-2 text-secondary-foreground font-semibold border border-border">
           Total Orders: {tableData.length}
         </div>
       </div>
 
-
-      <div className="mb-6 bg-white dark:bg-gray-950 p-3 sm:p-4 md:p-6 rounded-xl shadow border border-gray-100 dark:border-gray-800 transition-all">
-       <section className="mb-8 w-full">
+      <motion.section
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="mb-8 bg-card rounded-2xl border border-border shadow-md p-6"
+        style={{ width: "100%" }}
+      >
         <FilterPanel
           fields={fields}
           onApply={handleApply}
           onReset={handleReset}
           isPending={isPending}
         />
-      </section>
-       </div>
+      </motion.section>
 
-
-
-      {/* Table */}
-      <div className="relative w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
-       {isPending && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/50 dark:bg-black/50 backdrop-blur-sm">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-2"></div>
-            <p className="text-sm font-medium">Filtering data...</p>
-          </div>
-        )}
-      <div className="mb-6 overflow-x-auto rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
-        {tableData && Array.isArray(tableData) && tableData.length > 0 ? (
-          <ReusableTable columns={columns as any} data={tableData} actions={actions} />
-        ) : (
-          <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-base select-none">
-            No meals data found.
-          </div>
-        )}
+      <div className="relative w-full rounded-2xl border border-border bg-card shadow-sm overflow-hidden" style={{ width: "100%" }}>
+        <AnimatePresence>
+          {isPending && (
+            <motion.div
+              key="loading"
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/70 backdrop-blur"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-4" />
+              <p className="text-base font-medium text-muted-foreground">
+                Filtering data...
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <div className="overflow-x-auto pb-2" style={{ width: "100%" }}>
+          {tableData && Array.isArray(tableData) && tableData.length > 0 ? (
+            <ReusableTable
+              columns={columns as any}
+              data={tableData}
+              actions={actions}
+            />
+          ) : (
+            <div className="p-8 text-center text-muted-foreground text-base select-none">
+              No meals data found.
+            </div>
+          )}
+        </div>
       </div>
-      </div>
-
-
 
       <Dialog
         open={open}
@@ -224,46 +238,36 @@ const CustomerOrderTable = ({ role,initialorder }: {role:string,initialorder: IG
           }
         }}
       >
-        <DialogContent className="max-w-md w-full rounded-xl p-0 sm:p-0 bg-white dark:bg-gray-950">
-          <DialogHeader className="flex flex-col items-center justify-center px-6 pt-8 pb-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-t-xl shadow-none">
-            <DialogTitle className="text-[1.45rem] sm:text-2xl font-bold text-indigo-900 dark:text-indigo-100 mb-1 sm:mb-2 tracking-tight text-center">
-              {viewMode ? "My Menu Details" : "Edit Meal"}
-         
+        <DialogContent className="max-w-xl w-full rounded-2xl bg-card p-0">
+          <DialogHeader className="px-6 pt-8 pb-2 border-b border-border bg-card rounded-t-2xl shadow-none items-center">
+            <DialogTitle className="text-2xl font-bold text-foreground mb-1 tracking-tight text-center">
+              {viewMode ? "Order Details" : "Edit Order"}
             </DialogTitle>
-            <p
-              id="dialog-description"
-              className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-0 text-center"
-            >
+            <DialogDescription className="text-base text-muted-foreground mb-2 text-center">
               {viewMode
-                ? "View all details about your meal below."
-                : "Edit the details of your meal below as needed."}
-           
-            </p>
+                ? "View all details about this order below."
+                : "Update the details of your order below as needed."}
+            </DialogDescription>
           </DialogHeader>
-
-          {/* Make ONLY the modal content scrollable */}
-          <div
-            className="py-6 px-4 sm:px-8"
-            style={{
-              maxHeight: '70vh',
-              overflowY: 'auto',
-            }}
-          >
+          <div className="py-6 px-4 sm:px-8 overflow-y-auto" style={{ maxHeight: "70vh" }}>
             <ViewOrdersData
-              viewData={Array.isArray(viewData) ? viewData[0] : viewData ?? undefined}
+              viewData={
+                Array.isArray(viewData) ? viewData[0] : viewData ?? undefined
+              }
               viewMode={viewMode}
             />
-      
-
             {!viewMode && selectedmealid && (
-              <div className="mt-6">
-                <UpdateOrderStatusForm role={role as string} initialStatus={tableData[0].status as string} id={selectedmealid}/>
+              <div className="mt-8">
+                <UpdateOrderStatusForm
+                  role={role as string}
+                  initialStatus={tableData[0].status as string}
+                  id={selectedmealid}
+                />
               </div>
             )}
           </div>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 };

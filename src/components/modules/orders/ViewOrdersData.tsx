@@ -1,8 +1,12 @@
 import React from "react";
 import Link from "next/link";
 import CopyableId from "@/components/shared/CopyAndRoutebyId";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
-// Type for the order object
 interface OrderItem {
   createdAt: string;
   id: string;
@@ -23,7 +27,7 @@ interface OrderData {
   customerId: string;
   first_name: string;
   last_name: string;
-  paymentStatus:string;
+  paymentStatus: string;
   id: string;
   orderitem: OrderItem[];
   phone: string;
@@ -32,198 +36,269 @@ interface OrderData {
   updatedAt: string;
 }
 
-// Props for this order viewing component
-const ViewOrdersData = ({
-  viewMode,
-  viewData,
-}: {
+const statusVariants: Record<
+  string,
+  { label: string; variant: "secondary" | "success" | "destructive" | "outline" }
+> = {
+  PLACED: { label: "Placed", variant: "secondary" },
+  COMPLETED: { label: "Completed", variant: "success" },
+  CANCELLED: { label: "Cancelled", variant: "destructive" },
+};
+
+const paymentVariants: Record<
+  string,
+  { label: string; variant: "secondary" | "success" | "destructive" | "outline" }
+> = {
+  PENDING: { label: "Pending", variant: "secondary" },
+  PAID: { label: "Paid", variant: "success" },
+  FAILED: { label: "Failed", variant: "destructive" },
+};
+
+function formatDate(d?: string) {
+  if (!d) return "-";
+  return new Date(d).toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+const OrderCard: React.FC<{
+  item: OrderItem;
+}> = ({ item }) => (
+  <Card className="w-full flex flex-col h-full bg-card border border-border rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg group">
+    <CardContent className="p-6 flex flex-col gap-4 grow">
+      <div className="flex items-center gap-4 mb-2">
+        <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-input flex items-center justify-center overflow-hidden">
+          {/* Placeholder icon; replace with actual images as needed */}
+          <Image
+            src="/placeholders/meal.svg"
+            width={48}
+            height={48}
+            alt=""
+            className="object-contain w-8 h-8 opacity-70"
+            priority={false}
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="text-card-foreground font-semibold text-base md:text-lg truncate group-hover:text-primary transition-colors">
+            {item.meal.title}
+          </h4>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-muted-foreground text-xs flex-shrink-0">Meal ID:</span>
+            <CopyableId
+              href={item.meal.id}
+              showShort={item.meal.id as any}
+              id={item.meal.id}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 grow">
+        <div className="line-clamp-2 text-muted-foreground text-sm md:text-[15px]">
+          {item.meal.description || "-"}
+        </div>
+        <div className="flex flex-wrap gap-4 mt-2">
+          <Badge variant="secondary" className="px-3 py-1 text-sm">
+            Price: <span className="font-semibold ms-2 text-card-foreground">{item.price}</span>
+          </Badge>
+          <Badge variant="secondary" className="px-3 py-1 text-sm">
+            Qty: <span className="font-semibold ms-2 text-card-foreground">{item.quantity}</span>
+          </Badge>
+        </div>
+      </div>
+      {/* Optional CTA goes here */}
+    </CardContent>
+  </Card>
+);
+
+const SkeletonOrderCard: React.FC = () => (
+  <Card className="w-full h-full animate-pulse bg-card border border-border rounded-xl shadow-sm flex flex-col">
+    <CardContent className="p-6 flex flex-col gap-4 grow">
+      <div className="flex items-center gap-4 mb-2">
+        <div className="rounded-lg w-12 h-12 bg-muted" />
+        <div className="grow flex flex-col gap-2">
+          <div className="h-4 w-2/3 bg-muted-foreground/10 rounded" />
+          <div className="h-3 w-1/3 bg-muted-foreground/10 rounded" />
+        </div>
+      </div>
+      <div className="h-3 w-full bg-muted-foreground/10 rounded mb-2" />
+      <div className="flex gap-2 mt-2">
+        <div className="h-6 w-20 bg-muted-foreground/10 rounded" />
+        <div className="h-6 w-16 bg-muted-foreground/10 rounded" />
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const ViewOrdersData: React.FC<{
   viewMode: boolean;
   viewData?: OrderData;
-}) => {
+}> = ({ viewMode, viewData }) => {
   if (!viewMode || !viewData) return null;
+
+  const statusBadge = statusVariants[viewData.status] || {
+    label: viewData.status,
+    variant: "outline",
+  };
+  const paymentBadge = paymentVariants[viewData.paymentStatus] || {
+    label: viewData.paymentStatus ?? "-",
+    variant: "outline",
+  };
+
   return (
-    <div>
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-xl px-4 sm:px-6 py-6 space-y-8 overflow-y-scroll">
-        {/* Top: Customer and Order Info */}
-        <div className="flex flex-col sm:flex-row gap-6 items-center">
-          {/* User Avatar Placeholder */}
-          <div className="flex-shrink-0 w-20 h-20 flex items-center justify-center border border-blue-100 rounded-xl bg-gradient-to-tr from-blue-50 to-indigo-50 shadow-inner overflow-hidden">
-            <span className="text-5xl text-blue-200">👤</span>
+    <div className="max-w-[1440px] mx-auto w-full">
+      <motion.div
+        className="rounded-2xl border border-border bg-card shadow-xl px-6 py-8 space-y-8"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, type: "spring" }}
+      >
+        {/* Profile Section */}
+        <section className="flex flex-col md:flex-row gap-8 items-start">
+          <div className="w-20 h-20 flex items-center justify-center rounded-xl bg-gradient-to-tr from-primary/5 to-accent/10 shadow-inner border border-primary/10">
+            <span
+              role="img"
+              aria-label={`${viewData.first_name} ${viewData.last_name} avatar`}
+              className="text-5xl text-primary/50"
+            >
+              👤
+            </span>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="mb-1 font-bold text-2xl text-indigo-900 truncate">
-              {viewData.first_name} {viewData.last_name}
-            </h3>
-            <div className="flex flex-wrap gap-4 mt-2">
-              <div className="flex items-center gap-2">
-                <span className="text-gray-500 font-medium">Order ID:</span>
-                <span className="font-mono text-sm text-gray-700 select-all bg-gray-50 rounded px-2 py-1">
-                  <Link
-                    href={`/orders/${viewData.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    {viewData.id.slice(0, 10)}....
-                  </Link>
-                  <button
-                    type="button"
-                    className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-gray-500 hover:text-indigo-700 text-xs bg-gray-100 hover:bg-indigo-50 transition"
-                    title="Copy Order ID"
-                    onClick={() => {
-                      navigator.clipboard.writeText(viewData.id ?? "");
-                      if (typeof window !== "undefined") {
-                        import("react-toastify").then(({ toast }) => {
-                          toast.success("Order ID copied to clipboard!");
-                        });
-                      }
-                    }}
-                  >
-                    Copy
-                  </button>
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-400">
-                  <svg width={18} height={18} fill="none" viewBox="0 0 24 24">
-                    <path
-                      d="M15 2v2m-6-2v2m-5 4h16M5 6v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6"
-                      stroke="#6366F1"
-                      strokeWidth={1.3}
-                    />
-                  </svg>
-                </span>
-                <span className="font-medium text-gray-600">
-                  {viewData.createdAt
-                    ? new Date(viewData.createdAt).toLocaleString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-500 font-medium">Status:</span>
-                <span
-                  className={`inline-block px-2 py-[2px] rounded font-semibold text-xs border
-                ${
-                  viewData.status === "PLACED"
-                    ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                    : viewData.status === "COMPLETED"
-                    ? "bg-green-50 text-green-700 border-green-200"
-                    : viewData.status === "CANCELLED"
-                    ? "bg-red-50 text-red-700 border-red-200"
-                    : "bg-gray-50 text-gray-500 border"
-                }`}
-                >
-                  {viewData.status}
-                </span>
-              </div>
-            <div className="flex items-center gap-2">
-              <span className="text-gray-500 font-medium">Payment Status:</span>
-              <span
-                className={`inline-block px-2 py-[2px] rounded font-semibold text-xs border
-                  ${
-                    viewData.paymentStatus === "PENDING"
-                      ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                      : viewData.paymentStatus === "PAID"
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : viewData.paymentStatus === "FAILED"
-                      ? "bg-red-50 text-red-700 border-red-200"
-                      : "bg-gray-50 text-gray-500 border"
-                  }`
-                }
-              >
-                {viewData.paymentStatus ?? "-"}
-              </span>
-            </div>
-       
-            </div>
-            <div className="flex flex-wrap gap-4 mt-2">
-              <div>
-                <span className="text-gray-500 font-medium">Phone: </span>
-                <span className="font-mono text-sm text-gray-700 select-all">{viewData.phone}</span>
-              </div>
-              <div>
-                <span className="text-gray-500 font-medium">Address: </span>
-                <span className="font-mono text-sm text-gray-700 select-all">{viewData.address}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* DIVIDER */}
-        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-        {/* Order Details */}
-        <div>
-          <span className="text-gray-500 font-medium text-lg block mb-2">
-            Ordered Items ({viewData.orderitem?.length || 0})
-          </span>
-          <div className="space-y-6">
-            {viewData.orderitem.map((item, idx) => (
-              <div
-                key={item.id}
-                className="border rounded-lg p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-gray-50/70"
-              >
-                <div className="flex-1">
-                  <div className="font-semibold text-indigo-800 text-[16px]">
-                    {item.meal.title}
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-2 text-[15px] mt-1">
-                    <span>
-                      <span className="text-gray-500">Meal ID:</span>{" "}
-                      <span className="font-mono text-xs text-gray-700 select-all flex items-center gap-1">
-                        <div className="space-y-1">
-                        
-                        <CopyableId href={item.meal.id} showShort={item.meal.id as any} id={item.meal.id} /> ,
-                        </div>
-                        
-                      </span>
-                 
-                    </span>
-                    <span>
-                      <span className="text-gray-500">Description:</span>{" "}
-                      <span className="text-gray-800">{item.meal.description || "-"}</span>
-                    </span>
-                    <span>
-                      <span className="text-gray-500">Price:</span>{" "}
-                      <span className="font-semibold text-gray-800">{item.price}</span>
-                    </span>
-                    <span>
-                      <span className="text-gray-500">Quantity:</span>{" "}
-                      <span>{item.quantity}</span>
-                    </span>
+            <div className="flex flex-col gap-2">
+              <h3 className="font-bold text-2xl text-primary leading-snug truncate">{viewData.first_name} {viewData.last_name}</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-4 mt-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-muted-foreground font-medium">Order ID:</span>
+                  <div className="flex items-center gap-1 min-w-0">
+                    <Link
+                      href={`/orders/${viewData.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Order details"
+                      className="font-mono text-sm text-primary hover:underline select-all truncate"
+                      tabIndex={0}
+                    >
+                      {viewData.id.slice(0, 10)}....
+                    </Link>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 px-2 py-1"
+                      aria-label="Copy Order ID"
+                      onClick={() => {
+                        navigator.clipboard.writeText(viewData.id ?? "");
+                        if (typeof window !== "undefined") {
+                          import("react-toastify").then(({ toast }) => {
+                            toast.success("Order ID copied to clipboard!");
+                          });
+                        }
+                      }}
+                    >
+                      Copy
+                    </Button>
                   </div>
                 </div>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-muted-foreground">
+                    <svg width={18} height={18} fill="none" viewBox="0 0 24 24">
+                      <path
+                        d="M15 2v2m-6-2v2m-5 4h16M5 6v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6"
+                        stroke="currentColor"
+                        strokeWidth={1.3}
+                      />
+                    </svg>
+                  </span>
+                  <span className="font-medium text-muted-foreground">
+                    {formatDate(viewData.createdAt)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-muted-foreground font-medium">Status:</span>
+                  <Badge variant={statusBadge.variant as any}>{statusBadge.label}</Badge>
+                </div>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-muted-foreground font-medium">
+                    Payment Status:
+                  </span>
+                  <Badge variant={paymentBadge.variant as any}>{paymentBadge.label}</Badge>
+                </div>
               </div>
-            ))}
+              <div className="flex flex-wrap gap-4 mt-2">
+                <div className="flex items-center gap-1">
+                  <span className="text-muted-foreground font-medium">Phone:</span>
+                  <span className="font-mono text-sm text-card-foreground select-all">
+                    {viewData.phone}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-muted-foreground font-medium">Address:</span>
+                  <span className="font-mono text-sm text-card-foreground select-all truncate">
+                    {viewData.address}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        {/* DIVIDER */}
-        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-        {/* Total Price and Meta */}
-        <div className="flex flex-wrap gap-10 items-center justify-between text-[16px] font-medium">
-          <span>
-            <span className="text-gray-500">Total Price: </span>
-            <span className="text-indigo-900 font-bold text-xl">৳{viewData.totalPrice}</span>
+        </section>
+
+        <div className="h-px w-full bg-border" />
+
+        {/* Ordered Items */}
+        <section>
+          <span className="text-muted-foreground font-medium text-lg block mb-4">
+            Ordered Items ({viewData.orderitem?.length || 0})
           </span>
-          <span>
-            <span className="text-gray-500">Customer ID: </span>
-            <span className="font-mono text-sm text-gray-700 select-all">
+          <div className="flex flex-wrap">
+            {viewData.orderitem.length === 0 && (
+              <div className="text-muted-foreground">No items found for this order.</div>
+            )}
+            <AnimatePresence>
+              {viewData.orderitem.map((item) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="h-full"
+                >
+                  <OrderCard item={item} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </section>
+
+        <div className="h-px w-full bg-border" />
+
+        {/* Footer summary */}
+        <section className="flex flex-col sm:flex-row flex-wrap gap-6 items-center justify-between">
+          <div>
+            <span className="text-muted-foreground mr-1">Total Price: </span>
+            <span className="text-primary font-bold text-xl">
+              ৳{viewData.totalPrice}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Customer ID:</span>
+            <span className="font-mono text-sm text-card-foreground select-all flex items-center gap-2">
               <Link
                 href={`/profile/user/${viewData.customerId}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
+                className="text-primary hover:underline truncate"
               >
                 {viewData.customerId.slice(0, 10)}....
               </Link>
-              <button
-                type="button"
-                className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-gray-500 hover:text-indigo-700 text-xs bg-gray-100 hover:bg-indigo-50 transition"
-                title="Copy Customer ID"
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 px-2 py-1"
+                aria-label="Copy Customer ID"
                 onClick={() => {
                   navigator.clipboard.writeText(viewData.customerId ?? "");
                   if (typeof window !== "undefined") {
@@ -234,25 +309,17 @@ const ViewOrdersData = ({
                 }}
               >
                 Copy
-              </button>
+              </Button>
             </span>
-          </span>
-          <span>
-            <span className="text-gray-500">Last Updated: </span>
-            <span>
-              {viewData.updatedAt
-                ? new Date(viewData.updatedAt).toLocaleString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "-"}
+          </div>
+          <div>
+            <span className="text-muted-foreground mr-1">Last Updated: </span>
+            <span className="text-card-foreground">
+              {formatDate(viewData.updatedAt)}
             </span>
-          </span>
-        </div>
-      </div>
+          </div>
+        </section>
+      </motion.div>
     </div>
   );
 };
