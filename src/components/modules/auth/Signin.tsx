@@ -36,6 +36,9 @@ const Admin_Demo_PASSWORD = "Admin123!@#";
 const Demo_User_Email = "sujonbiswasdev@gmail.com";
 const Demo_User_Password = "Sujon12!@";
 
+const Demo_Provider_Email = "sujonbiswas.devpro@gmail.com";
+const Demo_Provider_Password = "Sujon12!@";
+
 const cardFade = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
@@ -119,6 +122,14 @@ export function SigninForm() {
     form.setFieldValue("password", Demo_User_Password);
   };
 
+  const Demo_Provider_Email = "sujonbiswas.devpro@gmail.com";
+  const Demo_Provider_Password = "Sujon12!@";
+
+  const fillProviderDemoCredentials = () => {
+    form.setFieldValue("email", Demo_Provider_Email);
+    form.setFieldValue("password", Demo_Provider_Password);
+  };
+
   return (
     <main className="min-h-screen bg-background flex items-center justify-center">
       <div className="container max-w-[1440px] min-h-screen flex flex-col justify-center items-center">
@@ -169,9 +180,17 @@ export function SigninForm() {
                   type="button"
                   variant="secondary"
                   className="flex-1 min-h-[40px] border border-border text-secondary-foreground bg-secondary hover:bg-accent hover:text-accent-foreground transition-colors text-sm font-medium"
-                  onClick={fillUserDemoCredentials}
+                  onClick={fillProviderDemoCredentials}
                 >
                   User Demo
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="flex-1 min-h-[40px] border border-border text-secondary-foreground bg-secondary hover:bg-accent hover:text-accent-foreground transition-colors text-sm font-medium"
+                  onClick={fillUserDemoCredentials}
+                >
+                  provider Demo
                 </Button>
               </div>
 

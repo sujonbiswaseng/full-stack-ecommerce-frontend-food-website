@@ -21,8 +21,16 @@ import Footer from "@/components/shared/footer";
 import Statics from "@/components/modules/home/stats-section";
 import { getPublicStatsAction } from "@/actions/stats.actions";
 import { PublicStats } from "@/types/stats.type";
+import BlogsContent from "@/components/modules/home/Blogs";
+import { getAllBlogsAction } from "@/actions/blog.actions";
+import { TResponseBlog } from "@/types/blog.type";
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const search = await searchParams;
   const mealdata = await getAllMeals();
   const categories = await getCategory();
   const providerinfo = await getTopProviderUser();
@@ -36,6 +44,7 @@ export default async function HomePage() {
     );
   }
   const res=await getPublicStatsAction()
+  const blogsResponse = await getAllBlogsAction(search);
 
   return (
     <div className="min-h-screen">
@@ -126,11 +135,18 @@ export default async function HomePage() {
         )}
       </ErrorBoundary>
 
+      <BlogsContent
+          blogs={
+            blogsResponse.data as TResponseBlog<{
+              author: TUser;
+              event: TResponseMeals;
+            }>[]
+          }
+        />
+
       <FAQSection />
-
-      <NewsletterSection />
-
       <CTASection />
+      <NewsletterSection/>
     </div>
   );
 }
