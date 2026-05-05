@@ -1,24 +1,20 @@
 
-### Project name :
-##### bitebase 🍱 | Advanced Full-Stack Multi-Vendor Food Ordering Platform
-৳
-### Project description :
-##### bitebase is a modern full-stack multi-vendor food ordering platform where customers can discover meals, place orders, and track deliveries, providers can manage menus and orders, and admins can control users, categories, and platform operations through a secure, responsive, and scalable system.
+### Project name : 
+##### Bitebase 🍱 | Advanced Full-Stack Multi-Vendor Food Ordering Platform
+
+### Project description : 
+##### **BiteBase** is an AI-powered full-stack multi-vendor food ordering platform that allows customers to discover meals, place orders, and track deliveries, while vendors manage menus and orders through a secure and responsive dashboard. The platform includes smart AI features, secure authentication, payment integration, and scalable admin management for a seamless food delivery experience.
+
 
 ### Quick Links
- - Frontend Repo    : https://github.com/sujonbiswasdev/frontend-next-level-assignment-4.git
-- Backend Repo     :https://github.com/sujonbiswasdev/backend-next-level-assignment-4.git
-- Frontend Live    : https://frontend-next-level-assingment-4.vercel.app
-- Backend Live     : https://backend-next-level-assignment-4.vercel.app
+ - Frontend Repo    : https://github.com/sujonbiswaseng/full-stack-ecommerce-frontend-food-website.git
+- Backend Repo     :https://github.com/sujonbiswaseng/full-stack-ecommerce-backend-food-website.git
+- Frontend Live    : https://full-stack-ecommerce-frontend-websi.vercel.app
+- Backend Live     : https://full-stack-ecommerce-backend-food-w.vercel.app
 
-### 🎨 Design System & UI/UX
-- **Multi-Theme System**: Default (Modern SaaS), Midnight (Dark Premium), Emerald (Fresh Startup)
-- **Design Tokens**: CSS Variables for consistent theming
-- **Responsive Design**: Mobile-first approach with perfect stacking
-- **Animations**: Smooth Framer Motion animations (fade-in, fade-up, scale-in, stagger)
-- **Component Library**: Reusable shadcn/ui components (Button, Card, Input, Modal, etc.)
 
-### Key Features
+
+### Key feature
 🔐 Advanced Authentication & Authorization
 
 - Secure JWT-based authentication system
@@ -26,16 +22,15 @@
 - Protected routes and private dashboards
 - Persistent login sessions
 - Secure logout and token handling
-- Social login (BetterAuth)
 
 🍽️ Meal Management
 - Browse all available meals
-- View meal details with image gallery
+- View meal details
 - Search meals by name
-- Filter by category, cuisine, dietary preferences, and price
+- Filter by category, cuisine, and price
 - Featured meals section
 - Browse meals from multiple providers
-- Skeleton loaders for better UX
+
 
 🛒 Cart & Checkout
 - Add meals to cart
@@ -45,127 +40,14 @@
 - Order confirmation system
 - Dynamic price calculation
 
-🔍 Advanced Search & Filter
-- Real-time search functionality
-- Multiple filter options
-- Sorting capabilities
-- Pagination support
-- Backend-powered filtering
+🔍 Search & Filter
 
-📊 Dashboard System (Role-Based)
-- **User Dashboard**: Order history, profile management, favorites
-- **Provider Dashboard**: Menu management, order tracking, analytics
-- **Admin Dashboard**: User management, category control, platform analytics
-- Real-time charts and statistics
-- Data tables with filtering and pagination
-
-📄 Content Pages
-- **Home**: Hero section, features, stats, testimonials, FAQ, newsletter
-- **About**: Company story, team, values, impact metrics
-- **Contact**: Contact form, business information, social links
-- **Blog**: Food industry insights and platform updates
-- **Help/Support**: FAQ, terms, privacy policy
-
-### 🛠️ Tech Stack
-
-**Frontend:**
-- Next.js 16 (App Router)
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-- Framer Motion
-- React Query (for caching)
-- Zustand (state management)
-
-**Backend:**
-- Express.js (REST API)
-- TypeScript
-- Prisma ORM
-- PostgreSQL
-- JWT Authentication
-- BetterAuth
-- Zod validation
-- Multer (file uploads)
-
-**DevOps:**
-- Vercel (Frontend deployment)
-- Railway/Render (Backend deployment)
-- Cloudinary (Image storage)
-
-### 🚀 Getting Started
-
-1. **Clone the repositories**
-```bash
-git clone https://github.com/sujonbiswasdev/frontend-next-level-assignment-4.git
-git clone https://github.com/sujonbiswasdev/backend-next-level-assignment-4.git
-```
-
-2. **Install dependencies**
-```bash
-# Frontend
-cd frontend-next-level-assignment-4
-npm install
-
-# Backend
-cd backend-next-level-assignment-4
-npm install
-```
-
-3. **Environment Setup**
-- Copy `.env.example` to `.env`
-- Configure database URL, JWT secrets, API keys
-
-4. **Database Setup**
-```bash
-# Backend
-npx prisma generate
-npx prisma db push
-npm run seed:admin
-```
-
-5. **Run Development Servers**
-```bash
-# Backend
-npm run dev
-
-# Frontend
-npm run dev
-```
-
-### 🎯 Demo Credentials
-
-**Admin Account:**
-- Email: admin@foodhub.com
-- Password: admin123
-
-**Test User:**
-- Email: user@foodhub.com
-- Password: user123
-
-**Provider Account:**
-- Email: provider@foodhub.com
-- Password: provider123
-
-### 📱 Features Overview
-
-- **Responsive Design**: Works perfectly on all devices
-- **Performance Optimized**: Lazy loading, image optimization, caching
-- **SEO Friendly**: Proper meta tags, structured data
-- **Accessibility**: WCAG compliant components
-- **Security**: Input validation, XSS protection, secure headers
-- **Scalability**: Modular architecture, clean code structure
-
-### 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
-
-### 📄 License
-
-This project is licensed under the MIT License.
+📦 Order Management
+- Place orders easily
+- Track order status
+- View order history
+- Cancel orders when allowed
+- Detailed order summary
 
 👨‍🍳 Provider Features
 - Add new meals
@@ -223,11 +105,11 @@ Deployment
 - vercel(Backend)
 
 ## Setup Instructions
-- (frontend) : git clone https://github.com/sujonbiswasdev/frontend-next-level-assignment-4.git
-- (backend) : git clone https://github.com/sujonbiswasdev/backend-next-level-assignment-4.git
+- (frontend) : git clone https://github.com/sujonbiswaseng/full-stack-ecommerce-frontend-food-website.git
+- (backend) : git clone https://github.com/sujonbiswaseng/full-stack-ecommerce-backend-food-website.git
 
 ### Backend Setup
-- cd backend-next-level-assignment-4
+- cd full-stack-ecommerce-backend-food-website.git
 - pnpm install
 - Create .env file:
 ```typescript
@@ -277,7 +159,7 @@ Run the cmd:
 
 ### Frontend Setup
 
-- cd frontend-next-level-assignment-4
+- cd full-stack-ecommerce-frontend-food-website.git
 - pnpm install
 - Create .env file:
 
