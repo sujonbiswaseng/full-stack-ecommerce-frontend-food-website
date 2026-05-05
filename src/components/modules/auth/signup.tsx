@@ -25,6 +25,7 @@ import { createUserSchema } from "@/validations/auth.validation";
 import { useState } from "react";
 import { UserPlus, ArrowRight, RefreshCw, Home, LogIn } from "lucide-react";
 import { FormInput } from "@/components/shared/FormInput";
+import Link from "next/link";
 
 export function SignupForm() {
   const [preview, setPreview] = useState<string | null>(null);
@@ -78,6 +79,23 @@ export function SignupForm() {
           <span className="rounded-full bg-primary/10 p-3 mb-1">
             <UserPlus className="text-primary w-6 h-6" />
           </span>
+          <div>
+                <Link
+                  href="/"
+                  className="
+                    text-sm
+                    font-medium
+                    text-[var(--primary)]
+                    hover:underline
+                    transition-colors
+                  "
+                  style={{
+                    transition: "color .2s",
+                  }}
+                >
+                  ← Back to Home
+                </Link>
+              </div>
           <CardTitle className="font-extrabold tracking-tight text-2xl text-foreground text-center">
             Create an Account
           </CardTitle>

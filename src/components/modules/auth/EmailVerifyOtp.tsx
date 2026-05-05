@@ -267,7 +267,7 @@ function VerifyOtp({
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card className="mx-auto max-w-md">
+      <Card className="mx-auto max-w-md mt-5 lg:mt-10">
         <CardHeader>
           <CardTitle>Verify your email</CardTitle>
           <CardDescription>
