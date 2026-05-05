@@ -38,7 +38,7 @@ export const reviewService = {
         };
       }
 
-      return result;
+      return {success:result.success,message:result.message,data:result.data};
     } catch (e: any) {
       return { success: false, message: e.message, error: "Server error" };
     }
