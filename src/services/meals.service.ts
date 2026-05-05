@@ -25,14 +25,18 @@ export interface IMealStatus{
 export const mealsService = {
   createMeals: async (mealsdata: TCreateMealsData) => {
     const formData = new FormData();
+    const cookieStore = await cookies();
 
     const { images, ...rest } = mealsdata;
 
     formData.append("data", JSON.stringify(rest));
-    if (images) {
-      formData.append("files", images);
+
+    if (images && images.length > 0) {
+      images.forEach((image) => {
+        formData.append("files", image);
+      });
     }
-    const cookieStore = await cookies();
+ 
     try {
       const res = await fetch(`${api_url}/api/v1/provider/meal`, {
         method: "POST",
@@ -221,11 +225,11 @@ export const mealsService = {
       const cookieStore = await cookies();
       const formData = new FormData();
 
-      const { image, ...rest } = mealsdata;
+      const { images, ...rest } = mealsdata;
   
       formData.append("data", JSON.stringify(rest));
-      if (image) {
-        formData.append("file", image);
+      if (images) {
+        formData.append("files", images);
       }
       revalidateTag("meal",'max')
       const res = await fetch(`${api_url}/api/v1/provider/meal/${id}`, {

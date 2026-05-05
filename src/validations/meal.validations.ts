@@ -6,7 +6,8 @@ export const CreateMealData = z.object({
   title: z.string().min(1, "meals name is required"),
   description: z.string().min(5, "description atleast 5 character"),
   deliverycharge: z.number(),
-  images: z.any().default([]),
+  images: z
+  .union([z.array(z.instanceof(File)).min(1, "At least 1 image is required"), z.array(z.string()).min(1, "At least 1 image is required")]),
   location: z.string().min(3, "Location is required"),
   date: z
   .string()
@@ -35,7 +36,7 @@ export const CreateMealData = z.object({
 export const UpdatemealData = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
-  image: z.any().optional(),
+  images: z.any().optional(),
   price: z.number().min(60,"price must be al least 60 taka").optional(),
   isAvailable: z.boolean().optional(),
   category_name: z.string().optional(),

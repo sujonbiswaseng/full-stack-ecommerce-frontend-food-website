@@ -60,7 +60,7 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
         toast.dismiss(toastid)
         toast.success("Meal created successfully! 🎉 Please wait about 10 seconds for it to appear.")
         setPreview([])
-        form.reset()
+        // form.reset()
       } catch (error) {
         toast.dismiss(toastid)
         toast.error("Something went wrong, please try again.");

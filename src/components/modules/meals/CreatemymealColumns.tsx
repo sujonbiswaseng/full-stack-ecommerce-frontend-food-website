@@ -18,14 +18,14 @@ export const createMyMealColumns = () => [
     ),
   },
   {
-    key: "image",
+    key: "images",
     label: "Image",
     render: (row: any) =>
       row.images && row.images.length > 0 ? (
         <div className="flex items-center justify-center w-14 h-14 rounded-full overflow-hidden bg-muted-foreground/5 border border-border ring-0">
-          <Image
+          <img
             alt={row.title ?? "Meal Image"}
-            src={row.images[0]}
+            src={"/images/default-meal.jpg"}
             width={56}
             height={56}
             className="object-cover w-14 h-14 rounded-full"

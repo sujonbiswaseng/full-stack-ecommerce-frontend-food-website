@@ -23,6 +23,7 @@ const fadeUp = {
 };
 
 const MealCard = ({ meal, className }: MealCardProps) => {
+  console.log(meal,'meal')
   const { addToCart } = manageCartStore();
   const router = useRouter();
   const fullStars = Math.floor(Number(meal.avgRating));
