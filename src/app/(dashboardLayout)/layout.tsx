@@ -1,5 +1,6 @@
 import { AppSidebar } from '@/components/app-sidebar'
 import { CartModal } from '@/components/Cardmodel'
+import DashbaordThemeChange from '@/components/DashbaordThemeChange'
 import Notfounddata from '@/components/Notfounddata'
 import ErrorBoundary from '@/components/shared/ErrorBoundary'
 import ErrorFallback from '@/components/shared/ErrorFallback'
@@ -61,6 +62,9 @@ const DashboardLayout = async ({ admin, provider, children }: { admin: React.Rea
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8">
+
+                <DashbaordThemeChange/>
+                
                 <ProfileCard  profile={userinfo.data as TUser} />
               </div>
             </div>

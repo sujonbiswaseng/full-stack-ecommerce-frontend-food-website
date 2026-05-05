@@ -1,6 +1,10 @@
 import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
-// Category type based on provided structure
 interface Category {
   id: string;
   adminId: string;
@@ -9,8 +13,18 @@ interface Category {
   createdAt: string;
   updatedAt: string;
   meals: any[];
-  user?: any;   
+  user?: any;
 }
+
+const fieldLabelClass = "text-sm text-muted-foreground font-medium";
+const fieldValueClass = "block mt-0.5 text-base text-card-foreground font-semibold truncate";
+
+const MetaField: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+  <div className="flex flex-col gap-1 min-w-0">
+    <span className={fieldLabelClass}>{label}</span>
+    <span className={fieldValueClass}>{value}</span>
+  </div>
+);
 
 const ViewCategoryData = ({
   viewMode,
@@ -19,111 +33,111 @@ const ViewCategoryData = ({
   viewMode: boolean;
   viewData?: Category;
 }) => {
+  if (!viewMode || !viewData) return null;
+
   return (
-    <div>
-      {viewMode && viewData && (
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-xl px-4 sm:px-6 py-6 space-y-8 overflow-y-scroll">
-          <div className="flex flex-col sm:flex-row gap-6 items-center">
-            <div className="flex-shrink-0 w-28 h-28 flex items-center justify-center border border-blue-100 rounded-xl bg-gradient-to-tr from-blue-50 to-indigo-50 shadow-inner overflow-hidden">
+    <motion.section
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 8 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="w-full"
+    >
+      <Card className="rounded-2xl border border-border bg-card shadow-lg px-4 md:px-8 py-6 md:py-8 max-w-[560px] mx-auto">
+        <CardContent className="flex flex-col gap-8 p-0">
+          {/* Category Header */}
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex-shrink-0 w-28 h-28 rounded-xl bg-input border border-border flex items-center justify-center overflow-hidden shadow-sm">
               {viewData.image ? (
-                <img
+                <Image
                   src={viewData.image}
                   alt={viewData.name || "Category"}
-                  className="w-full h-full object-cover rounded-lg"
+                  width={112}
+                  height={112}
+                  className="w-full h-full object-cover rounded-xl"
+                  loading="lazy"
+                  placeholder="empty"
+                  priority={false}
+                  sizes="112px"
                 />
               ) : (
-                <span className="text-5xl text-blue-200">
-                  <svg width={50} height={50} viewBox="0 0 20 20">
-                    <circle cx="10" cy="10" r="9" fill="#E0E7FF" />
-                    <text
-                      x="50%"
-                      y="55%"
-                      textAnchor="middle"
-                      fill="#64748b"
-                      fontSize="11"
-                      dy=".3em"
-                    >
-                      🍕
-                    </text>
-                  </svg>
+                <span className="w-full h-full flex items-center justify-center text-4xl text-muted-foreground">
+                  <span aria-label="No Image" role="img">
+                    🍕
+                  </span>
                 </span>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="mb-1 font-bold text-2xl text-indigo-900 truncate">
-                {viewData.name || "-"}
-              </h3>
-              <div className="flex flex-wrap items-center gap-4 mt-2">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-600">
-                    Created At:
-                  </span>
-                  <span className="font-medium text-gray-600">
-                    {viewData.createdAt
+              <h2 className="font-bold text-2xl md:text-3xl text-card-foreground truncate mb-2">
+                {viewData.name || <Skeleton className="h-8 w-32 rounded" />}
+              </h2>
+              <div className="flex flex-wrap gap-2 items-center">
+                <Badge variant="secondary" className="rounded-md text-xs">
+                  {viewData.id?.slice(0, 8) || <Skeleton className="h-4 w-20 rounded" />}
+                </Badge>
+                <span className="text-xs text-muted-foreground font-mono">
+                  Meals: {Array.isArray(viewData.meals) ? viewData.meals.length : 0}
+                </span>
+              </div>
+              <div className="flex gap-4 mt-3 flex-wrap">
+                <MetaField
+                  label="Created"
+                  value={
+                    viewData.createdAt
                       ? new Date(viewData.createdAt).toLocaleDateString(undefined, {
                           year: "numeric",
                           month: "short",
                           day: "numeric",
                         })
-                      : "-"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-600">
-                    Updated At:
-                  </span>
-                  <span className="font-medium text-gray-600">
-                    {viewData.updatedAt
-                      ? new Date(viewData.updatedAt).toLocaleDateString(
-                          undefined,
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          }
-                        )
-                      : "-"}
-                  </span>
-                </div>
+                      : "-"
+                  }
+                />
+                <MetaField
+                  label="Updated"
+                  value={
+                    viewData.updatedAt
+                      ? new Date(viewData.updatedAt).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : "-"
+                  }
+                />
               </div>
             </div>
           </div>
-          <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-4 text-[15px]">
-            <div>
-              <span className="text-gray-500 font-medium">Category ID:</span>
-              <span className="block mt-0.5 font-mono text-sm text-gray-700 select-all bg-gray-50 rounded px-2 py-1">
-                {viewData.id || "-"}
-              </span>
-            </div>
-            <div>
-              <span className="text-gray-500 font-medium">Admin ID:</span>
-              <span className="block mt-0.5 text-gray-800 font-semibold">
-                {viewData.adminId || "-"}
-              </span>
-            </div>
-            <div>
-              <span className="text-gray-500 font-medium">Meals Count:</span>
-              <span className="block mt-0.5">
-                {Array.isArray(viewData.meals) ? viewData.meals.length : 0}
-              </span>
-            </div>
-            <div>
-              <span className="text-gray-500 font-medium">Admin Name:</span>
-              <span className="block mt-0.5">
-                {viewData.user?.name ?? "-"}
-              </span>
-            </div>
-            <div className="sm:col-span-2">
-              <span className="text-gray-500 font-medium">Admin Email:</span>
-              <span className="block mt-0.5">
-                {viewData.user?.email ?? "-"}
-              </span>
-            </div>
+          {/* Divider */}
+          <div className="h-px w-full bg-border" />
+          {/* Meta Info Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MetaField
+              label="Category ID"
+              value={
+                <span className="font-mono text-sm bg-input rounded px-2 py-1 select-all border border-border">
+                  {viewData.id || "-"}
+                </span>
+              }
+            />
+            <MetaField
+              label="Admin ID"
+              value={
+                <span className="font-mono text-sm">{viewData.adminId || "-"}</span>
+              }
+            />
+            <MetaField
+              label="Admin Name"
+              value={viewData.user?.name ?? "-"}
+            />
+            <MetaField
+              label="Admin Email"
+              value={viewData.user?.email ?? "-"}
+            />
           </div>
-        </div>
-      )}
-    </div>
+        </CardContent>
+      </Card>
+    </motion.section>
   );
 };
 
