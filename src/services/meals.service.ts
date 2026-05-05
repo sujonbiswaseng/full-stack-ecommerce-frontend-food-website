@@ -26,11 +26,11 @@ export const mealsService = {
   createMeals: async (mealsdata: TCreateMealsData) => {
     const formData = new FormData();
 
-    const { image, ...rest } = mealsdata;
+    const { images, ...rest } = mealsdata;
 
     formData.append("data", JSON.stringify(rest));
-    if (image) {
-      formData.append("file", image);
+    if (images) {
+      formData.append("files", images);
     }
     const cookieStore = await cookies();
     try {
@@ -44,6 +44,7 @@ export const mealsService = {
       revalidateTag("meal",'max')
 
       const data = await res.json();
+      console.log(data,'data')
 
       const result = data as ApiResponse<TCreateMealsData>;
       if (!res.ok) {

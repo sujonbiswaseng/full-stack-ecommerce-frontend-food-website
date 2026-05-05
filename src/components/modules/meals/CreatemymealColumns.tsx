@@ -1,5 +1,8 @@
 // Columns for Provider Meals Table (for MyMealsTable, matching data set @file_context_0)
 import CopyableId from "@/components/shared/CopyAndRoutebyId";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 export const createMyMealColumns = () => [
   {
@@ -10,7 +13,7 @@ export const createMyMealColumns = () => [
         href={`/meals/${row.id}`}
         id={row.id}
         showShort={row.id?.slice(0, 8)}
-        className="bg-white border border-gray-200 text-indigo-700 px-2 py-1 rounded-lg shadow-sm font-mono transition hover:border-indigo-400 hover:text-indigo-900"
+        className="bg-card border border-border text-primary px-2 py-1 rounded-md font-mono hover:border-accent hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition"
       />
     ),
   },
@@ -18,24 +21,28 @@ export const createMyMealColumns = () => [
     key: "image",
     label: "Image",
     render: (row: any) =>
-      row.image ? (
-        <img
-          alt={row.title}
-          src={row.images[0]}
-          className="w-14 h-14 rounded-full object-cover border border-gray-300 shadow"
-          style={{ backgroundColor: "#f3f4f6" }}
-        />
+      row.images && row.images.length > 0 ? (
+        <div className="flex items-center justify-center w-14 h-14 rounded-full overflow-hidden bg-muted-foreground/5 border border-border ring-0">
+          <Image
+            alt={row.title ?? "Meal Image"}
+            src={row.images[0]}
+            width={56}
+            height={56}
+            className="object-cover w-14 h-14 rounded-full"
+            loading="lazy"
+          />
+        </div>
       ) : (
-        <span className="text-gray-400 italic px-2 py-1 rounded bg-gray-100 border border-gray-200">
-          No image
-        </span>
+        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-secondary border border-border">
+          <span className="text-muted-foreground text-xs font-medium select-none">No image</span>
+        </div>
       ),
   },
   {
     key: "title",
     label: "Meal Name",
     render: (row: any) => (
-      <span className="font-semibold text-indigo-900 truncate max-w-[160px] block">
+      <span className="font-semibold text-foreground truncate max-w-[160px] block" title={row.title}>
         {row.title}
       </span>
     ),
@@ -44,8 +51,10 @@ export const createMyMealColumns = () => [
     key: "description",
     label: "Description",
     render: (row: any) => (
-      <span className="text-gray-600 line-clamp-2 max-w-[260px] bg-white block px-2 py-1 rounded border border-gray-100">
-        {row.description ? `${row.description.slice(0, 10)}${row.description.length > 10 ? "..." : ""}` : ""}
+      <span className="text-muted-foreground line-clamp-2 max-w-[260px] bg-input block px-2 py-1 rounded border border-border">
+        {row.description
+          ? `${row.description.slice(0, 40)}${row.description.length > 40 ? "..." : ""}`
+          : ""}
       </span>
     ),
   },
@@ -54,30 +63,37 @@ export const createMyMealColumns = () => [
     label: "Price",
     render: (row: any) =>
       typeof row.price !== "undefined" ? (
-        <span className="font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded">
+        <span className="font-semibold text-green-700 bg-green-50/80 px-2 py-0.5 rounded text-sm">
           ৳{Number(row.price).toFixed(2)}
         </span>
       ) : (
-        <span className="text-gray-400 italic">N/A</span>
+        <span className="text-muted-foreground italic">N/A</span>
       ),
   },
   {
     key: "category_name",
     label: "Category",
     render: (row: any) => (
-      <span className="capitalize px-2 py-1 rounded-md bg-gray-100 text-gray-900 font-medium border border-gray-200">
-        {row.category_name ? `${row.category_name.slice(0, 20)}${row.category_name.length > 20 ? "..." : ""}` : ""}
-   
-      </span>
+      <Badge
+        variant="secondary"
+        className="truncate capitalize px-2 py-1 rounded-md border border-border font-medium max-w-[120px]"
+      >
+        {row.category_name
+          ? `${row.category_name.slice(0, 20)}${row.category_name.length > 20 ? "..." : ""}`
+          : ""}
+      </Badge>
     ),
   },
   {
     key: "cuisine",
     label: "Cuisine",
     render: (row: any) => (
-      <span className="capitalize px-2 py-1 rounded-md bg-gray-50 text-gray-700 font-medium border border-gray-100">
+      <Badge
+        variant="outline"
+        className="truncate capitalize px-2 py-1 rounded-md border border-border font-normal bg-card text-muted-foreground max-w-[110px]"
+      >
         {row.cuisine}
-      </span>
+      </Badge>
     ),
   },
   {
@@ -85,54 +101,51 @@ export const createMyMealColumns = () => [
     label: "Available",
     render: (row: any) =>
       row.isAvailable ? (
-        <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-semibold border border-green-200">
+        <Badge
+          variant="secondary"
+          className="bg-green-100 text-green-800 border-green-200 px-2 py-0.5 rounded-full text-xs font-semibold"
+        >
           Yes
-        </span>
+        </Badge>
       ) : (
-        <span className="bg-red-50 text-red-600 px-2 py-0.5 rounded-full text-xs font-semibold border border-red-200">
+        <Badge
+          variant="secondary"
+          className="bg-red-50 text-red-700 border-red-200 px-2 py-0.5 rounded-full text-xs font-semibold"
+        >
           No
-        </span>
+        </Badge>
       ),
   },
   {
     key: "status",
     label: "Status",
     render: (row: any) => {
-      let colorClass = "";
-      let bgClass = "";
-      let borderClass = "";
+      let className = "";
       let text = "";
       switch (row.status) {
         case "APPROVED":
-          colorClass = "text-green-800";
-          bgClass = "bg-green-100";
-          borderClass = "border border-green-200";
+          className = "bg-green-100 text-green-800 border-green-200";
           text = "Approved";
           break;
         case "PENDING":
-          colorClass = "text-yellow-800";
-          bgClass = "bg-yellow-50";
-          borderClass = "border border-yellow-200";
+          className = "bg-accent/30 text-accent border-accent";
           text = "Pending";
           break;
         case "REJECTED":
-          colorClass = "text-red-700";
-          bgClass = "bg-red-100";
-          borderClass = "border border-red-200";
+          className = "bg-red-100 text-red-700 border-red-200";
           text = "Rejected";
           break;
         default:
-          colorClass = "text-gray-600";
-          bgClass = "bg-gray-50";
-          borderClass = "border border-gray-100";
+          className = "bg-card text-muted-foreground border-border";
           text = row.status;
       }
       return (
-        <span
-          className={`inline-block px-3 py-1 rounded-lg text-xs font-semibold ${colorClass} ${bgClass} ${borderClass} min-w-[85px] text-center`}
+        <Badge
+          variant="secondary"
+          className={`min-w-[85px] text-center px-3 py-1 rounded-lg text-xs font-semibold border ${className}`}
         >
           {text}
-        </span>
+        </Badge>
       );
     },
   },
@@ -141,17 +154,18 @@ export const createMyMealColumns = () => [
     label: "Created At",
     render: (row: any) => {
       const date = new Date(row.createdAt);
+      const value = isNaN(date.getTime())
+        ? "-"
+        : date.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
       return (
-        <span className="text-xs px-2 py-1 rounded bg-gray-50 text-gray-700 border border-gray-100 font-medium">
-          {isNaN(date.getTime())
-            ? "-"
-            : date.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+        <span className="text-xs px-2 py-1 rounded bg-input text-muted-foreground border border-border font-medium">
+          {value}
         </span>
       );
     },

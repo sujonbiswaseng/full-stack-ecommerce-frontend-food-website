@@ -96,7 +96,9 @@ export type TResponseMeals<T = unknown> = IGetMealData & T;
 export type UpdateMealsData = {
   title?: string;
   description?: string;
-  image?: any;
+  location?: string;
+  date?: string;
+  images?: string[];
   price?: number;
   isAvailable?: boolean;
   dietaryPreference?: TDietaryPreference;

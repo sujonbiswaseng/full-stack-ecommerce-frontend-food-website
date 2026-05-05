@@ -28,15 +28,17 @@ import { cuisines, dietaryPreferences, IGetMealData, TCreateMealsData } from "@/
 import { CreateMealData } from "@/validations/meal.validations"
 import { TUser } from "@/types/user.type"
 export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData,user:TUser}>[]}) {
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string[]>([]);
   const [category, setcategory] = useState<TGetCategory[] | undefined>()
   const router = useRouter()
   const form = useForm({
     defaultValues: {
       title: "",
       deliverycharge:0,
+      date: "",
+      location: "",
       description: "",
-      image: null as File | null,
+      images: [] as File[],
       price: 0,
       isAvailable: true,
       dietaryPreference: 'ANY',
@@ -57,7 +59,7 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
         }
         toast.dismiss(toastid)
         toast.success("Meal created successfully! 🎉 Please wait about 10 seconds for it to appear.")
-        setPreview(null)
+        setPreview([])
         form.reset()
       } catch (error) {
         toast.dismiss(toastid)
@@ -108,38 +110,70 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
             />
 
 <form.Field
-              name="image"
-              children={(field) => (
-                <Field>
-                  <FieldLabel>Image *</FieldLabel>
+              name="images"
+              validators={{ onChange: CreateMealData.shape.images as any }}
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field>
+                    <div className="flex gap-2">
+                      <FieldLabel>Event Images (Max 3)</FieldLabel>{" "}
+                      <span style={{ color: "red" }}>*</span>
+                    </div>
 
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 1 * 1024 * 1024) {
-                          toast.error("Image size must be less than 1MB!");
-                          e.target.value = "";
-                          field.handleChange(null);
-                          setPreview(null);
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+
+                        if (!files.length) return;
+
+                        if (files.length > 3) {
+                          toast.error("Maximum 3 images allowed");
                           return;
                         }
-                        field.handleChange(file);
-                        setPreview(URL.createObjectURL(file));
-                      }
-                    }}
-                  />
 
-                  {preview && (
-                    <img
-                      src={preview}
-                      className="h-32 rounded-md object-cover mt-2"
+                        const oversized = files.find(
+                          (file) => file.size > 6 * 1024 * 1024,
+                        );
+
+                        if (oversized) {
+                          toast.error("Each image must be less than 6MB");
+                          return;
+                        }
+
+                        field.handleChange(files);
+
+                        const urls = files.map((file) =>
+                          URL.createObjectURL(file),
+                        );
+
+                        setPreview(urls);
+                      }}
                     />
-                  )}
-                </Field>
-              )}
+
+                    {preview.length > 0 && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+                        {preview.map((img, index) => (
+                          <img
+                            key={index}
+                            src={img}
+                            alt="preview"
+                            className="h-28 w-full rounded-md object-cover border"
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
             />
 
             <form.Field
@@ -170,6 +204,35 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
             />
 
 <form.Field
+              name="location"
+              validators={{ onChange: CreateMealData.shape.location }}
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      location <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value ?? ""}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="Enter the event venue"
+                      autoComplete="off"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+
+<form.Field
               name="deliverycharge"
                   validators={{ onChange: CreateMealData.shape.deliverycharge as any }}
               children={(field) => {
@@ -185,11 +248,43 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(Number(e.target.value))}
                       aria-invalid={isInvalid}
-                      className="border-amber-50 shadow-sm px-2 py-2.5"
+                      className={`
+                        w-full
+                        bg-background
+                        text-foreground
+                        border
+                        border-border
+                        rounded-lg
+                        px-4
+                        py-3
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-ring
+                        shadow-md
+                        transition
+                        duration-200
+                        appearance-none
+                        ${isInvalid ? 'border-destructive ring-destructive' : ''}
+                      `}
+                      style={{
+                        minHeight: "48px",
+                        fontSize: "1rem",
+                        fontWeight: 500,
+                      }}
                     >
                       <option value="">Select delivery charge</option>
-                      <option value={0}>0</option>
-                      <option value={120}>120</option>
+                      <option className="text-foreground"
+                            style={{
+                              backgroundColor: "#23272b", // fallback for dark bg
+                              color: "#f5f6fa", // visible on dark
+                              padding: "8px 12px",
+                            }} value={0}>0</option>
+                      <option className="text-foreground"
+                            style={{
+                              backgroundColor: "#23272b", // fallback for dark bg
+                              color: "#f5f6fa", // visible on dark
+                              padding: "8px 12px",
+                            }} value={120}>120</option>
                     </select>
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -209,7 +304,29 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>cuisine</FieldLabel>
                     <select
-                      className="border-amber-50 shadow-sm px-2 py-2.5"
+                       className={`
+                        w-full
+                        bg-background
+                        text-foreground
+                        border
+                        border-border
+                        rounded-lg
+                        px-4
+                        py-3
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-ring
+                        shadow-md
+                        transition
+                        duration-200
+                        appearance-none
+                        ${isInvalid ? 'border-destructive ring-destructive' : ''}
+                      `}
+                      style={{
+                        minHeight: "48px",
+                        fontSize: "1rem",
+                        fontWeight: 500,
+                      }}
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
@@ -218,7 +335,12 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                       aria-invalid={isInvalid}
                     >
                       <option value="">Select a cuisines</option>
-                      {cuisines?.map((item: any, index: number) => <option value={item} key={index}>{item}</option>)}
+                      {cuisines?.map((item: any, index: number) => <option className="text-foreground"
+                            style={{
+                              backgroundColor: "#23272b", // fallback for dark bg
+                              color: "#f5f6fa", // visible on dark
+                              padding: "8px 12px",
+                            }}>{item}</option>)}
                     </select>
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -239,24 +361,101 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>Category Name</FieldLabel>
 
-                    <select
-                      className="border-amber-50 shadow-sm px-2 py-2.5"
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                    >
-                      <option value="">Select a category</option>
-                      {data.map((item: any, index: number) => <option key={index}>{item.name}</option>)}
-                    </select>
-
+                    <div className="relative">
+                      <select
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        aria-describedby={isInvalid ? `${field.name}-error` : undefined}
+                        className={`
+                          w-full
+                          bg-background
+                          text-foreground
+                          border
+                          border-border
+                          rounded-lg
+                          px-4
+                          py-3
+                          focus:outline-none
+                          focus:ring-2
+                          focus:ring-ring
+                          shadow-md
+                          transition
+                          duration-200
+                          appearance-none
+                          ${isInvalid ? 'border-destructive ring-destructive' : ''}
+                        `}
+                        style={{
+                          minHeight: "48px",
+                          fontSize: "1rem",
+                          fontWeight: 500,
+                        }}
+                      >
+                        <option value="" className="text-muted-foreground">
+                          Select a category
+                        </option>
+                        {data.map((item: any, index: number) => (
+                          <option
+                            key={index}
+                            value={item.name}
+                            className="text-foreground"
+                            style={{
+                              backgroundColor: "#23272b", // fallback for dark bg
+                              color: "#f5f6fa", // visible on dark
+                              padding: "8px 12px",
+                            }}
+                          >
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
+                 
+                      <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                        <svg width="20" height="20" fill="none" aria-hidden="true">
+                          <path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                    </div>
+               
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
                   </Field>
                 )
+              }}
+            />
+
+
+<form.Field
+              name="date"
+              validators={{ onChange: CreateMealData.shape.date }}
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Date <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type="date"
+                      value={field.state.value ?? ""}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="Select the event date"
+                      autoComplete="off"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
               }}
             />
 
@@ -269,8 +468,31 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>dietaryPreference</FieldLabel>
+                    
                     <select
-                      className="border-amber-50 overflow-scroll shadow-sm px-2 py-2.5"
+                       className={`
+                        w-full
+                        bg-background
+                        text-foreground
+                        border
+                        border-border
+                        rounded-lg
+                        px-4
+                        py-3
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-ring
+                        shadow-md
+                        transition
+                        duration-200
+                        appearance-none
+                        ${isInvalid ? 'border-destructive ring-destructive' : ''}
+                      `}
+                      style={{
+                        minHeight: "48px",
+                        fontSize: "1rem",
+                        fontWeight: 500,
+                      }}
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
@@ -279,7 +501,14 @@ export function MealsForm({data}:{data:TResponseCategoryData<{meals:IGetMealData
                       aria-invalid={isInvalid}
                     >
                       <option value="">Select a dietaryPreference</option>
-                      {dietaryPreferences?.map((item: any, index: number) => <option value={item} key={index}>{item}</option>)}
+                      {dietaryPreferences?.map((item: any, index: number) => <option  key={index}
+                          
+                            className="text-foreground"
+                            style={{
+                              backgroundColor: "#23272b", // fallback for dark bg
+                              color: "#f5f6fa", // visible on dark
+                              padding: "8px 12px",
+                            }}  value={item} >{item}</option>)}
                     </select>
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />

@@ -6,7 +6,14 @@ export const CreateMealData = z.object({
   title: z.string().min(1, "meals name is required"),
   description: z.string().min(5, "description atleast 5 character"),
   deliverycharge: z.number(),
-  image: z.any(),
+  images: z.any().default([]),
+  location: z.string().min(3, "Location is required"),
+  date: z
+  .string()
+  .refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format",
+  })
+  .transform((val) => new Date(val).toISOString()),
   price: z
   .preprocess((val) => {
     if (val === "" || val === null) return 0;

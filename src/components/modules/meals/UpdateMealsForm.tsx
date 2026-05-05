@@ -32,7 +32,7 @@ export function UpdateMealsForm({
     defaultValues: {
       title: initialData.title || "",
       description: initialData.description || "",
-      image: initialData.image || "",
+      images: initialData.images || "",
       price: initialData.price ?? "",
       isAvailable: initialData.isAvailable ?? true,
       category_name: initialData.category_name || "",
@@ -128,6 +128,7 @@ export function UpdateMealsForm({
                 </Field>
               )}
             </form.Field>
+            
             <form.Field
               name="isAvailable"
               validators={{ onChange: UpdatemealData.shape.isAvailable as any }}

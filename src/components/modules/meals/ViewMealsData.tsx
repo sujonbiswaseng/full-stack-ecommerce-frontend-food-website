@@ -3,257 +3,295 @@ import { TResponseMeals } from '@/types/meals.type';
 import { IProviderInfo } from '@/types/provider.type';
 import { IgetReviewData } from '@/types/reviews.type';
 import Link from 'next/link';
-import React from 'react';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { motion, AnimatePresence } from 'framer-motion';
+import * as React from 'react';
 
-interface IMealCategory {
-  category_name: string;
-}
-
-interface IMealProvider {
-  providerId: string;
-}
+const statusMap: Record<string, { text: string; variant: "secondary" | "destructive" | "outline" | "default" | "success" | "warning" }> = {
+  PENDING:    { text: "Pending",    variant: "warning" },
+  APPROVED:   { text: "Approved",   variant: "success" },
+  REJECTED:   { text: "Rejected",   variant: "destructive" },
+  BANNED:     { text: "Banned",     variant: "outline" },
+};
 
 const ViewMealsData = ({
   viewMode,
-  viewData
+  viewData,
 }: {
   viewMode: boolean;
-  viewData?: TResponseMeals<{category:TGetCategory,provider:IProviderInfo,reviews:IgetReviewData}>;
-  
+  viewData?: TResponseMeals<{
+    category: TGetCategory;
+    provider: IProviderInfo;
+    reviews: IgetReviewData;
+  }>;
 }) => {
   if (!viewMode || !viewData) return null;
 
+  // Animation setup
+  const fadeVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  };
+
+  const handleCopy = (label: string, value: string) => {
+    navigator.clipboard.writeText(value ?? '');
+    if (typeof window !== 'undefined') {
+      import('react-toastify').then(({ toast }) => {
+        toast.success(`${label} copied to clipboard!`);
+      });
+    }
+  };
+
   return (
-    <div>
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-xl px-4 sm:px-6 py-6 space-y-8 overflow-y-scroll">
-        <div className="flex flex-col sm:flex-row gap-6 items-center">
-          <div className="flex-shrink-0 w-28 h-28 flex items-center justify-center border border-blue-100 rounded-xl bg-gradient-to-tr from-blue-50 to-indigo-50 shadow-inner overflow-hidden">
-            {viewData.images ? (
-              <img
-                src={viewData?.images[0]}
-                alt={viewData.title ?? 'Meal'}
-                className="w-full h-full object-cover rounded-lg"
-              />
-            ) : (
-              <span className="text-5xl text-blue-200">
-                <svg width={50} height={50} viewBox="0 0 20 20">
-                  <circle cx="10" cy="10" r="9" fill="#E0E7FF" />
-                  <text
-                    x="50%"
-                    y="55%"
-                    textAnchor="middle"
-                    fill="#64748b"
-                    fontSize="12"
-                    dy=".3em"
-                  >
-                    🍽️
-                  </text>
-                </svg>
-              </span>
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="mb-1 font-bold text-2xl text-indigo-900 truncate">
-              {viewData.title.slice(0,10)}....
-            </h3>
-           
-            <div className="flex flex-wrap items-center gap-4 mt-2">
-              <div className="flex items-center gap-2">
-                <span className="text-gray-400">
-                  <svg width={18} height={18} fill="none" viewBox="0 0 24 24">
-                    <path
-                      d="M15 2v2m-6-2v2m-5 4h16M5 6v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6"
-                      stroke="#6366F1"
-                      strokeWidth={1.3}
+    <AnimatePresence>
+      <motion.section
+        key="meal-detail-card"
+        variants={fadeVariants}
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
+        className="max-w-[540px] sm:max-w-[700px] mx-auto w-full"
+      >
+        <Card className="bg-card shadow-lg border-border rounded-2xl overflow-hidden p-6">
+          <CardContent className="p-0">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="flex-shrink-0">
+                <div className="relative w-28 h-28 bg-accent/30 rounded-xl border border-border flex items-center justify-center overflow-hidden">
+                  {viewData.images && viewData.images[0] ? (
+                    <Image
+                      src={viewData.images[0]}
+                      alt={viewData.title ?? 'Meal'}
+                      fill
+                      className="object-cover rounded-xl"
+                      sizes="112px"
+                      priority
+                      placeholder="blur"
+                      blurDataURL="/placeholder.svg"
                     />
-                  </svg>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span
+                        aria-label="Meal placeholder"
+                        className="text-4xl text-accent"
+                      >
+                        🍽️
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex-1 w-full min-w-0">
+                <h2 className="text-2xl font-bold text-card-foreground truncate">
+                  {viewData.title}
+                </h2>
+                <div className="flex flex-wrap items-center gap-4 mt-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <CalendarIcon className="w-5 h-5" />
+                    <span>
+                      {viewData.createdAt
+                        ? new Date(viewData.createdAt).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })
+                        : '-'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <FolderIcon className="w-5 h-5" />
+                    <span>{viewData.category_name || '-'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="h-px w-full bg-border my-6" />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-base">
+              <ReadOnlyField label="Meal ID">
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/meals/${viewData.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary font-mono"
+                  >
+                    {viewData.id.slice(0, 10)}...
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-primary transition"
+                    aria-label="Copy Meal ID"
+                    onClick={() => handleCopy('Meal ID', viewData.id)}
+                  >
+                    <CopyIcon className="w-4 h-4" />
+                  </Button>
+                </div>
+              </ReadOnlyField>
+              <ReadOnlyField label="Status">
+                <Badge
+                  className="text-xs font-medium"
+                >
+                  {statusMap[viewData.status]?.text ?? viewData.status}
+                </Badge>
+              </ReadOnlyField>
+              <ReadOnlyField label="Description">
+                <span className="text-card-foreground">
+                  {viewData.description?.slice(0, 24) || '-'}
+                  {viewData.description && viewData.description.length > 24 && '...'}
                 </span>
-                <span className="font-medium text-gray-600">
+              </ReadOnlyField>
+              <ReadOnlyField label="Price">
+                <span className="font-medium text-card-foreground">৳{viewData.price}</span>
+              </ReadOnlyField>
+              <ReadOnlyField label="Delivery Charge">
+                <span className="text-card-foreground">{viewData.deliverycharge}</span>
+              </ReadOnlyField>
+              <ReadOnlyField label="Available">
+                <span className="text-card-foreground">
+                  {viewData.isAvailable ? 'Yes' : 'No'}
+                </span>
+              </ReadOnlyField>
+              <ReadOnlyField label="Dietary Preference">
+                <span className="text-card-foreground">{viewData.dietaryPreference || '-'}</span>
+              </ReadOnlyField>
+              <ReadOnlyField label="Cuisine">
+                <span className="text-card-foreground">{viewData.cuisine || '-'}</span>
+              </ReadOnlyField>
+              <ReadOnlyField label="Provider ID">
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/providers/${viewData.providerId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary font-mono"
+                  >
+                    {viewData.providerId.slice(0, 10)}...
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-primary transition"
+                    aria-label="Copy Provider ID"
+                    onClick={() => handleCopy('Provider ID', viewData.providerId)}
+                  >
+                    <CopyIcon className="w-4 h-4" />
+                  </Button>
+                </div>
+              </ReadOnlyField>
+              {typeof viewData.avgRating !== 'undefined' && (
+                <ReadOnlyField label="Average Rating">
+                  <span className="text-card-foreground">{viewData.avgRating ?? '-'}</span>
+                </ReadOnlyField>
+              )}
+              {typeof viewData.totalReviews !== 'undefined' && (
+                <ReadOnlyField label="Total Reviews">
+                  <span className="text-card-foreground">{viewData.totalReviews ?? '-'}</span>
+                </ReadOnlyField>
+              )}
+              <ReadOnlyField label="Created At" className="col-span-1 sm:col-span-2">
+                <span>
                   {viewData.createdAt
-                    ? new Date(viewData.createdAt).toLocaleDateString(undefined, {
+                    ? new Date(viewData.createdAt).toLocaleString(undefined, {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
                       })
                     : '-'}
                 </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-400">
-                  <svg width={18} height={18} fill="none" viewBox="0 0 24 24">
-                    <path
-                      d="M21 10.5V6a2 2 0 0 0-2-2h-2M3 6a2 2 0 0 1 2-2h2M3 18v-3M16 18h2a2 2 0 0 0 2-2v-2M3 10.5V18c0 1.1.9 2 2 2h2M12 8v4l3 2"
-                      stroke="#6366F1"
-                      strokeWidth={1.3}
-                    />
-                  </svg>
+              </ReadOnlyField>
+              <ReadOnlyField label="Last Updated" className="col-span-1 sm:col-span-2">
+                <span>
+                  {viewData.updatedAt
+                    ? new Date(viewData.updatedAt).toLocaleString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    : '-'}
                 </span>
-                <span className="font-medium text-gray-600">
-                  {viewData.category_name || '-'}
-                </span>
-              </div>
+              </ReadOnlyField>
             </div>
-          </div>
-        </div>
-
-        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-4 text-[15px]">
-          <div>
-            <span className="text-gray-500 font-medium">Meal ID:</span>
-            <span className="block mt-0.5 font-mono text-sm text-gray-700 select-all bg-gray-50 rounded px-2 py-1">
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/meals/${viewData.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  {viewData.id.slice(0,10)}....
-                </Link>
-                <button
-                  type="button"
-                  className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-gray-500 hover:text-indigo-700 text-xs bg-gray-100 hover:bg-indigo-50 transition"
-                  title="Copy Meal ID"
-                  onClick={() => {
-                    navigator.clipboard.writeText(viewData.id ?? "");
-                    if (typeof window !== "undefined") {
-                      import("react-toastify").then(({ toast }) => {
-                        toast.success("Meal ID copied to clipboard!");
-                      });
-                    }
-            
-                  }}
-                >
-                  Copy
-                </button>
-              </div>
-         
-         
-            </span>
-          </div>
-          <div>
-            <span className="text-gray-500 font-medium">Status:</span>
-            <span className={`inline-block ml-2 px-2 py-[2px] rounded font-semibold text-xs border
-              ${
-                viewData.status === "PENDING"
-                  ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                  : viewData.status === "APPROVED"
-                  ? "bg-green-50 text-green-700 border-green-200"
-                  : viewData.status === "REJECTED"
-                  ? "bg-red-50 text-red-700 border-red-200"
-                  : viewData.status === "BANNED"
-                  ? "bg-gray-800 text-white border-gray-600"
-                  : "bg-gray-50 text-gray-500 border"
-              }`}>
-              {viewData.status}
-            </span>
-          </div>
-          <div>
-            <span className="text-gray-500 font-medium">Description:</span>
-            <span className="block mt-0.5 text-gray-800 font-semibold">{viewData.description?.slice(0,10)}...</span>
-          </div>
-          <div>
-            <span className="text-gray-500 font-medium">Price:</span>
-            <span className="block mt-0.5 font-semibold text-gray-800">৳{viewData.price}</span>
-          </div>
-          <div>
-          <span className="text-gray-500 font-medium">deliverycharge:</span>
-          <h3 className="mb-1 font-bold text-2xl text-indigo-900 truncate">
-              {viewData.deliverycharge}
-            </h3>
-          </div>
-          <div>
-            <span className="text-gray-500 font-medium">Available:</span>
-            <span className="block mt-0.5">
-              {viewData.isAvailable ? "Yes" : "No"}
-            </span>
-          </div>
-          <div>
-            <span className="text-gray-500 font-medium">Dietary Preference:</span>
-            <span className="block mt-0.5">{viewData.dietaryPreference || '-'}</span>
-          </div>
-          <div>
-            <span className="text-gray-500 font-medium">Cuisine:</span>
-            <span className="block mt-0.5">{viewData.cuisine || '-'}</span>
-          </div>
-          <div>
-            <span className="text-gray-500 font-medium">provider ID:</span>
-            <span className="block mt-0.5 font-mono text-sm text-gray-700 select-all bg-gray-50 rounded px-2 py-1">
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/providers/${viewData.providerId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  {viewData.providerId.slice(0,10)}....
-                </Link>
-                <button
-                  type="button"
-                  className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-gray-500 hover:text-indigo-700 text-xs bg-gray-100 hover:bg-indigo-50 transition"
-                  title="Copy Meal ID"
-                  onClick={() => {
-                    navigator.clipboard.writeText(viewData.providerId ?? "");
-                    if (typeof window !== "undefined") {
-                      import("react-toastify").then(({ toast }) => {
-                        toast.success("provider ID copied to clipboard!");
-                      });
-                    }
-            
-                  }}
-                >
-                  Copy
-                </button>
-              </div>
-         
-         
-            </span>
-          </div>
-          {typeof viewData.avgRating !== 'undefined' && (
-            <div>
-              <span className="text-gray-500 font-medium">Average Rating:</span>
-              <span className="block mt-0.5">{viewData.avgRating ?? '-'}</span>
-            </div>
-          )}
-          {typeof viewData.totalReviews !== 'undefined' && (
-            <div>
-              <span className="text-gray-500 font-medium">Total Reviews:</span>
-              <span className="block mt-0.5">{viewData.totalReviews ?? '-'}</span>
-            </div>
-          )}
-          <div className="sm:col-span-2">
-            <span className="text-gray-500 font-medium">Created At:</span>
-            <span className="block mt-0.5">
-              {viewData.createdAt
-                ? new Date(viewData.createdAt).toLocaleString(undefined, {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })
-                : '-'}
-            </span>
-          </div>
-          <div className="sm:col-span-2">
-            <span className="text-gray-500 font-medium">Last Updated:</span>
-            <span className="block mt-0.5">
-              {viewData.updatedAt
-                ? new Date(viewData.updatedAt).toLocaleString(undefined, {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })
-                : '-'}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+          </CardContent>
+        </Card>
+      </motion.section>
+    </AnimatePresence>
   );
 };
 
 export default ViewMealsData;
+
+// Helper, enterprise-friendly reusable field for label-value display
+type FieldProps = {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+};
+function ReadOnlyField({ label, children, className }: FieldProps) {
+  return (
+    <div className={`flex flex-col gap-2 ${className || ''}`}>
+      <span className="text-muted-foreground text-sm font-medium">{label}</span>
+      <div className="rounded bg-input px-2 py-1 font-normal text-[15px] leading-tight overflow-x-auto">{children}</div>
+    </div>
+  );
+}
+
+// Icon components
+function CalendarIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="20"
+      height="20"
+      fill="none"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M16 2v4M8 2v4" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function FolderIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="20"
+      height="20"
+      fill="none"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        d="M3 7a2 2 0 012-2h2l2 3h10a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function CopyIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width={18}
+      height={18}
+      aria-hidden="true"
+      fill="none"
+      viewBox="0 0 20 20"
+    >
+      <rect x="7" y="7" width="8" height="8" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" strokeWidth="1.5" opacity=".6" />
+    </svg>
+  );
+}
