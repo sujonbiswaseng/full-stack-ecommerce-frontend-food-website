@@ -4,11 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { TResponseUserData } from "@/types/user.type";
-import { IgetReviewData } from "@/types/reviews.type";
-import { TResponseMeals } from "@/types/meals.type";
 import { Ipagination } from "@/types/pagination.type";
 import { useFilter } from "@/components/shared/filter/ReuseableFilter";
 import { TFilterField } from "@/types/filter.types";
@@ -19,12 +21,17 @@ import { ReusableTable } from "@/components/shared/ReuseableTable";
 import PaginationPage from "@/components/shared/pagination";
 import ViewUserData from "./ViewUserData";
 import { UpdateUserForm } from "./userprofilechange";
+import { motion, AnimatePresence } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Token-based container class for consistent enterprise layout
+const containerClass = "max-w-[1440px] mx-auto w-full px-4 sm:px-6 md:px-8";
 
 export default function UserTable({
   users,
   pagination,
 }: {
-  users: TResponseUserData<{ accounts: { password: string; }}>[]; 
+  users: TResponseUserData<{ accounts: { password: string } }>[];
   pagination?: Ipagination;
 }) {
   const [tableData, setTableData] = useState(users);
@@ -32,7 +39,7 @@ export default function UserTable({
   const [viewMode, setViewMode] = useState(false);
   const [viewData, setViewData] = useState<any>(null);
   const router = useRouter();
-  const { updateFilters, reset ,isPending} = useFilter();
+  const { updateFilters, reset, isPending } = useFilter();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
@@ -45,13 +52,17 @@ export default function UserTable({
     emailVerified: false,
   });
 
+  console.log(viewData, "id");
   useEffect(() => {
     setTableData(users ?? []);
   }, [users]);
 
-  const handleChange = useCallback((key: keyof typeof form, value: string | number | boolean) => {
-    setForm(prev => ({ ...prev, [key]: value }));
-  }, []);
+  const handleChange = useCallback(
+    (key: keyof typeof form, value: string | number | boolean) => {
+      setForm((prev) => ({ ...prev, [key]: value }));
+    },
+    [],
+  );
 
   const handleApply = () => {
     updateFilters(form);
@@ -71,7 +82,8 @@ export default function UserTable({
     setForm(defaultForm);
     reset();
   };
-  const fields:TFilterField[] = [
+
+  const fields: TFilterField[] = [
     {
       type: "text",
       name: "name",
@@ -103,7 +115,6 @@ export default function UserTable({
         { label: "Admin", value: "Admin" },
         { label: "Customer", value: "Customer" },
         { label: "Provider", value: "Provider" },
-   
       ],
     },
     {
@@ -114,7 +125,7 @@ export default function UserTable({
       onChange: (val: string) => handleChange("status", val),
       options: [
         { label: "Activate", value: "activate" },
-        { label: "Suspend", value: "suspend" },   
+        { label: "Suspend", value: "suspend" },
       ],
     },
     {
@@ -127,7 +138,6 @@ export default function UserTable({
         { label: "No", value: "false" },
         { label: "Yes", value: "true" },
       ],
- 
     },
     {
       type: "select",
@@ -139,29 +149,38 @@ export default function UserTable({
         { label: "No", value: "false" },
         { label: "Yes", value: "true" },
       ],
- 
     },
   ];
 
-  const handleDeleteUser = useCallback(async (id: string) => {
-    try {
-      if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
-      const toastId = toast.loading("Deleting user. Please wait...");
-      const resp = await deleteUser(id);
-      toast.dismiss(toastId);
+  const handleDeleteUser = useCallback(
+    async (id: string) => {
+      try {
+        if (
+          !window.confirm(
+            "Are you sure you want to delete this user? This action cannot be undone.",
+          )
+        )
+          return;
+        const toastId = toast.loading("Deleting user. Please wait...");
+        const resp = await deleteUser(id);
+        toast.dismiss(toastId);
 
-      if (resp.success) {
-        setTableData((prev) => prev.filter((item) => item.id !== id));
-        router.refresh();
-        toast.success(resp.message || "Deleted successfully");
-      } else {
-        toast.error(resp.message || "Failed to delete. Please contact support.");
+        if (resp.success) {
+          setTableData((prev) => prev.filter((item) => item.id !== id));
+          router.refresh();
+          toast.success(resp.message || "Deleted successfully");
+        } else {
+          toast.error(
+            resp.message || "Failed to delete. Please contact support.",
+          );
+        }
+      } catch (error: any) {
+        toast.dismiss();
+        toast.error("Something went wrong. " + (error?.message || ""));
       }
-    } catch (error: any) {
-      toast.dismiss();
-      toast.error("Something went wrong. " + (error?.message || ""));
-    }
-  }, []);
+    },
+    [router],
+  );
 
   const actions = [
     {
@@ -181,52 +200,76 @@ export default function UserTable({
         setViewMode(false);
         setOpen(true);
       },
-      className: "text-blue-500",
+      className: "text-primary",
     },
     {
       icon: Trash2,
       label: "Delete",
       onClick: (item: any) => handleDeleteUser(item.id),
-      className: "text-red-500",
+      className: "text-destructive",
     },
   ];
-
   const columns = createUserColumns();
 
-
   return (
-    <div className="w-full">
-      <div className="mb-6 bg-white dark:bg-gray-950 p-4 sm:p-6 rounded-xl shadow border border-gray-100 dark:border-gray-800">
-      <section className="mb-8 w-full">
-        <FilterPanel
-          fields={fields}
-          onApply={handleApply}
-          onReset={handleReset}
-          isPending={isPending}
-        />
+    <main className={`${containerClass} py-6`}>
+      <section className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="rounded-2xl bg-card border border-border shadow"
+        >
+          <div className="p-6 flex flex-col gap-6">
+            <FilterPanel
+              fields={fields}
+              onApply={handleApply}
+              onReset={handleReset}
+              isPending={isPending}
+            />
+          </div>
+        </motion.div>
       </section>
-      </div>
 
-      <div className="relative w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
-       {isPending && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/50 dark:bg-black/50 backdrop-blur-sm">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-2"></div>
-            <p className="text-sm font-medium">Filtering data...</p>
+      <section className="relative mb-10">
+        <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow">
+          <AnimatePresence>
+            {isPending && (
+              <motion.div
+                className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/70 backdrop-blur transition-all"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <Skeleton className="w-12 h-12 rounded-full mb-4" />
+                <span className="text-muted-foreground text-base font-medium">
+                  Filtering data...
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="overflow-x-auto">
+            {Array.isArray(tableData) && tableData.length > 0 ? (
+              <ReusableTable
+                columns={columns as any}
+                data={tableData}
+                actions={actions}
+              />
+            ) : isPending ? (
+              <div className="p-8 w-full flex flex-col gap-4 items-center">
+                <Skeleton className="h-8 w-2/3 rounded" />
+                <Skeleton className="h-8 w-1/2 rounded" />
+                <Skeleton className="h-8 w-1/4 rounded" />
+              </div>
+            ) : (
+              <div className="p-8 text-center text-muted-foreground text-base select-none">
+                No users data found.
+              </div>
+            )}
           </div>
-        )}
-
-      <div className="mb-6 overflow-x-auto rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
-        
-
-        {tableData && Array.isArray(tableData) && tableData.length > 0 ? (
-          <ReusableTable columns={columns as any} data={tableData} actions={actions} />
-        ) : (
-          <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-base select-none">
-            No users data found.
-          </div>
-        )}
-      </div>
-      </div>
+        </div>
+      </section>
 
       <Dialog
         open={open}
@@ -235,37 +278,48 @@ export default function UserTable({
           if (!val) setViewData(null);
         }}
       >
-        <DialogContent className="max-w-md w-full rounded-xl p-0 sm:p-0 bg-white dark:bg-gray-950">
-          <DialogHeader className="flex flex-col items-center justify-center px-6 pt-8 pb-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-t-xl shadow-none">
-            <DialogTitle className="text-[1.45rem] sm:text-2xl font-bold text-indigo-900 dark:text-indigo-100 mb-1 sm:mb-2 tracking-tight text-center">
-              {viewMode ? "user Details" : "Edit user"}
+        <DialogContent className="max-w-md w-full rounded-xl p-0 bg-card">
+          <DialogHeader className="flex flex-col items-center justify-center px-6 pt-8 pb-4 border-b border-border bg-card rounded-t-xl shadow-none">
+            <DialogTitle className="text-2xl font-bold text-primary mb-2 tracking-tight text-center">
+              {viewMode ? "User Details" : "Edit User"}
             </DialogTitle>
-            <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-0 text-center">
-              {viewMode ? "user information below." : "Update status or details as needed."}
+            <p className="text-base text-muted-foreground mb-0 text-center">
+              {viewMode
+                ? "Review all user profile info below."
+                : "Update status or details as needed."}
             </p>
           </DialogHeader>
 
           {!viewMode && !viewData && selectedUserId && (
-            <UpdateUserForm
-              id={selectedUserId}
-              onSuccess={(updated:any) => {
-                setOpen(updated);
-                setSelectedUserId(null);
-              }}
-            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="py-6 px-6"
+            >
+              <UpdateUserForm
+                id={selectedUserId}
+                onSuccess={(updated: any) => {
+                  setOpen(updated);
+                  setSelectedUserId(null);
+                }}
+              />
+            </motion.div>
           )}
-
-          
-
-          <div style={{ maxHeight:'70vh',overflowY:'auto' }} className="py-6 px-4 sm:px-8">
-            {viewData && viewMode==true? ( <ViewUserData viewData={viewData} viewMode={viewMode} />):null}
-          </div>
+          {viewData && viewMode === true ? (
+            <ViewUserData
+              viewData={
+                Array.isArray(viewData) ? viewData[0] : (viewData ?? undefined)
+              }
+              viewMode={viewMode}
+            />
+          ) : null}
         </DialogContent>
       </Dialog>
 
-      <div className="flex justify-center py-4">
+      <footer className="flex justify-center py-6">
         <PaginationPage pagination={pagination as Ipagination} />
-      </div>
-    </div>
+      </footer>
+    </main>
   );
 }
