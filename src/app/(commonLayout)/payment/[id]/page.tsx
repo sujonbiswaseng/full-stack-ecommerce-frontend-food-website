@@ -2,13 +2,13 @@ import React from "react";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { getOwnPaymentActions } from "@/actions/order.action";
-import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import Notfounddata from "@/components/Notfounddata";
-import { getSession } from "@/services/auth.service";
 import { TResponseOrderData } from "@/types/order/order.type";
 import { TBasePayment } from "@/types/payment.type";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
-
+// InfoRow is an atomic, token-based, semantic row for displaying a label:value pattern
 const InfoRow = ({
   label,
   value,
@@ -20,260 +20,311 @@ const InfoRow = ({
   highlight?: boolean;
   mono?: boolean;
 }) => (
-  <div className="flex flex-row gap-2 py-1">
-    <span className="text-gray-700 font-semibold min-w-[122px]">{label}:</span>
+  <div className="flex flex-row gap-4 py-2">
+    <span className="text-muted-foreground font-medium min-w-[128px]">
+      {label}:
+    </span>
     <span
-      className={`${
+      className={[
         highlight
-          ? "text-green-600 font-bold"
+          ? "text-accent font-semibold"
           : mono
-          ? "font-mono text-gray-500"
-          : "text-gray-800"
-      }`}
+          ? "font-mono text-muted-foreground"
+          : "text-foreground",
+        "truncate",
+      ].join(" ")}
     >
       {value}
     </span>
   </div>
 );
 
- const PaymentSuccessPage = async ({
+const ResultStatusIcon = ({
+  isSuccess,
+}: {
+  isSuccess: boolean;
+}) => (
+  <span
+    className={`rounded-full p-4 bg-card border border-border shadow flex items-center justify-center mb-4 transition-colors duration-300 ${
+      isSuccess
+        ? "bg-accent/10 text-accent border-accent"
+        : "bg-secondary/10 text-primary border-primary"
+    }`}
+    aria-label={isSuccess ? "Payment Successful" : "Payment Failed"}
+  >
+    <CheckCircle2
+      className={
+        isSuccess ? "text-accent" : "text-destructive"
+      }
+      size={48}
+      strokeWidth={2.4}
+    />
+  </span>
+);
+
+const PaymentCard = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => (
+  <motion.section
+    initial={{ opacity: 0, y: 24 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+    className="bg-card border border-border rounded-2xl shadow-lg px-6 py-8 md:px-8 w-full flex flex-col items-center gap-6 relative z-10"
+    role="region"
+    aria-label="Payment Card"
+  >
+    {children}
+  </motion.section>
+);
+
+const CardDivider = () => (
+  <div className="border-t border-border w-full my-6" aria-hidden="true" />
+);
+
+const SectionContainer = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => (
+  <div className="w-full max-w-[32rem] mx-auto px-4 py-8 md:py-12 flex flex-col items-center min-h-screen justify-center bg-background">
+    <div className="absolute inset-0 pointer-events-none flex items-center justify-center select-none -z-10">
+      {/* Subtle background blob gradient, token-based */}
+      <svg width="420" height="420" className="opacity-30 scale-110">
+        <defs>
+          <radialGradient id="g1" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stopColor="var(--accent)" />
+            <stop offset="100%" stopColor="var(--background)" />
+          </radialGradient>
+        </defs>
+        <circle cx="210" cy="210" r="210" fill="url(#g1)" />
+      </svg>
+    </div>
+    {children}
+  </div>
+);
+
+const RegistrationSummary = ({
+  data,
+}: {
+  data: TResponseOrderData<{ payment: TBasePayment }>;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 16 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+    className="w-full bg-card border border-border shadow-inner rounded-xl p-6 flex flex-col gap-2"
+  >
+    <InfoRow label="Order ID" value={data?.id || "-"} mono />
+    <InfoRow label="Customer ID" value={data?.customerId || "-"} mono />
+    <InfoRow label="Provider ID" value={data?.providerId || "-"} mono />
+    <InfoRow label="First Name" value={data?.first_name || "-"} />
+    <InfoRow label="Last Name" value={data?.last_name || "-"} />
+    <InfoRow
+      label="Total Price"
+      value={
+        <span className="inline-flex items-center font-semibold text-accent">
+          <span className="mr-1 text-lg font-bold">৳</span>
+          {data?.totalPrice ?? "-"}
+        </span>
+      }
+    />
+    <InfoRow label="Phone" value={data?.phone || "-"} />
+    <InfoRow label="Address" value={data?.address || "-"} />
+    <InfoRow
+      label="Date"
+      value={
+        data?.createdAt
+          ? new Date(data.createdAt).toLocaleString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })
+          : "-"
+      }
+    />
+    <InfoRow
+      label="Amount Paid"
+      value={
+        data?.payment?.amount ? `৳${data.payment.amount}` : "-"
+      }
+      highlight
+    />
+    <InfoRow
+      label="Status"
+      value={
+        <span
+          className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
+            (data?.status || "").toLowerCase() === "paid"
+              ? "bg-accent/10 text-accent"
+              : (data?.status || "").toLowerCase() === "pending"
+              ? "bg-secondary text-secondary"
+              : "bg-destructive/10 text-destructive"
+          }`}
+        >
+          {data?.status || "Unknown"}
+        </span>
+      }
+    />
+    <InfoRow
+      label="Payment Status"
+      value={
+        <span
+          className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
+            (data?.payment?.status || "").toLowerCase() === "paid"
+              ? "bg-accent/10 text-accent"
+              : (data?.payment?.status || "").toLowerCase() === "pending"
+              ? "bg-secondary text-secondary"
+              : "bg-destructive/10 text-destructive"
+          }`}
+        >
+          {data?.payment?.status || "Unknown"}
+        </span>
+      }
+    />
+    <InfoRow label="Payment ID" value={data?.payment?.id || "-"} mono />
+    <InfoRow label="Transaction ID" value={data?.payment?.transactionId || "-"} mono />
+  </motion.div>
+);
+
+const TrackingReferenceCard = ({
+  orderId,
+  paymentId,
+}: {
+  orderId: string;
+  paymentId: string;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+    className="bg-card border border-border rounded-xl shadow-inner p-6"
+  >
+    <div className="flex items-center justify-between mb-4">
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
+        Tracking Reference
+      </p>
+      <span className="text-xs font-bold bg-destructive/10 text-destructive px-3 py-1 rounded">
+        FAILED
+      </span>
+    </div>
+    <details className="group w-full">
+      <summary className="cursor-pointer text-sm font-medium text-primary underline select-none">
+        Show IDs
+      </summary>
+      <div className="mt-3 flex flex-col gap-2">
+        <InfoRow label="Order ID" value={orderId} mono />
+        <InfoRow label="Payment ID" value={paymentId} mono />
+      </div>
+    </details>
+    <p className="mt-4 text-xs text-muted-foreground">
+      Please try payment again. If this issue continues, contact support with these IDs.
+    </p>
+  </motion.div>
+);
+
+const HelpFooter = () => (
+  <div className="w-full text-xs text-muted-foreground pt-8 text-center">
+    Need help?&nbsp;
+    <a
+      href="https://wa.me/01804935939"
+      className="underline text-primary hover:text-accent transition-colors"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Contact Support
+    </a>
+  </div>
+);
+
+const PaymentSuccessPage = async ({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) => {
-    try {
-      const { id } = await params;
-    const resolvedSearchParams =  await searchParams
-    const paymentId =
-      (resolvedSearchParams?.paymentId as string | undefined) ?? "-";
-    const orderResult = await getOwnPaymentActions(id,paymentId);
-    
-    const paymentData=orderResult?.data as TResponseOrderData<{payment:TBasePayment}>
+  try {
+    const { id } = await params;
+    const resolvedSearchParams = await searchParams;
+    const paymentId = (resolvedSearchParams?.paymentId as string | undefined) ?? "-";
+    const orderResult = await getOwnPaymentActions(id, paymentId);
+    const paymentData = orderResult?.data as TResponseOrderData<{ payment: TBasePayment }>;
     const isServiceSuccess = Boolean(orderResult?.success);
-    const paymentStatus=paymentData?.payment?.status==="PAID"
+    const paymentStatus = paymentData?.payment?.status === "PAID";
     const isSuccessView = isServiceSuccess && paymentStatus;
-   
+
     return (
-      <main className="min-h-screen flex items-center justify-center bg-neutral-100 mt-6 sm:mt-10 md:mt-14 lg:mt-20">
-        <section className="w-full max-w-xl relative">
-          <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center">
-            <svg width="400" height="400" className="opacity-10 scale-125">
-              <defs>
-                <radialGradient id="g1" cx="50%" cy="50%" r="60%">
-                  <stop offset="0%" stopColor="#4f46e5" />
-                  <stop offset="100%" stopColor="#f0fdfa" />
-                </radialGradient>
-              </defs>
-              <circle cx="200" cy="200" r="200" fill="url(#g1)" />
-            </svg>
-          </div>
-          <div className="relative z-10 bg-white rounded-2xl shadow-lg border border-gray-100 px-8 py-12 md:px-12 flex flex-col items-center">
-            <div className="flex flex-col items-center gap-1 mb-5">
-              <span
-                className={`rounded-full p-3 mb-1 shadow-sm ${
-                  isSuccessView ? "bg-green-50" : "bg-red-50"
-                }`}
-              >
-                <CheckCircle2
-                  className={isSuccessView ? "text-green-500" : "text-red-500"}
-                  size={44}
-                />
-              </span>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
+      <main className="relative bg-background min-h-screen flex items-center justify-center">
+        <SectionContainer>
+          <PaymentCard>
+            <ResultStatusIcon isSuccess={isSuccessView} />
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="flex flex-col items-center gap-2 mb-2"
+            >
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground">
                 {isSuccessView ? "Payment Successful" : "Payment Failed"}
               </h1>
-              <p className="text-sm text-gray-500 text-center max-w-sm">
+              <p className="text-sm text-muted-foreground text-center max-w-xs">
                 {isSuccessView
                   ? "Thank you for your payment. Your registration has been confirmed. All details are below."
-                  : orderResult?.message || "We could not verify this payment in our records. Please try again or contact support."}
+                  : orderResult?.message ||
+                    "We could not verify this payment in our records. Please try again or contact support."}
               </p>
-            </div>
+            </motion.div>
             <div className="w-full">
-              <div className="border-t border-gray-100 my-6" />
-              <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-2">
+              <CardDivider />
+              <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-4">
                 Registration Summary
               </h2>
-              {isSuccessView || isServiceSuccess!==false? (
-                  <div
-                    className="bg-neutral-50 rounded-xl p-5 border border-gray-100 shadow-inner mb-4"
-                  >
-                    <InfoRow
-                      label="Order ID"
-                      value={paymentData?.id || "-"}
-                      mono
-                    />
-                    <InfoRow
-                      label="customer ID"
-                      value={paymentData?.customerId || "-"}
-                      mono
-                    />
-                     <InfoRow
-                      label="Privider ID"
-                      value={paymentData?.providerId || "-"}
-                      mono
-                    />
-                     <InfoRow
-                      label="first_name"
-                      value={paymentData?.first_name || "-"}
-                    />
-                     <InfoRow
-                      label="last_name"
-                      value={paymentData?.last_name || "-"}
-                    />
-
-<InfoRow
-                      label="totalPrice (not paid) "
-                      value={
-                        <span className="inline-flex items-center text-base font-semibold text-emerald-700 bg-emerald-50 rounded px-2 py-0.5">
-                          <span className="mr-1 text-lg font-bold">৳</span>
-                          {paymentData?.totalPrice ?? "-"}
-                        </span>
-                      }
-                 
-                    />
-
-<InfoRow
-                      label="phone"
-                      value={paymentData?.phone || "-"}
-                    />
-
-<InfoRow
-                      label="address"
-                      value={paymentData?.address || "-"}
-                    />
-
-                    <InfoRow
-                      label="Date"
-                      value={
-                        paymentData?.createdAt
-                          ? new Date(paymentData.createdAt).toLocaleString(undefined, {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            })
-                          : "-"
-                      }
-                    />
-                    <InfoRow
-                      label="Amount Paid"
-                      value={
-                        paymentData?.payment?.amount
-                          ? `৳${paymentData.payment.amount}`
-                          : "-"
-                      }
-                      highlight
-                    />
-                     <InfoRow
-                      label="Status"
-                      value={
-                        <span
-                          className={`inline-block px-2 py-px rounded-md text-xs font-semibold ${
-                            (paymentData?.status || "").toLowerCase() === "paid" || (paymentData?.status || "").toLowerCase() === "paid"
-                              ? "bg-green-100 text-green-700"
-                              : (paymentData?.status || "").toLowerCase() === "pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {paymentData?.status || paymentData?.status || "Unknown"}
-                        </span>
-                      }
-                    />
-                    <InfoRow
-                      label="payment Status"
-                      value={
-                        <span
-                          className={`inline-block px-2 py-px rounded-md text-xs font-semibold ${
-                            (paymentData.payment?.status || "").toLowerCase() === "paid" || (paymentData?.payment?.status || "").toLowerCase() === "paid"
-                              ? "bg-green-100 text-green-700"
-                              : (paymentData.payment.status || "").toLowerCase() === "pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {paymentData.payment.status || paymentData?.payment?.status || "Unknown"}
-                        </span>
-                      }
-                    />
-                     <InfoRow
-                      label="Payment ID"
-                      value={paymentData?.payment?.id || "-"}
-                      mono
-                    />
-                    <InfoRow
-                      label="Transaction ID"
-                      value={paymentData?.payment?.transactionId || "-"}
-                      mono
-                    />
-                  </div>
-                )
-               : (
-                <div className="my-8 space-y-4">
-                  <div className="text-center space-y-1">
-                    <p className="text-sm font-semibold text-red-700">Payment Verification Failed</p>
-                    <p className="text-xs text-gray-500 max-w-sm mx-auto">
+              {isSuccessView || isServiceSuccess !== false ? (
+                <RegistrationSummary data={paymentData} />
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="my-8 flex flex-col gap-4 w-full"
+                >
+                  <div className="text-center space-y-2">
+                    <p className="text-sm font-semibold text-destructive">
+                      Payment Verification Failed
+                    </p>
+                    <p className="text-xs text-muted-foreground max-w-xs mx-auto">
                       No payment record was found for this event right now.
                     </p>
                   </div>
-                  <div className="bg-neutral-50 rounded-xl p-5 border border-gray-100 shadow-inner">
-                    <div className="flex items-center justify-between gap-3 mb-3">
-                      <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">
-                        Tracking Reference
-                      </p>
-                      <span className="text-xs font-semibold text-red-700 bg-red-100 px-2 py-1 rounded-md">
-                        FAILED
-                      </span>
-                    </div>
-                    <details className="group">
-                      <summary className="cursor-pointer text-sm font-medium text-indigo-700 select-none">
-                        Show IDs
-                      </summary>
-                      <div className="mt-4 space-y-1">
-                        <InfoRow label="Order ID" value={id} mono />
-                        <InfoRow label="Payment ID" value={paymentId} mono />
-                      </div>
-                    </details>
-                    <p className="mt-4 text-xs text-gray-500">
-                      Please try payment again. If this issue continues, contact support with these IDs.
-                    </p>
-                  </div>
-                </div>
-              )} 
+                  <TrackingReferenceCard orderId={id} paymentId={paymentId} />
+                </motion.div>
+              )}
             </div>
-            <div className="flex flex-col md:flex-row gap-3 w-full mt-8">
-              <Link
-                href="/Meals"
-                className="flex-1 inline-flex justify-center items-center rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 shadow transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              >
-                Browse More Meals
-              </Link>
-              <Link
-                href="/"
-                className="flex-1 inline-flex justify-center items-center rounded-md border border-gray-200 bg-white hover:bg-neutral-50 text-indigo-700 font-semibold py-3 px-6 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-100"
-              >
-                Home
-              </Link>
+            <div className="flex flex-col md:flex-row gap-4 w-full mt-8">
+              <Button asChild variant="default" size="lg" className="flex-1">
+                <Link href="/Meals">Browse More Meals</Link>
+              </Button>
+              <Button asChild variant="secondary" size="lg" className="flex-1">
+                <Link href="/">Home</Link>
+              </Button>
             </div>
-            <div className="text-xs text-gray-400 pt-8 text-center w-full">
-              Need help?&nbsp;
-              <a
-                href="https://wa.me/01804935939"
-                className="underline text-indigo-600 hover:text-indigo-800 transition"
-              >
-                Contact Support
-              </a>
-            </div>
-          </div>
-        </section>
+            <HelpFooter />
+          </PaymentCard>
+        </SectionContainer>
       </main>
     );
-    } catch (error) {
-      console.log(error)
-    return  <Notfounddata content="something went wrong please try again" btntext="Home" path="/"/>
-      
-    }
+  } catch (error) {
+    console.log(error);
+    return (
+      <Notfounddata
+        content="Something went wrong. Please try again."
+        btntext="Home"
+        path="/"
+      />
+    );
   }
+};
 
-export default PaymentSuccessPage
+export default PaymentSuccessPage;

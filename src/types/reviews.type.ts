@@ -25,7 +25,8 @@ export interface IgetReviewData{
     comment: string,
     createdAt: string,
     updatedAt: string,
-    customer?:TUser
+    customer?:TUser,
+    replies: IgetReviewData[] 
 }
 
 export type TResponseReviewData<T = unknown> = IgetReviewData & T;

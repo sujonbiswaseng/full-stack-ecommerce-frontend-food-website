@@ -9,13 +9,13 @@ import { Button } from '../../ui/button'
 import { Status, StatusIndicator, StatusLabel } from '../../ui/status'
 import { manageCartStore } from '@/store/CartStore'
 import ReviewForm from '../review/reviewform'
-import { ReviewItem } from '../review/reviewitem'
 import { TResponseMeals } from '@/types/meals.type'
 import { TUser } from '@/types/user.type'
 import { TGetCategory } from '@/types/category'
 import { IProviderInfo } from '@/types/provider.type'
 import { IgetReviewData } from '@/types/reviews.type'
 import ImageWithSkeleton from '@/components/ImageSkeleton'
+import ReviewItem from '../review/reviewitem'
 
 const PAGE_ANIMATION = {
   initial: { opacity: 0, y: 8 },
@@ -81,12 +81,12 @@ const SingleMealById = ({
                     />
                   </motion.div>
                 </AnimatePresence>
-            
+
                 <span className="absolute top-4 left-4 rounded-full border border-border bg-background/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-card-foreground shadow-sm backdrop-blur-md select-none">
                   Featured Meal
                 </span>
               </div>
-        
+
               <div className="flex gap-4 w-full flex-wrap" aria-label="gallery thumbnails">
                 {images.map((img, idx) => (
                   <button
@@ -262,6 +262,7 @@ const SingleMealById = ({
               </div>
             </motion.section>
 
+            {/* Customer Reviews Card */}
             <motion.section
               {...PAGE_ANIMATION}
               className="bg-card rounded-2xl shadow border border-border p-6 flex flex-col gap-6"
@@ -298,27 +299,49 @@ const SingleMealById = ({
                   ))}
                 </div>
               </div>
-              <div className="flex flex-col gap-6 w-full">
-                {meal.providerRating.totalReview === 0 && (
-                  <span className="text-muted-foreground">No reviews yet.</span>
-                )}
-                {meal.reviews.map((review: any) => (
-                  <div
-                    key={review.id}
-                    className="border-t border-border pt-4 flex flex-col gap-4 sm:flex-row"
-                  >
-                    <ReviewItem
-                      user={userinfo}
-                      review={review}
-                      meal={meal}
-                      activeReplyId={activeReplyId}
-                      setActiveReplyId={setActiveReplyId}
-                      totalLength={review.replies.length}
-                    />
+              {/* No reviews message (providerRating.totalReview) */}
+              {meal.providerRating.totalReview === 0 && (
+                <span className="text-muted-foreground">No reviews yet.</span>
+              )}
+            </motion.section>
+
+            {/* Customer Reviews List */}
+            <motion.section className="mt-4 md:mt-10 space-y-6">
+              <h2 className="text-xl font-semibold text-foreground mb-2">
+                Reviews
+              </h2>
+              <div className="rounded-2xl border border-border bg-card shadow-sm p-3 sm:p-4">
+                {meal.reviews?.length > 0 ? (
+                  // Enable horizontal scroll on small devices only (max-width: sm)
+                  <div className="space-y-4 min-w-[280px] sm:min-w-0 overflow-x-auto sm:overflow-x-visible scrollbar-thin scrollbar-thumb-accent/40 scrollbar-track-transparent">
+                    {meal.reviews.map((review: IgetReviewData) => (
+                      <div
+                        key={review.id}
+                        className="rounded-xl border border-border bg-card px-3 sm:px-5 py-4 min-w-[320px] sm:min-w-0"
+                      >
+                        <ReviewItem
+                          user={userinfo}
+                          review={{
+                            ...review,
+                            user: (review as any).customer ?? meal.provider.user,
+                            meal: meal,
+                          }}
+                          meal={meal}
+                          activeReplyId={activeReplyId}
+                          setActiveReplyId={setActiveReplyId}
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <p className="text-sm text-muted-foreground bg-muted px-4 py-3 rounded">
+                    No reviews yet. Be the first to review!
+                  </p>
+                )}
               </div>
             </motion.section>
+ 
+      
           </section>
           <aside className="lg:sticky lg:top-20 h-fit">
             <motion.div

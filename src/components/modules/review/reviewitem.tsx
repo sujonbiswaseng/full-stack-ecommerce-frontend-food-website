@@ -1,214 +1,229 @@
-import {
-  deleteReviewAction,
-  reviewUpdate,
-} from "@/actions/reviews.order";
-import ReviewForm from "@/components/modules/review/reviewform";
-import { IGetMealData, MealReview } from "@/types/meals.type";
-import { IUpdatereviewData } from "@/types/reviews.type";
-import { TUser } from "@/types/user.type";
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "react-toastify";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { TResponseReviewData } from "@/types/reviews.type";
+import { TUser } from "@/types/user.type";
+import { TResponseMeals } from "@/types/meals.type";
+import { deleteReviewAction, reviewUpdate } from "@/actions/reviews.order";
+import ReviewForm from "./reviewform";
 
-export const ReviewItem = ({
+interface ReviewItemProps {
+  user: TUser;
+  review: TResponseReviewData<{ user: TUser; meal: TResponseMeals }>;
+  meal: TResponseMeals;
+  activeReplyId: string | null;
+  setActiveReplyId: (id: string | null) => void;
+  depth?: number;
+  maxDepth?: number;
+}
+
+export default function ReviewItem({
   user,
   review,
   meal,
   activeReplyId,
   setActiveReplyId,
-  totalLength,
-}: {
-  user: TUser;
-  review: MealReview;
-  meal: IGetMealData;
-  activeReplyId: any;
-  setActiveReplyId: any;
-  totalLength: number;
-}) => {
+  depth = 0,
+  maxDepth = 2, // Facebook-style max nested reply
+}: ReviewItemProps) {
   const router = useRouter();
-  const [isEditing, setisEditing] = useState(false);
-  const [updateReview, setupdateReview] = useState<IUpdatereviewData>();
-  if (!meal) {
-    return (
-      <div className="p-4 rounded-md bg-destructive/10 text-destructive">
-        Failed to load review
-      </div>
-    );
-  }
+  const [isEditing, setIsEditing] = useState(false);
+  // console.log(reviews.user,'review')
 
-  const reply = review.replies.filter((item: any) => item.customer?.name);
-  const reviewinfo = reply.find((item: any) => item.customer?.id);
-  const defaultIamge =
-    "https://res.cloudinary.com/drmeagmkl/image/upload/v1771962102/default_meal_kgc6mv.png";
+  // Add state and handler for editing the review comment
+  const [editComment, setEditComment] = useState(review.comment || "");
+  const [editRating, setEditRating] = useState(review.rating || 0);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const handleUpdate = async () => {
+    if (!editComment.trim()) {
+      // Prefer better user feedback via toast or alert
+      alert("Comment cannot be empty.");
+      return;
+    }
+    setIsUpdating(true);
+    try {
+      const toastId=toast.loading("review updating...")
+      const result = await reviewUpdate(review.id, {
+        comment: editComment,
+        rating: editRating,
+      });
+      console.log(result,'dsdfds')
+      if (result?.success) {
+        toast.dismiss(toastId)
+        toast.success("review updated successfully")
+        setIsEditing(false);
+        router.refresh?.();
+        return
+      } else {
+        toast.dismiss(toastId)
+        toast.error("review updated failed")
+        setIsEditing(false);
+        router.refresh?.();
+      }
+    } catch (err: any) {
+      alert(err?.message || "Failed to update review");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this review?")) return;
-    const toastId = toast.loading("Deleting review...");
-    const res = await deleteReviewAction(review.id);
-    toast.dismiss(toastId);
-    if (res.success) {
-      router.refresh();
-      toast.success(res.message || "Review deleted successfully");
-    } else {
-      toast.error(res.message || "Review deletion failed");
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this review? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+   
+    try {
+      const toastId=toast.loading("review deleting...")
+      const result = await deleteReviewAction(review.id);
+      setIsDeleting(true);
+      if (result?.success) {
+        toast.dismiss(toastId)
+        toast.success(result.message || "review message delete successfully")        
+        router.refresh?.();
+        return
+      } else {
+        toast.dismiss(toastId)
+        toast.error(result.message || "review delete failed")        
+        router.refresh?.();
+      }
+    } catch (err: any) {
+      alert(err?.message || "Failed to delete review");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-  const handleUpdate = async () => {
-    const res = await reviewUpdate(
-      review.id,
-      updateReview as IUpdatereviewData
-    );
-    if (res.success) {
-      setisEditing(false);
-      toast.success("Review updated!");
-      router.refresh();
-    } else {
-      toast.error(res.message || "Update failed");
-    }
-  };
+  // Safe replies
+  const replies = review.replies || [];
 
-  const reviewlength = review?.replies?.map((_, i) => i);
+  const canReply = depth < maxDepth;
+  const isOwner = user?.id === review.user?.id;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="border-t border-border pt-6 mt-4 flex gap-4"
+    <div
+      className={`flex gap-3 mt-3 ${depth > 0 ? "ml-8" : ""} 
+      sm:gap-4 sm:mt-4 xs:gap-2 xs:mt-2 xs:flex-col xs:items-start`}
+      style={{ alignItems: "flex-start" }}
     >
+      {/* Avatar */}
       <div className="flex-shrink-0">
-        <div className="w-12 h-12 rounded-full bg-input overflow-hidden border border-border flex items-center justify-center">
+        <div className="w-9 h-9 xs:w-8 xs:h-8 rounded-full overflow-hidden bg-gray-200 relative">
           <Image
-            src={
-              review.customer?.image ||
-              reviewinfo?.customer?.image ||
-              defaultIamge
-            }
-            alt="User"
+            src={review.user?.image|| "/logo.png"}
+            alt={review.user?.name || "User"}
             fill
             className="object-cover"
-            sizes="48px"
-            priority={false}
           />
         </div>
       </div>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex flex-wrap items-center gap-4 mb-1">
-          <h4 className="font-semibold text-card-foreground truncate">
-            {review.customer?.name || reviewinfo?.customer?.name || "Customer"}
-          </h4>
-          {review.rating && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent text-accent-foreground text-xs font-medium">
-              {review.rating.toFixed(1)} ★
+      <div className="flex-1 w-full min-w-0 space-y-4 min-w-[280px] sm:min-w-0 overflow-x-auto sm:overflow-x-visible scrollbar-thin scrollbar-thumb-accent/40 scrollbar-track-transparent">
+        {/* Review Bubble */}
+        <div
+          className="bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-2xl min-w-0 w-full
+          sm:px-4 sm:py-2 xs:px-2 xs:py-1"
+        >
+          <div className="flex items-center gap-1 mb-0.5 flex-wrap">
+            <span className="font-semibold text-xs sm:text-sm text-gray-800 dark:text-gray-200">
+              {review.user?.name || "User"}
             </span>
-          )}
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setisEditing((prev) => !prev)}
-              className="text-muted-foreground"
-              aria-label={isEditing ? "Cancel edit" : "Edit review"}
-              type="button"
-              tabIndex={0}
-            >
-              {isEditing ? "Cancel" : "Edit"}
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleDelete}
-              className="text-destructive"
-              aria-label="Delete review"
-              type="button"
-              tabIndex={0}
-            >
-              Delete
-            </Button>
+            {review.rating && (
+              <span className="text-orange-500 text-xs sm:text-sm font-medium ml-1">
+                {review.rating.toFixed(1)}
+              </span>
+            )}
           </div>
-        </div>
-
-        {isEditing ? (
-          <div className="max-w-md w-full mt-2">
-            <label htmlFor={`edit-review-input-${review.id}`} className="sr-only">
-              Edit comment
-            </label>
-            <input
-              id={`edit-review-input-${review.id}`}
-              type="text"
-              className="w-full rounded-md border border-border bg-input text-foreground px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring transition"
-              value={updateReview?.comment ?? ""}
-              placeholder="Update your comment"
-              onChange={(e) =>
-                setupdateReview({ comment: e.target.value })
-              }
-              aria-label="Edit your comment"
-            />
-            <div className="flex gap-2 mt-3">
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleUpdate}
-                disabled={!updateReview?.comment || updateReview.comment.trim().length === 0}
-              >
-                Save
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setisEditing(false)}
-              >
-                Cancel
-              </Button>
+          {isEditing ? (
+            <div>
+              <input
+                className="mt-0 w-full text-xs sm:text-sm px-2 py-1 border rounded"
+                value={editComment}
+                onChange={(e) => {
+                  setEditComment(e.target.value);
+                }}
+              />
+              <button onClick={() => handleUpdate()}>save</button>
             </div>
-          </div>
-        ) : (
-          <p className="text-muted-foreground mt-1 whitespace-pre-line break-words">
-            {review.comment}
-          </p>
-        )}
-
-        <div className="mt-4 flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={totalLength !== reviewlength?.length}
-            onClick={() =>
-              setActiveReplyId(activeReplyId === review.id ? null : review.id)
-            }
-            tabIndex={0}
-          >
-            {totalLength === reviewlength?.length ? "Reply" : ""}
-          </Button>
+          ) : (
+            <p className="text-gray-600 dark:text-gray-200 mt-0 text-xs sm:text-sm break-words">
+              {review.comment}
+            </p>
+          )}
         </div>
 
+        {/* Actions like Facebook style: small, subtle, row, spaced out, on the side (bottom left of bubble) */}
+        <div className="flex gap-3 mt-1 pl-1 xs:gap-2 xs:mt-0.5 xs:pl-0 flex-wrap">
+          {canReply && (
+            <button
+              className="text-[11px] sm:text-xs text-blue-500 font-semibold hover:underline focus:outline-none"
+              style={{ fontSize: "10.5px" }}
+              onClick={() =>
+                setActiveReplyId(activeReplyId === review.id ? null : review.id)
+              }
+            >
+              Reply
+            </button>
+          )}
+          {isOwner && (
+            <>
+              <button
+                className="text-[11px] sm:text-xs text-gray-500 font-semibold hover:underline focus:outline-none"
+                style={{ fontSize: "10.5px" }}
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                }}
+              >
+                Edit
+              </button>
+              {/* Delete button can go here if needed */}
+
+              <button
+                className="text-[11px] sm:text-xs text-gray-500 font-semibold hover:underline focus:outline-none"
+                style={{ fontSize: "10.5px" }}
+                onClick={() => {
+                  handleDelete()
+                }}
+              >
+                {isDeleting?"ddelete...":"delete"}
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Reply Form */}
         {activeReplyId === review.id && (
-          <div className="mt-4">
+          <div className="mt-1 xs:mt-0.5 w-full">
             <ReviewForm parentId={review.id} mealId={meal.id} />
           </div>
         )}
 
-        {review.replies?.length > 0 && (
-          <div className="ml-4 sm:ml-8 pl-4 border-l border-border mt-4 space-y-4">
-            {review.replies.map((reply: any) => (
+        {/* Nested Replies */}
+        {replies.length > 0 && (
+          <div className="ml-6 pl-4 border-l border-gray-200 dark:border-gray-700 xs:ml-2 xs:pl-2">
+            {replies.map((reply) => (
               <ReviewItem
                 key={reply.id}
                 user={user}
-                review={reply}
+                review={reply as any}
                 meal={meal}
                 activeReplyId={activeReplyId}
                 setActiveReplyId={setActiveReplyId}
-                totalLength={review.replies.length}
+                depth={depth + 1}
+                maxDepth={maxDepth}
               />
             ))}
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
-};
+}
