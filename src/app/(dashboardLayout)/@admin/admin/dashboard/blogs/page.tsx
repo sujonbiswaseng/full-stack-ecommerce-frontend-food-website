@@ -1,19 +1,19 @@
-import { getSessionAction } from '@/actions/auth.actions';
-import ErrorBoundary from '@/components/ErrorBoundary'
-import ErrorFallback from '@/components/ErrorFallback'
-import { getAllBlogsAction } from '@/actions/blog.actions';
-import { TPagination } from '@/types/event.types';
-import { TResponseBlog } from '@/types/blog.type';
-import BlogTable from '@/components/module/blog/BlogTable';
-import BlogsTable from '@/components/module/blog/BlogTable';
+import { getAllBlogsAction } from "@/actions/blog.actions";
+import BlogsTable from "@/components/modules/blog/BlogTable";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import ErrorFallback from "@/components/shared/ErrorFallback";
+import { getSession } from "@/services/auth.service";
+import { TResponseBlog } from "@/types/blog.type";
+import { Ipagination } from "@/types/pagination.type";
+
 
 const BlogsPage = async ({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) => {
-  const userinfo = await getSessionAction();
-  const role = userinfo.data?.role;
+  const userinfo = await getSession();
+  const role = userinfo?.data?.role;
   if (!userinfo || !userinfo.data) {
     return (
       <ErrorBoundary fallback={
@@ -55,7 +55,7 @@ const BlogsPage = async ({
         ) : (
           <BlogsTable
             blogs={blogsResponse.data as TResponseBlog[]}
-            pagination={blogsResponse.pagination as TPagination}
+            pagination={blogsResponse.pagination as Ipagination}
             role={role as string}
           />
         )}
