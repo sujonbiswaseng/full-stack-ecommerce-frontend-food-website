@@ -24,7 +24,7 @@ const DashboardSidebarContent = ({dashboardHome, navItems, userInfo} : Dashboard
       {/* Logo / Brand */}
       <div className="flex h-8 items-center border-b px-6">
         <Link href={dashboardHome} className="mb-4">
-          <span className="text-xl font-bold text-primary">FoodHub</span>
+          <span className="text-xl font-bold text-primary">BiteBase</span>
         </Link>
       </div>
 

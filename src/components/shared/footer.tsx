@@ -14,10 +14,10 @@ export default function Footer() {
               <img
                 src="https://res.cloudinary.com/drmeagmkl/image/upload/v1772007286/logo_rcsr8h.png"
                 className="w-[54px] h-[54px] xs:w-[60px] xs:h-[60px] sm:w-[64px] sm:h-[64px] md:w-[70px] md:h-[70px] rounded-full object-cover"
-                alt="FoodHub logo"
+                alt="BiteBase logo"
               />
               <h2 className="text-xl xs:text-2xl sm:text-2xl md:text-2xl font-bold text-primary tracking-tight">
-                FoodHub
+                BiteBase
               </h2>
             </div>
             <p className="text-muted-foreground text-xs xs:text-sm md:text-sm leading-relaxed max-w-xs md:max-w-[240px]">
@@ -157,7 +157,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-border mt-8 md:mt-16 pt-4 md:pt-6 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 text-xs xs:text-sm text-muted-foreground w-full">
           <p className="text-center md:text-left w-full md:w-auto">
-            © {new Date().getFullYear()} FoodHub. All rights reserved.
+            © {new Date().getFullYear()} BiteBase. All rights reserved.
           </p>
 
           <div className="flex flex-wrap justify-center md:justify-end gap-4 xs:gap-6">

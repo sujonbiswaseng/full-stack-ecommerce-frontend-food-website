@@ -1,17 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import * as z from "zod";
-
-import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldError,
@@ -22,10 +21,12 @@ import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
 import { CreateCategory } from "@/validations/category.schema";
 import { categoryCreate } from "@/actions/category";
-import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function CreateCategoryForm() {
   const [preview, setPreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -35,14 +36,14 @@ export function CreateCategoryForm() {
       onSubmit: CreateCategory as any,
     },
     onSubmit: async ({ value }) => {
+      setLoading(true);
       const toastId = toast.loading("Creating category...", {
         theme: "colored",
         position: "bottom-right",
       });
 
       try {
-        // Using native fetch
-        const res= await categoryCreate(value as any)
+        const res = await categoryCreate(value as any);
 
         toast.dismiss(toastId);
 
@@ -51,6 +52,7 @@ export function CreateCategoryForm() {
             theme: "colored",
             position: "bottom-right",
           });
+          setLoading(false);
           return;
         }
 
@@ -58,8 +60,7 @@ export function CreateCategoryForm() {
           theme: "colored",
           position: "bottom-right",
         });
-        setPreview(null)
-
+        setPreview(null);
         form.reset();
       } catch (error) {
         toast.dismiss(toastId);
@@ -67,109 +68,180 @@ export function CreateCategoryForm() {
           theme: "colored",
           position: "bottom-right",
         });
+      } finally {
+        setLoading(false);
       }
     },
   });
 
   return (
-    <Card className="w-full sm:max-w-md mx-auto p-4 shadow-lg border border-gray-200">
-      <CardHeader>
-        <CardTitle className="text-2xl text-indigo-600">Create Category</CardTitle>
-        <CardDescription className="text-gray-500">
-          Add a new category with name and image.
-        </CardDescription>
-      </CardHeader>
+    <div className="max-w-[420px] mx-auto w-full px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
+        <Card className="bg-card border border-border rounded-xl shadow-sm w-full">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-2xl text-primary font-semibold">
+              Create Category
+            </CardTitle>
+            <CardDescription className="text-muted-foreground text-base mt-1">
+              Add a new category with a name and image.
+            </CardDescription>
+          </CardHeader>
 
-      <CardContent>
-        <form
-          id="category-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-          className="space-y-4"
-        >
-          <FieldGroup>
-            <form.Field
-              name="name"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Category Name</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      placeholder="Enter category name"
-                      className="border-indigo-400 focus:ring-indigo-400 focus:border-indigo-500"
-                    />
-                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                  </Field>
-                );
+          <CardContent>
+            <form
+              id="category-form"
+              autoComplete="off"
+              tabIndex={-1}
+              onSubmit={(e) => {
+                e.preventDefault();
+                form.handleSubmit();
               }}
-            />
+              className="flex flex-col gap-6"
+              aria-label="Create Category Form"
+            >
+              <FieldGroup className="flex flex-col gap-6">
+                <form.Field
+                  name="name"
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid;
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel
+                          htmlFor={field.name}
+                          className="text-sm font-medium text-foreground"
+                        >
+                          Category Name<span className="text-destructive ml-1">*</span>
+                        </FieldLabel>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          autoComplete="off"
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
+                          placeholder="Enter category name"
+                          className="bg-input border border-border focus:ring-2 focus:ring-ring focus:border-ring text-foreground placeholder:text-muted-foreground"
+                          disabled={loading}
+                          required
+                        />
+                        <AnimatePresence>
+                          {isInvalid && (
+                            <motion.div
+                              key="field-error"
+                              initial={{ opacity: 0, y: 6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 6 }}
+                              transition={{ duration: 0.25 }}
+                            >
+                              <FieldError errors={field.state.meta.errors} />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </Field>
+                    );
+                  }}
+                />
 
-<form.Field
-              name="image"
-              children={(field) => (
-                <Field>
-                  <FieldLabel>category Image *</FieldLabel>
+                <form.Field
+                  name="image"
+                  children={(field) => (
+                    <Field>
+                      <FieldLabel className="text-sm font-medium text-foreground">
+                        Category Image<span className="text-destructive ml-1">*</span>
+                      </FieldLabel>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        aria-label="Category Image"
+                        className="bg-input border border-border focus:ring-2 focus:ring-ring focus:border-ring file:mr-2 file:px-3 file:rounded-md file:bg-muted file:text-foreground"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 1 * 1024 * 1024) {
+                              toast.error("Image size must be less than 1MB!");
+                              e.target.value = "";
+                              field.handleChange(null);
+                              setPreview(null);
+                              return;
+                            }
+                            field.handleChange(file);
+                            setPreview(URL.createObjectURL(file));
+                          } else {
+                            field.handleChange(null);
+                            setPreview(null);
+                          }
+                        }}
+                        disabled={loading}
+                        required
+                      />
 
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 1 * 1024 * 1024) {
-                          toast.error("Image size must be less than 1MB!");
-                          e.target.value = "";
-                          field.handleChange(null);
-                          setPreview(null);
-                          return;
-                        }
-                        field.handleChange(file);
-                        setPreview(URL.createObjectURL(file));
-                      }
-                    }}
-                  />
-
-                  {preview && (
-                    <img
-                      src={preview}
-                      className="h-32 rounded-md object-cover mt-2"
-                    />
+                      <AnimatePresence>
+                        {preview && (
+                          <motion.div
+                            key="image-preview"
+                            initial={{ opacity: 0, scale: 0.98 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.98 }}
+                            transition={{ duration: 0.3 }}
+                            className="w-full"
+                          >
+                            <div className="w-full max-w-[192px] mx-auto mt-4 aspect-[4/3] rounded-lg bg-muted border border-border overflow-hidden flex items-center justify-center">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={preview}
+                                alt="Category Preview"
+                                className="object-cover w-full h-full rounded-lg"
+                                loading="lazy"
+                                draggable={false}
+                              />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </Field>
                   )}
-                </Field>
+                />
+              </FieldGroup>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-row items-center justify-end gap-4 border-t border-border pt-6">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                form.reset();
+                setPreview(null);
+              }}
+              disabled={loading}
+              className="px-4"
+            >
+              Reset
+            </Button>
+            <Button
+              type="submit"
+              form="category-form"
+              className="px-6 font-semibold"
+              disabled={loading}
+              aria-busy={loading}
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin border-2 border-ring border-t-transparent rounded-full" />
+                  Adding...
+                </span>
+              ) : (
+                "Add Category"
               )}
-            />
-          </FieldGroup>
-        </form>
-      </CardContent>
-
-      <CardFooter className="flex justify-between gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => form.reset()}
-          className="text-red-600 border-red-400 hover:bg-red-50"
-        >
-          Reset
-        </Button>
-
-        <Button
-          type="submit"
-          form="category-form"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white"
-        >
-          Add Category
-        </Button>
-      </CardFooter>
-    </Card>
+            </Button>
+          </CardFooter>
+        </Card>
+      </motion.div>
+    </div>
   );
 }

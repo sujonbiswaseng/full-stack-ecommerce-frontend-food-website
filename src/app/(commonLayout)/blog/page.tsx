@@ -18,7 +18,7 @@ const blogPosts = [
     title: "The Future of Food Delivery: Trends to Watch",
     excerpt:
       "Explore the latest innovations shaping the food delivery industry and what they mean for consumers and restaurants.",
-    author: "FoodHub Team",
+    author: "bitebase Team",
     date: "2024-12-15",
     category: "Industry",
     readTime: "5 min read",
@@ -37,7 +37,7 @@ const blogPosts = [
   },
   {
     id: 3,
-    title: "Behind the Scenes: A Day in the Life of a FoodHub Partner",
+    title: "Behind the Scenes: A Day in the Life of a bitebase Partner",
     excerpt:
       "Get an exclusive look at how our partner restaurants prepare and deliver exceptional food experiences.",
     author: "Sarah Chen",
@@ -59,10 +59,10 @@ const blogPosts = [
   },
   {
     id: 5,
-    title: "How FoodHub is Supporting Local Restaurants",
+    title: "How bitebase is Supporting Local Restaurants",
     excerpt:
       "A deep dive into our partnership model and how we help local businesses thrive in a competitive market.",
-    author: "FoodHub Team",
+    author: "bitebase Team",
     date: "2024-11-20",
     category: "Stories",
     readTime: "7 min read",
@@ -72,7 +72,7 @@ const blogPosts = [
     id: 6,
     title: "Understanding Food Allergies: A Guide for Customers",
     excerpt:
-      "Everything you need to know about allergen labeling and how FoodHub helps customers with dietary restrictions.",
+      "Everything you need to know about allergen labeling and how bitebase helps customers with dietary restrictions.",
     author: "Dr. Priya Nair",
     date: "2024-11-14",
     category: "Health",
@@ -117,7 +117,7 @@ export default function BlogPage() {
           className="text-center mb-12"
         >
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-            FoodHub Blog
+            Bitebase Blog
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
             Insights, stories, and tips from the world of food delivery and

@@ -55,7 +55,7 @@ export default function FeaturesSection() {
           transition={{ duration: 0.6 }}
           className="text-3xl md:text-4xl font-bold text-foreground mb-4"
         >
-          Why Choose FoodHub?
+          Why Choose BiteBase?
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}

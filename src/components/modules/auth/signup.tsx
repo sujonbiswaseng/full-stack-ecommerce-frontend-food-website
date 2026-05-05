@@ -58,7 +58,7 @@ export function SignupForm() {
         toast.dismiss(toastId);
         toast.success(data.message || "Signup successful!");
         alert("The OTP is valid for only 10 minutes. Please check your email.");
-        localStorage.removeItem("foodhub-cart");
+        localStorage.removeItem("BiteBase-cart");
         router.push(`/verify-email?email=${value.email}`);
       } catch (error: any) {
         toast.dismiss(toastId);
@@ -100,7 +100,7 @@ export function SignupForm() {
             Create an Account
           </CardTitle>
           <p className="text-sm text-muted-foreground font-medium mt-1 text-center">
-            Join FoodHub to discover, order, or provide amazing food experiences.
+            Join BiteBase to discover, order, or provide amazing food experiences.
           </p>
         </CardHeader>
         <CardContent>

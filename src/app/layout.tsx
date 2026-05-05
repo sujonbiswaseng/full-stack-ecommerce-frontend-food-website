@@ -15,7 +15,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FoodHub - Premium Food Delivery",
+  title: "bitebase - Premium Food Delivery",
   description: "Discover and order delicious meals from top restaurants. Premium food delivery experience.",
 };
 

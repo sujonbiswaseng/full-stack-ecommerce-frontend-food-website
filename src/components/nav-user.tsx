@@ -77,7 +77,7 @@ export function NavUser({ user }: { user: TUser }) {
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.image as string} alt={user.name} />
                   <AvatarFallback className="rounded-lg">
-                    Foodhub
+                    BiteBase
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">

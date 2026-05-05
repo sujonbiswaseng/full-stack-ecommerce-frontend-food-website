@@ -214,10 +214,9 @@ export default function Navbar({ user }: NavbarProps) {
               </ul>
               {/* Auth Section - Mobile */}
               <div className="mt-6 pt-4 border-t border-border flex flex-col gap-3">
+                
                 {user ? (
-                  <Button onClick={handleLogout} variant="outline" className="w-full">
-                    Log out
-                  </Button>
+                 <ProfileCard profile={user} />
                 ) : (
                   <>
                     <Link href="/login">

@@ -33,14 +33,17 @@ const INITIAL_MESSAGES: Message[] = [
     id: "welcome",
     role: "bot",
     content:
-      "Hello! I'm your AI event assistant 👋\n\nAsk me anything about upcoming events — schedules, speakers, ticket prices, or how to register. I'll help you find the right event information quickly.",
+      "Hello! I'm your AI meal assistant 👋\n\nAsk me anything about meals — the most searched dishes, trending foods, or popular cuisines. I'll help you discover the most sought-after meal content quickly.",
   },
 ];
 
 const SUGGESTED_QUERIES = [
-  "What are the upcoming tech events?",
-  "Are there any workshops this weekend?",
-  "How do I register for the conference?",
+  "best food near me open now",
+  "top restaurants near me",
+  "cheap food near me today",
+  "order food online near me",
+  "best rated restaurants nearby",
+  "popular food places near me"
 ];
 
 // Skeleton Loader for card/message loading

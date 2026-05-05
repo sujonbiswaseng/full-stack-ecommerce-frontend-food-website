@@ -66,7 +66,7 @@ const faqs: { category: Exclude<HelpCategory, "All">; question: string; answer: 
     category: "Payments",
     question: "Is my payment information secure?",
     answer:
-      "Yes. FoodHub uses Stripe for payment processing — we never store your card details on our servers. All data is encrypted with TLS.",
+      "Yes. BiteBase uses Stripe for payment processing — we never store your card details on our servers. All data is encrypted with TLS.",
   },
   {
     category: "Account",

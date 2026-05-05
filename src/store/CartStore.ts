@@ -96,7 +96,7 @@ export const manageCartStore = create<CartState>()(
 
     }),
     {
-      name: "foodhub-cart", // save to add to cart
+      name: "BiteBase-cart", // save to add to cart
     }
   )
 )

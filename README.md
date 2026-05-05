@@ -1,9 +1,9 @@
 
 ### Project name :
-##### FoodHub 🍱 | Advanced Full-Stack Multi-Vendor Food Ordering Platform
+##### bitebase 🍱 | Advanced Full-Stack Multi-Vendor Food Ordering Platform
 ৳
 ### Project description :
-##### FoodHub is a modern full-stack multi-vendor food ordering platform where customers can discover meals, place orders, and track deliveries, providers can manage menus and orders, and admins can control users, categories, and platform operations through a secure, responsive, and scalable system.
+##### bitebase is a modern full-stack multi-vendor food ordering platform where customers can discover meals, place orders, and track deliveries, providers can manage menus and orders, and admins can control users, categories, and platform operations through a secure, responsive, and scalable system.
 
 ### Quick Links
  - Frontend Repo    : https://github.com/sujonbiswasdev/frontend-next-level-assignment-4.git

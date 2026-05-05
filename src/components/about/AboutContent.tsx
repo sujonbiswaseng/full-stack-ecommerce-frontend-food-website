@@ -113,7 +113,7 @@ export default function AboutContent({ data }: { data: PublicStats }) {
                 Our Story
               </h2>
               <p className="text-muted-foreground text-base md:text-lg">
-                FoodHub was born from a simple idea: great food should be accessible to everyone. Founded in 2024, we've been working to bridge the gap between exceptional chefs and food enthusiasts.
+                BiteBase was born from a simple idea: great food should be accessible to everyone. Founded in 2024, we've been working to bridge the gap between exceptional chefs and food enthusiasts.
               </p>
               <p className="text-muted-foreground text-base md:text-lg">
                 Our platform empowers local restaurants and home chefs to showcase their culinary talents while providing customers with a seamless ordering experience.
