@@ -95,6 +95,7 @@ export const mealsService = {
           message: error.message || "retrieve all meals failed",
         };
       }
+    
       return {
         success: data.success,
         message: data.message || "retrieve all meals successfully",
@@ -181,6 +182,7 @@ export const mealsService = {
         const error=body as ApiErrorResponse
         return {success:error.success, message:error.message || "retrieve single meal failed"}
       }
+
       return {success:result.success,message:result.message || "retrieve signle meal successfully",result}
     } catch (error: any) {
       return {

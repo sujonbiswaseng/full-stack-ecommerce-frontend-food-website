@@ -43,32 +43,27 @@ export default function ImageWithSkeleton({
       role="presentation"
     >
       {/* Skeleton Loader */}
-      <AnimatePresence>
-        {loading && hasImage && (
-          <motion.div
-            key="skeleton"
-            initial={{ opacity: 0, scale: 0.98, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: 4 }}
-            transition={{ duration: 0.3, ease: [0.4, 0.1, 0.2, 1] }}
+      {/* Skeleton Loader */}
+      {loading && (
+        <div
+          className={cn(
+            "absolute inset-0 z-10 w-full h-full pointer-events-none",
+            "animate-pulse",
+            "bg-muted"
+          )}
+          aria-hidden="true"
+        >
+          <Skeleton
             className={cn(
-              "absolute inset-0 z-10 w-full h-full pointer-events-none",
-              "animate-pulse",
-              "bg-muted"
+              "w-full h-full bg-muted",
+              rounded && "rounded-xl"
             )}
-            aria-hidden="true"
-          >
-            <Skeleton
-              className={cn(
-                "w-full h-full bg-muted",
-                rounded && "rounded-xl"
-              )}
-              data-testid="image-skeleton"
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {/* If image support ache then image show korbe, na thakle "No image" */}
+            data-testid="image-skeleton"
+          />
+        </div>
+      )}
+
+
       {src && hasImage ? (
         <Image
           src={src}

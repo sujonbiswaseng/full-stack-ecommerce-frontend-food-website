@@ -1,53 +1,79 @@
-'use client'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Star, StarHalf } from 'lucide-react'
-import { Button } from '../../ui/button'
-import { Status, StatusIndicator, StatusLabel } from '../../ui/status'
-import { manageCartStore } from '@/store/CartStore'
-import ReviewForm from '../review/reviewform'
-import { TResponseMeals } from '@/types/meals.type'
-import { TUser } from '@/types/user.type'
-import { TGetCategory } from '@/types/category'
-import { IProviderInfo } from '@/types/provider.type'
-import { IgetReviewData } from '@/types/reviews.type'
-import ImageWithSkeleton from '@/components/ImageSkeleton'
-import ReviewItem from '../review/reviewitem'
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { AnimatePresence, m, motion } from "framer-motion";
+import { Star, StarHalf } from "lucide-react";
+import { Button } from "../../ui/button";
+import { Status, StatusIndicator, StatusLabel } from "../../ui/status";
+import { manageCartStore } from "@/store/CartStore";
+import ReviewForm from "../review/reviewform";
+import { TResponseMeals } from "@/types/meals.type";
+import { TUser } from "@/types/user.type";
+import { TGetCategory } from "@/types/category";
+import { IProviderInfo, TResponseproviderData } from "@/types/provider.type";
+import { IgetReviewData } from "@/types/reviews.type";
+import ImageWithSkeleton from "@/components/ImageSkeleton";
+import ReviewItem from "../review/reviewitem";
+import { getAllMeals } from "@/actions/meals.action";
+import CardSkeleton from "@/components/Skeleton/CardSkeleton";
+import MealCard from "./MealCard";
 
 const PAGE_ANIMATION = {
   initial: { opacity: 0, y: 8 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.3 }
-}
+  transition: { duration: 0.3 },
+};
 
 const SingleMealById = ({
   meal,
   userinfo,
 }: {
   meal: TResponseMeals<{
-    category: TGetCategory
-    provider: IProviderInfo
-    reviews: IgetReviewData[]
-    providerRating: any
-  }>
-  userinfo: TUser
+    category: TGetCategory;
+    provider: IProviderInfo;
+    reviews: IgetReviewData[];
+    providerRating: any;
+  }>;
+  userinfo: TUser;
 }) => {
-  const addToCart = manageCartStore((state) => state.addToCart)
-  const router = useRouter()
+  const addToCart = manageCartStore((state) => state.addToCart);
+  const router = useRouter();
   const defaultImage =
-    'https://res.cloudinary.com/drmeagmkl/image/upload/v1771962102/default_meal_kgc6mv.png'
-  const [activeReplyId, setActiveReplyId] = useState<string | null>(null)
+    "https://res.cloudinary.com/drmeagmkl/image/upload/v1771962102/default_meal_kgc6mv.png";
+  const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
   const starCounts = [5, 4, 3, 2, 1].map((star) => ({
     star,
     count: meal.reviews.filter((r) => Math.floor(r.rating) === star).length,
-  }))
-  const fullStars = Math.floor(Number(meal.providerRating?.averageRating))
-  const hasHalfStar = Number(meal.providerRating?.averageRating) % 1 >= 0.5
-  const images = meal.images?.length ? meal.images : ['/default-meals.png']
-  const [activeImage, setActiveImage] = useState(images[0])
+  }));
+  const fullStars = Math.floor(Number(meal.providerRating?.averageRating));
+  const hasHalfStar = Number(meal.providerRating?.averageRating) % 1 >= 0.5;
+  const images = meal.images?.length ? meal.images : ["/default-meals.png"];
+  const [activeImage, setActiveImage] = useState(images[0]);
+
+  const [relatedItems, setrelatedItems] = useState<TResponseMeals[]>();
+  const [isloading, setisloading] = useState(true);
+
+  useEffect(() => {
+    const featchdata = async () => {
+      try {
+        const mealsRes = await getAllMeals();
+
+        const meals = mealsRes?.data?.filter(
+          (item) => item.category_name === meal.category_name && item.dietaryPreference===meal.dietaryPreference && item.cuisine===meal.cuisine,
+        );
+        if (!meals) {
+          setisloading(true);
+        }
+        setisloading(false);
+        setrelatedItems(meals);
+      } catch (error) {
+        setisloading(true);
+      }
+    };
+    featchdata();
+  }, []);
 
   return (
     <main className="bg-background min-h-screen max-w-[1440px] mx-auto w-full py-8 px-4">
@@ -75,10 +101,7 @@ const SingleMealById = ({
                     exit={{ opacity: 0, scale: 0.96 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <ImageWithSkeleton
-                      src={activeImage}
-                      alt={meal.title}
-                    />
+                    <ImageWithSkeleton src={activeImage} alt={meal.title} />
                   </motion.div>
                 </AnimatePresence>
 
@@ -87,7 +110,10 @@ const SingleMealById = ({
                 </span>
               </div>
 
-              <div className="flex gap-4 w-full flex-wrap" aria-label="gallery thumbnails">
+              <div
+                className="flex gap-4 w-full flex-wrap"
+                aria-label="gallery thumbnails"
+              >
                 {images.map((img, idx) => (
                   <button
                     key={img}
@@ -98,7 +124,7 @@ const SingleMealById = ({
                       "group relative h-14 w-14 rounded-xl border flex items-center justify-center bg-card overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors",
                       img === activeImage
                         ? "border-primary ring-2 ring-primary"
-                        : "border-border hover:border-accent/60"
+                        : "border-border hover:border-accent/60",
                     ].join(" ")}
                   >
                     <Image
@@ -125,8 +151,10 @@ const SingleMealById = ({
                   {meal.title}
                 </h1>
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold shadow transition-colors select-none
-                    bg-secondary text-secondary-foreground">
+                  <span
+                    className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold shadow transition-colors select-none
+                    bg-secondary text-secondary-foreground"
+                  >
                     {meal.cuisine}
                   </span>
                   <span
@@ -134,7 +162,7 @@ const SingleMealById = ({
                       "inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold shadow transition-colors select-none",
                       meal.isAvailable
                         ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground"
+                        : "bg-secondary text-secondary-foreground",
                     ].join(" ")}
                   >
                     {meal.isAvailable ? "Available" : "Sold Out"}
@@ -146,20 +174,28 @@ const SingleMealById = ({
                   {Array.from({ length: 5 }).map((_, i) => {
                     if (i < fullStars) {
                       return (
-                        <Star key={i} className="w-4 h-4 text-accent fill-accent" />
-                      )
+                        <Star
+                          key={i}
+                          className="w-4 h-4 text-accent fill-accent"
+                        />
+                      );
                     }
                     if (i === fullStars && hasHalfStar) {
                       return (
-                        <StarHalf key={i} className="w-4 h-4 text-accent fill-accent" />
-                      )
+                        <StarHalf
+                          key={i}
+                          className="w-4 h-4 text-accent fill-accent"
+                        />
+                      );
                     }
-                    return <Star key={i} className="w-4 h-4 text-muted-foreground" />
+                    return (
+                      <Star key={i} className="w-4 h-4 text-muted-foreground" />
+                    );
                   })}
                   <span className="text-xs text-muted-foreground ml-2 hidden sm:inline-block">
                     {meal.providerRating?.averageRating
                       ? `${Number(meal.providerRating.averageRating).toFixed(1)}`
-                      : '0.0'}
+                      : "0.0"}
                   </span>
                   <span className="text-xs text-muted-foreground ml-2">
                     {`(${meal.providerRating?.totalReview ?? 0} reviews)`}
@@ -176,7 +212,9 @@ const SingleMealById = ({
               {...PAGE_ANIMATION}
               className="bg-card rounded-2xl shadow border border-border p-6 flex flex-col gap-6"
             >
-              <h2 className="text-2xl font-bold text-card-foreground mb-2">About This Meal</h2>
+              <h2 className="text-2xl font-bold text-card-foreground mb-2">
+                About This Meal
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sm">
                 <div className="flex flex-col gap-2">
                   <span className="text-muted-foreground block">Category</span>
@@ -188,31 +226,41 @@ const SingleMealById = ({
                       height={40}
                       className="rounded-full object-cover border border-border"
                     />
-                    <span className="font-semibold text-card-foreground">{meal.category.name}</span>
+                    <span className="font-semibold text-card-foreground">
+                      {meal.category.name}
+                    </span>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="text-muted-foreground block">Dietary</span>
-                  <span className="font-semibold text-card-foreground">{meal.dietaryPreference}</span>
+                  <span className="font-semibold text-card-foreground">
+                    {meal.dietaryPreference}
+                  </span>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="text-muted-foreground block">Cuisine</span>
-                  <span className="font-semibold text-card-foreground">{meal.cuisine}</span>
+                  <span className="font-semibold text-card-foreground">
+                    {meal.cuisine}
+                  </span>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="text-muted-foreground block">Price</span>
                   <span className="font-semibold text-card-foreground">
-                    ${meal.price?.toFixed(2)}
+                    ৳{meal.price?.toFixed(2)}
                   </span>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <span className="text-muted-foreground block">Delivery Charge</span>
+                  <span className="text-muted-foreground block">
+                    Delivery Charge
+                  </span>
                   <span className="font-semibold text-card-foreground">
-                    ${meal.deliverycharge?.toFixed(2)}
+                    ৳ {meal.deliverycharge?.toFixed(2)}
                   </span>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <span className="text-muted-foreground block">Created At</span>
+                  <span className="text-muted-foreground block">
+                    Created At
+                  </span>
                   <span className="font-semibold text-card-foreground">
                     {meal.createdAt?.slice(0, 10)}
                   </span>
@@ -221,41 +269,56 @@ const SingleMealById = ({
                   <span className="text-muted-foreground block">Available</span>
                   <span className="inline-flex items-center gap-1">
                     <Status
-                      variant={meal.isAvailable ? 'success' : 'error'}
+                      variant={meal.isAvailable ? "success" : "error"}
                       className="rounded-full px-3 py-1 text-xs items-center border border-border"
                     >
                       <StatusIndicator />
                       <StatusLabel>
-                        {meal.isAvailable ? 'Available' : 'Unavailable'}
+                        {meal.isAvailable ? "Available" : "Unavailable"}
                       </StatusLabel>
                     </Status>
                   </span>
                 </div>
+
                 <div className="flex flex-col gap-2">
                   <span className="text-muted-foreground block">Status</span>
                   <span className="inline-flex items-center gap-1">
                     {(() => {
-                      const status = meal.status
+                      const status = meal.status;
                       const variantMap: Record<string, string> = {
-                        APPROVED: 'success',
-                        PENDING: 'warning',
-                        REJECTED: 'error',
-                      }
+                        APPROVED: "success",
+                        PENDING: "warning",
+                        REJECTED: "error",
+                      };
                       return (
                         <Status
-                          variant={variantMap[status] as any || 'default'}
+                          variant={(variantMap[status] as any) || "default"}
                           className="rounded-full px-3 py-1 text-xs items-center border border-border"
                         >
                           <StatusIndicator />
                           <StatusLabel>{status}</StatusLabel>
                         </Status>
-                      )
+                      );
                     })()}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="text-muted-foreground block">date</span>
+                  <span className="font-semibold text-card-foreground">
+                    {meal.date?.slice(0, 10)}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="text-muted-foreground block">location</span>
+                  <span className="font-semibold text-card-foreground">
+                    {meal.location}
                   </span>
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold text-lg text-card-foreground mt-2">Description</h3>
+                <h3 className="font-semibold text-lg text-card-foreground mt-2">
+                  Description
+                </h3>
                 <p className="text-muted-foreground leading-relaxed text-base mt-4">
                   {meal.description}
                 </p>
@@ -276,7 +339,9 @@ const SingleMealById = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col items-start gap-2">
                   <span className="text-4xl font-bold text-primary">
-                    {meal.avgRating !== undefined ? meal.avgRating.toFixed(1) : '0.0'}
+                    {meal.avgRating !== undefined
+                      ? meal.avgRating.toFixed(1)
+                      : "0.0"}
                   </span>
                   <span className="text-muted-foreground text-base">
                     Average Rating
@@ -285,7 +350,9 @@ const SingleMealById = ({
                 <div className="flex flex-col gap-3 w-full">
                   {starCounts.map(({ star, count }) => (
                     <div key={star} className="flex items-center w-full gap-3">
-                      <span className="w-10 text-xs text-muted-foreground">{star}★</span>
+                      <span className="w-10 text-xs text-muted-foreground">
+                        {star}★
+                      </span>
                       <div className="flex-1 h-2.5 bg-input rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full bg-accent transition-all"
@@ -294,7 +361,9 @@ const SingleMealById = ({
                           }}
                         />
                       </div>
-                      <span className="w-8 text-xs text-muted-foreground pl-1">{count}</span>
+                      <span className="w-8 text-xs text-muted-foreground pl-1">
+                        {count}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -323,7 +392,8 @@ const SingleMealById = ({
                           user={userinfo}
                           review={{
                             ...review,
-                            user: (review as any).customer ?? meal.provider.user,
+                            user:
+                              (review as any).customer ?? meal.provider.user,
                             meal: meal,
                           }}
                           meal={meal}
@@ -340,8 +410,6 @@ const SingleMealById = ({
                 )}
               </div>
             </motion.section>
- 
-      
           </section>
           <aside className="lg:sticky lg:top-20 h-fit">
             <motion.div
@@ -355,12 +423,12 @@ const SingleMealById = ({
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-between">
                 <Button
-                  onClick={() => router.push('/cart')}
+                  onClick={() => router.push("/cart")}
                   disabled={!meal.isAvailable}
                   className="flex-1"
                   size="lg"
                 >
-                  {meal.isAvailable ? 'Order Now' : 'Currently Unavailable'}
+                  {meal.isAvailable ? "Order Now" : "Currently Unavailable"}
                 </Button>
                 <Button
                   variant="secondary"
@@ -375,7 +443,10 @@ const SingleMealById = ({
                       price: meal.price,
                       restaurantName: meal.provider.restaurantName,
                       deliverycharge: meal.deliverycharge ?? 0,
-                      image: meal?.images && meal.images.length > 0 ? meal.images[0] : defaultImage,
+                      image:
+                        meal?.images && meal.images.length > 0
+                          ? meal.images[0]
+                          : defaultImage,
                       isAvailable: meal.isAvailable,
                       quantity: 1,
                     })
@@ -385,9 +456,14 @@ const SingleMealById = ({
                 </Button>
               </div>
               <div className="border-t border-border pt-6">
-                <h3 className="font-semibold mb-2 text-card-foreground">Provided By</h3>
+                <h3 className="font-semibold mb-2 text-card-foreground">
+                  Provided By
+                </h3>
                 <div className="flex items-center gap-4 justify-between flex-wrap">
-                  <Link href={`/providers/${meal.provider?.id}`} className="group">
+                  <Link
+                    href={`/providers/${meal.provider?.id}`}
+                    className="group"
+                  >
                     <div className="relative w-10 h-10 rounded-full overflow-hidden border border-primary shadow">
                       <Image
                         src={meal.provider.image || defaultImage}
@@ -402,15 +478,26 @@ const SingleMealById = ({
                     {Array.from({ length: 5 }).map((_, i) => {
                       if (i < fullStars) {
                         return (
-                          <Star key={i} className="w-4 h-4 text-accent fill-accent" />
-                        )
+                          <Star
+                            key={i}
+                            className="w-4 h-4 text-accent fill-accent"
+                          />
+                        );
                       }
                       if (i === fullStars && hasHalfStar) {
                         return (
-                          <StarHalf key={i} className="w-4 h-4 text-accent fill-accent" />
-                        )
+                          <StarHalf
+                            key={i}
+                            className="w-4 h-4 text-accent fill-accent"
+                          />
+                        );
                       }
-                      return <Star key={i} className="w-4 h-4 text-muted-foreground" />
+                      return (
+                        <Star
+                          key={i}
+                          className="w-4 h-4 text-muted-foreground"
+                        />
+                      );
                     })}
                     <span className="text-xs text-muted-foreground ml-2">
                       {`(${meal.providerRating?.totalReview} reviews)`}
@@ -443,7 +530,9 @@ const SingleMealById = ({
                     </span>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-card-foreground text-xs">isActive:</span>
+                    <span className="text-card-foreground text-xs">
+                      isActive:
+                    </span>
                     {meal.provider.user.isActive ? (
                       <Status
                         variant="success"
@@ -478,8 +567,81 @@ const SingleMealById = ({
           </div>
         </div>
       </div>
-    </main>
-  )
-}
 
-export default SingleMealById
+      {/* Blog list content */}
+      <section className="w-full mt-6 md:mt-8 lg:mt-12">
+        <section className="w-full border-b border-border pb-8 ">
+          <div className="max-w-[1440px] mx-auto w-full px-4 md:px-8 flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-card-foreground tracking-tight">
+                Related Meals
+              </h2>
+            </div>
+            <p className="text-muted-foreground text-base md:text-lg max-w-2xl">
+              Discover a curated selection of meals chosen to match your tastes and preferences.
+            </p>
+       
+          </div>
+        </section>
+   
+   
+   
+        <div className="max-w-[1440px] mx-auto w-full px-4 md:px-8 py-4">
+          {isloading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, idx) => (
+                <CardSkeleton
+                  key={idx}
+                  className="w-full h-full min-h-[340px] rounded-xl"
+                  contentLines={4}
+                  minHeight="min-h-[340px]"
+                  showActions
+                  showAvatar
+                />
+              ))}
+            </div>
+          ) : (
+            <AnimatePresence mode="wait">
+              {relatedItems && relatedItems.length > 0 ? (
+                <motion.div
+                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: {},
+                    visible: {
+                      transition: { staggerChildren: 0.1 },
+                    },
+                  }}
+                >
+                  {relatedItems.map((meal: TResponseMeals, index: number) => {
+                    return (
+                      <div>
+                        <MealCard
+                          key={meal.id}
+                          meal={
+                            meal as TResponseMeals<{
+                              provider: TResponseproviderData;
+                            }>
+                          }
+                        />
+                      </div>
+                    );
+                  })}
+                </motion.div>
+              ) : (
+                <div className="flex flex-col items-center justify-center w-full py-16 bg-background rounded-xl border border-border">
+                  <span className="text-muted-foreground text-lg">
+                    No items found.
+                  </span>
+                </div>
+              )}
+            </AnimatePresence>
+          )}
+        </div>
+      </section>
+    </main>
+  );
+};
+
+export default SingleMealById;

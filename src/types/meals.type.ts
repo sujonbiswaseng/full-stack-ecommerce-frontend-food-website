@@ -67,6 +67,8 @@ export interface IGetMealData {
   title: string;
   description: string | null;
   images: string[] | null;
+  date:string;
+  location:string;
   price: number;
   isAvailable: boolean;
   dietaryPreference: TDietaryPreference;

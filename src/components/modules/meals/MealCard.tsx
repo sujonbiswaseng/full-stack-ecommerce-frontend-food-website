@@ -137,6 +137,26 @@ const MealCard = ({ meal, className }: MealCardProps) => {
           {meal.description}
         </p>
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2">
+            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+              Date
+            </span>
+            <span className="text-sm font-semibold text-card-foreground bg-input rounded px-2 py-1">
+              {meal.date?.slice(0, 10) || <span className="text-muted-foreground">N/A</span>}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+              Location
+            </span>
+            <span className="text-sm font-semibold text-card-foreground bg-input rounded px-2 py-1 truncate" title={meal.location}>
+              {meal.location || <span className="text-muted-foreground">N/A</span>}
+            </span>
+          </div>
+        </div>
+   
+
         <div className="rounded-lg border border-border bg-background p-4 flex flex-col gap-2 mt-auto">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
@@ -176,13 +196,15 @@ const MealCard = ({ meal, className }: MealCardProps) => {
         {/* BUTTONS - Redesigned for a more modern, professional and responsive look */}
         <div className="flex gap-2 pt-3 mt-2">
           <Button
-            variant="outline"
-            className="flex-1 px-0 sm:px-4 min-w-0 truncate font-medium border-2 border-primary transition hover:bg-primary/10 active:bg-primary/20 shadow-sm"
+            variant="secondary"
+            className="flex-1 min-w-0 truncate font-medium border-border border bg-secondary text-secondary-foreground px-0 sm:px-4 py-2 transition hover:bg-accent/70 hover:text-accent-foreground active:bg-accent/80 focus-visible:ring-2 focus-visible:ring-ring shadow-md h-10"
             onClick={() => router.push(`/meals/${meal.id}`)}
             tabIndex={0}
+            aria-label={`View details for ${meal.title}`}
           >
             <span className="w-full text-center">View Details</span>
           </Button>
+     
           <Button
             variant="default"
             className={cn(
