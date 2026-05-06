@@ -110,7 +110,7 @@ function MessageBubble({
                     className="w-full"
                   >
                     <Link
-                      href={`/events/${evt.id}`}
+                      href={`/meals/${evt.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`View details for ${evt.title}`}
@@ -205,9 +205,9 @@ export default function FloatingChatbot() {
     startSyncTransition(async () => {
       const result = await Ingestmeals();
       if (result.success) {
-        toast.success("Doctor data synced!", {
+        toast.success("meal data synced!", {
           description:
-            result.message ?? `${result.data.count ?? 0} doctors indexed.`,
+            result.message ?? `${result.data.count ?? 0} meal indexed.`,
         });
       } else {
         toast.error("Sync failed");
@@ -367,7 +367,8 @@ export default function FloatingChatbot() {
                   id="chatbot-input"
                   ref={inputRef}
                   type="text"
-                  placeholder="Ask about doctors, specialties…"
+                  placeholder="Type your question about meals, restaurants, or cuisines…"
+             
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   disabled={isQuerying}

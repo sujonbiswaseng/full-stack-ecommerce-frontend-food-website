@@ -85,16 +85,20 @@ export default function Navbar({ user }: NavbarProps) {
         >
           <div className="flex h-10 w-10 items-center justify-center relative">
             <div className="relative bg-card rounded-xl shadow-sm border border-border flex items-center justify-center w-10 h-10 p-1 overflow-hidden">
-                        <ImageSkeleton
-                          src={'/logo.png'}
-                          alt={"bitebase"}
+                        <img
+                          src="https://res.cloudinary.com/dcbgdaiod/image/upload/v1778025830/logo_exurh0.png"
+                          alt="bitebase"
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03] bg-muted"
+                          style={{ display: "block" }}
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                            const fallback = document.createElement("div");
+                            fallback.className = "flex items-center justify-center h-full w-full bg-muted text-muted-foreground font-semibold text-lg select-none";
+                            fallback.innerText = "No Image";
+                            e.currentTarget.parentNode?.appendChild(fallback);
+                          }}
                         />
-                       : (
-                        <div className="flex items-center justify-center h-full w-full bg-muted text-muted-foreground font-semibold text-lg select-none">
-                          No Image
-                        </div>
-                      )
+                
             </div>
           </div>
           <span className="hidden sm:inline font-bold text-lg text-primary transition-colors group-hover:text-primary/80 select-none">
