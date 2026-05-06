@@ -30,14 +30,15 @@ import { forgotPasswordEmailOTPAction } from "@/actions/auth.actions";
 import { loginUser } from "@/services/auth.service";
 import { FormInput } from "@/components/shared/FormInput";
 
-const Admin_Demo_Email = "admin123@gmail.com";
-const Admin_Demo_PASSWORD = "Admin123!@#";
-
-const Demo_User_Email = "sujonbiswasdev@gmail.com";
+const Admin_Demo_Email = "admin1@gmail.com";
+const Admin_Demo_PASSWORD = "Admin12!@";
+ 
+const Demo_User_Email = "sujonbiswas.devpro@gmail.com";
 const Demo_User_Password = "Sujon12!@";
 
-const Demo_Provider_Email = "sujonbiswas.devpro@gmail.com";
+const Demo_Provider_Email = "sujonbiswasdev@gmail.com";
 const Demo_Provider_Password = "Sujon12!@";
+
 
 const cardFade = {
   hidden: { opacity: 0, y: 24 },
@@ -122,8 +123,6 @@ export function SigninForm() {
     form.setFieldValue("password", Demo_User_Password);
   };
 
-  const Demo_Provider_Email = "sujonbiswas.devpro@gmail.com";
-  const Demo_Provider_Password = "Sujon12!@";
 
   const fillProviderDemoCredentials = () => {
     form.setFieldValue("email", Demo_Provider_Email);
